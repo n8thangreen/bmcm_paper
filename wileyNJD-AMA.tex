@@ -1,0 +1,137 @@
+\documentclass[AMA,STIX1COL]{WileyNJD-v2}
+
+\articletype{Article Type}%
+
+\received{26 April 2016}
+\revised{6 June 2016}
+\accepted{6 June 2016}
+
+\raggedbottom
+
+\begin{document}
+
+\title{Bayesian hierarchical mixture cure modelling \protect\thanks{This is an example for title footnote.}}
+
+\author[1]{Nathan Green*}
+
+\author[2,3]{Gianluca Baio}
+
+\author[3]{Author Three}
+
+\authormark{N Green \textsc{et al}}
+
+\address[1]{\orgdiv{Department of Statistical Science}, \orgname{UCL}, \orgaddress{\state{London}, \country{UK}}}
+
+\address[2]{\orgdiv{Org Division}, \orgname{Org Name}, \orgaddress{\state{State name}, \country{Country name}}}
+
+\address[3]{\orgdiv{Org Division}, \orgname{Org Name}, \orgaddress{\state{State name}, \country{Country name}}}
+
+\corres{*Nathan Green \email{n.green@ucl.ac.uk}}
+
+\presentaddress{}
+
+\abstract[Summary]{}
+
+\keywords{Bayesian, survival analysis}
+
+\jnlcitation{\cname{%
+\author{Green N.}, 
+\author{G. Baio}, and 
+\author{T. Woollings}} (\cyear{2021}), 
+\ctitle{}, \cvol{2017;00:1--6}.}
+
+\maketitle
+
+\footnotetext{\textbf{Abbreviations:} MCM, mixture cure model; APC, antigen-presenting cells}
+
+
+\section{Introduction}\label{sec1}
+
+set the scene
+more prevalent in HEA
+plateau in events
+
+BMC to give background
+
+Q. can we do better?
+i) PFS from OS
+ii) pooled fraction
+
+Why are MCM important, specifically in health economics?
+Brief review of existing applications
+Our innovative proposal --- joint model of PFS and OS, which has the double advantage of borrowing information (eg the likely more mature PFS data to inform the highly censored OS) *and* obtaining a pooled cure rate.
+
+
+\section{Motivating example}\label{sec5}
+
+long term
+different cut points
+
+Description of the BMS data
+How it compares with dataset prevalent in our field/applications
+
+
+\section{Methods}\label{sec5}
+
+implications
+
+Description of "standard" model and the frequentist approach typically used
+Description of our proposal to model jointly PFS and OS - data model/priors/inference
+
+
+\section{Application}\label{sec5}
+
+Back to BMS data and results, with various scenarios/distributions and all the plots and tables, similar to the ones Nathan has already provided
+
+
+\section{Discussion}\label{sec5}
+
+Lorem ipsum dolor sit amet
+
+%\backmatter
+
+\section*{Acknowledgments}
+This is acknowledgment text.\cite{Kenamond2013} Provide text here. This is acknowledgment text. Provide text here. This 
+\subsection*{Author contributions}
+
+This is an author contribution text.
+
+\subsection*{Financial disclosure}
+
+None reported.
+
+\subsection*{Conflict of interest}
+
+The authors declare no potential conflict of interests.
+
+
+\section*{Supporting information}
+
+The following supporting information is available as part of the online article:
+
+\noindent
+\textbf{Figure S1.}
+{500{\uns}hPa geopotential anomalies for GC2C calculated against the ERA Interim reanalysis. The period is 1989--2008.}
+
+
+\appendix
+
+\section{Section title of first appendix\label{app1}}
+
+with normal text font. Refer below example:
+
+\begin{lstlisting}[caption={Descriptive Caption Text},label=DescriptiveLabel]
+for i:=maxint to 0 do
+\end{lstlisting}
+
+%\nocite{*}% Show all bib entries - both cited and uncited; comment this line to view only cited bib entries;
+\bibliography{wileyNJD-AMA}%
+
+\clearpage
+
+\section*{Author Biography}
+
+\begin{biography}{\includegraphics[width=66pt,height=86pt,draft]{empty}}{\textbf{Author Name.} This is sample author is sample author biography text.}
+\end{biography}
+
+\end{document}
