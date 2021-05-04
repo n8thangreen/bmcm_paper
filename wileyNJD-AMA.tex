@@ -92,17 +92,16 @@ long term
 different cut points
 
 \subsection{BMS data}
+The data source for the analysis is the patient-level data from the CheckMate 067 trial [ref?].
+Our dataset contains $n = 945$ subjects (8 with a missing treatment indicator, i.e. the actual treatment received). The treatment groups are as  follows:
+\begin{description}
+\item[Nivolumab monotherapy] 3 mg/kg intravenous (IV) once every 2 weeks (Q2W). 313 patients were treated (203 PFS events and 175 OS events). Median PFS and OS are 6.93 months (95\% confidence interval (CI) 5.32 - 10.41) and 36.9 months (95\% CI 31.24 - 60.9), respectively. {\it should time be in months/days?}
+\item[Ipilimumab monotherapy] 3 mg/kg IV once every 3 weeks (Q3W) for a total of 4 doses. 311 patients have been treated (261 PFS events and 228 OS events). Median PFS and OS are 2.86 months (95\% CI 2.79 - 3.29) and 20.0 months (95\% CI 17.22 - 25.6), respectively.
+\item[Combined nivolumab with ipilimumab] 1 mg/kg IV and 3 mg/kg IV Q3W for 4 doses followed by nivolumab 3 mg/kg IV Q2W. 313 patients were treated (182 PFS events and 151 OS events). Median PFS is 11.50 months (95\% CI 9.26 - 20.80) and median OS not reached. 
+\end{description}
 
-The data source for the analysis is the patient-level data from the CheckMate 067 trial. Our dataset contains $n=945$ subjects (8 with a missing treatment indicator TRTA, i.e. the actual treatment received). There are the following treatment groups:
-\begin{itemize}
-\item Nivolumab monotherapy 3 mg/kg intravenous (IV) once every 2 weeks (Q2W). 313 patients have been treated (203 PFS events and 175 OS events). Median PFS and OS are 6.93 months (95\% confidence interval [CI] 5.32-10.41) and 36.9 months (95\% CI 31.24-60.9), respectively. 
-\item Ipilimumab monotherapy 3 mg/kg IV once every 3 weeks (Q3W) for a total of 4 doses. 311 patients have been treated (261 PFS events and 228 OS events). Median PFS and OS are 2.86 months (95\% CI 2.79-3.29) and 20.0 months (95\% CI 17.22-25.6), respectively.
-\item Nivolumab 1 mg/kg IV combined with ipilimumab 3 mg/kg IV Q3W for 4 doses followed by nivolumab 3 mg/kg IV Q2W. 313 patients have been treated (182 PFS events and 151 OS events). Median PFS and OS are 11.50 months (95\% CI 9.26-20.80) and NA (median OS not reached; 95\% CI 39.26-NA), respectively. 
-\end{itemize}
 
-
-
-{\it How it compares with dataset prevalent in our field/applications}
+{\it How it compares with dataset prevalent in our field/applications? BMS?}
 
 
 \section{Methods}\label{sec:methods}
@@ -110,31 +109,28 @@ The data source for the analysis is the patient-level data from the CheckMate 06
 \begin{figure}
 \centering
 \includegraphics[width=0.6\linewidth]{DAG_with_Tx.png}
-\caption{\label{fig:hier_dag} Hierarchical cure fraction DAG.}
+\caption{\label{fig:hier_dag} Hierarchical cure fraction DAG for PFS and .}
 \end{figure}
 
+\subsection{The standard mixture cure model} \label{section:basic_model}
+{\it Description of "standard" model and the frequentist approach typically used}\\
+The standard mixture cure model (MCM), which is the basic of the proposed model, is a type of cure model where survival is modelled as a mixture of two groups of patients: those who are cured (and so will never experience the event of interest) and those who are not (and who therefore remain at risk).
+The combined survival for a population with a cure fraction can be written as follows:
 
-{\it Description of "standard" model and the frequentist approach typically used}
-[from Antonio]\\
-A mixture cure model (MCM) is a type of cure model where survival is modelled as a mixture of two groups of patients: those who are cured and those who are not (and who therefore remain at risk). The survival for a population with a cure fraction can be written as follows:
+\begin{equation}
+\label{eqn:mcm}
+S(t, x) = S^*(t, x) [\pi(x) + (1 - \pi(x)) S_u(t, x)],
+\end{equation}
+\\
+\noindent
+where $S(t)$ denotes the survival at time $t$, $S^*(t, x)$ denotes the background mortality
+at time $t$ conditional on covariates $x$, $\pi(x)$ denotes the probability of being
+cured conditional on covariates $x$, and $S_{u}(t, x)$ denotes the mortality due to 
+cancer at time $t$ conditional on covariates $x$.
 
-\begin{equation*}
-S(t,\bm{x}) = S^{*}(t, \bm{x}) [\pi(\bm{x}) + (1 - \pi(\bm{x})) S_u(t, \bm{x})],
-\end{equation*}
-where $S(t)$ denotes the survival at time $t$, $S^*(t,\bm{x})$ denotes the background mortality
-at time $t$ conditional on covariates $\bm{x}$, $\pi(\bm{x})$ denotes the probability of being
-cured conditional on covariates $\bm{x}$, and $S_{u}(t,\bm{x})$ denotes the mortality due to 
-cancer at time $t$ conditional on covariates $\bm{x}$.
-
-
-
-
-{\it Description of our proposal to model jointly PFS and OS}
-
-\subsection{Likelihood}
-Let $T_i$ be the non-negative random variable denoting the survival time
-of patient $i$ with covariate vector $\boldsymbol{x}_i$.
-
+\subsubsection{Likelihood}
+Let $T_i$ be a non-negative event time and $C_i$ be a censoring time for the $i$th individual. Then define the censoring indicator $\delta_i = I(T_i < C_i)$ and variable denoting the observed survival time $t_i = \min(T_i, C_i)$. Either $\delta_i = 1$ or $0$ denoting an event or censored observation at $t_i$. The observed data on the $i$th individual are thus $\mathcal{O}_i = (t_i, \delta_i, \boldsymbol{x}_i),\; i = 1, \ldots, N$, where $\boldsymbol{x}_i$ is the covariate vector.
+Covariates may be experimental (e.g. treatment assignment) or prognostic factors.
 In the simplest case we can assume that the cure fraction is the same
 for the whole population i.e. $\pi$ is fixed. Further, we can assume the
 $\pi$ models the relationship between $\boldsymbol{x}_i$ and the
@@ -149,13 +145,13 @@ L = \prod_i S(t_i | \boldsymbol{x}_i) h(t_i | \boldsymbol{x}_i)^{\delta_i}
 $$
 Log-likelihood is therefore
 $$
-\mathcal{l} = \sum_i \log(S(t_i | \boldsymbol{x}_i)) + \delta_i \log(h(t_i | \boldsymbol{x}_i))
+\mathnormal{l} = \sum_i \log(S(t_i | \boldsymbol{x}_i)) + \delta_i \log(h(t_i | \boldsymbol{x}_i))
 $$
-Plugging this directly into the mixture cure equation in (\*) gives
+Plugging this directly into the mixture cure equation in (\ref{eqn:mcm}) gives
 $$
-\mathcal{l}(\pi | \boldsymbol{\delta}, \boldsymbol{x}) =
+\mathnormal{l}(\pi | \boldsymbol{\delta}, \boldsymbol{x}) =
  \sum_i \log(S^*(t_i | \boldsymbol{x}_i) h^*(t_i | \boldsymbol{x}_i)^{\delta_i}[\pi(x) +
-   (1 − \pi(x)) S_u(t_i | \boldsymbol{x}_i) h_u(t_i | \boldsymbol{x}_i)^{\delta_i}])
+   (1 - \pi(x)) S_u(t_i | \boldsymbol{x}_i) h_u(t_i | \boldsymbol{x}_i)^{\delta_i}])
 $$
 If we assume that the cured component is the Exponential survival model
 then the non-cured component can be thought of in similar terms to the
@@ -165,19 +161,11 @@ all-cause and cancer mortality) and then experiencing either i.e.
 dropping the $S$ dependencies for brevity
 
 \begin{equation}
-\tag{**}
+\label{eqn:surv_pdf_exp}
 S^* S_u (h^*)^{\delta} + S^* S_u (h_u)^{\delta} = S^* S_u (h^* + h_u)^{\delta}
 \end{equation}
 
-\subsection{Prior specification}
-The choice of priors should be informed by expert opinion.
-We specify vague priors on log-scale for the coefficients of the OS and PFS rates. Centering the ages, the baseline is $\beta_0^{PFS} \sim \text{Normal}(0, 100),\; \beta_0^{OS} \sim \text{Normal}(0, 100)$ and for age $\beta_{age}^{PFS} \sim \text{Normal}(0, 100),\; \beta_{age}^{OS} \sim \text{Normal}(0, 100)$.
-This corresponds to median survival time of xxx.
-We don't wish to apply covariate effect to the other parameters of the OS and PFS time distributions so we specify the priors directly on the parameter e.g for the Weibull distribution shape parameter $\nu \sim \text{Gamma}(2, 2)$. 
-The level-one cure fraction is modelled as a fixed effect linear regression with logistic link and coefficient priors $\alpha \sim \text{Normal}(0, 100)$.
-The level-two cure fraction distribution for OS and PFS have logistic-normal priors for the probabilities with variances $\sigma^2_{PFS} \sim \text{Gamma}(2, 2),\; \sigma^2_{OS} \sim \text{Gamma}(2, 2)$.
-
-\subsection{Inference}
+\subsubsection{Bayesian inference}
 Using the likelihood function defined above and prior distributions on
 uncertain parameters, we can specify the posterior distribution.
 Defining $g_2$ as the prior distribution for the coefficients of the
@@ -185,27 +173,46 @@ uncured fraction $\beta^u$ and $g_3$ as the prior distribution for the
 coefficients of the cured fraction $\beta^*$, then the general form of
 the posterior distribution can be written as follows.
 
-$$
-p(\pi, \boldsymbol{\beta^u}, \boldsymbol{\beta^*} | \boldsymbol{\delta}, \boldsymbol{x}) \propto
-L(\pi, \boldsymbol{\beta^u}, \boldsymbol{\beta^*} | \boldsymbol{\delta}, \boldsymbol{x}) f(\pi) g_2(\boldsymbol{\beta^u}) g_3(\boldsymbol{\beta^*})
-$$
+\begin{equation}
+\label{eqn:basic_posterior}
+p(\pi, \boldsymbol{\beta^u}, \boldsymbol{\beta^*} | \mathcal{O}) \propto
+L(\pi, \boldsymbol{\beta^u}, \boldsymbol{\beta^*} | \mathcal{O}) f(\pi) g_2(\boldsymbol{\beta^u}) g_3(\boldsymbol{\beta^*})
+\end{equation}
 assuming that the cure fraction is independent of the covariates.
 
-[taken from \cite{Alvares2020} for BUGS implementation]
+\subsection{The hierarchical mixture cure model}
+Extending the notation of Section~\ref{section:basic_model}, denote the observed data on the $i$th individual for two survival event types as $(t_{1i}, t_{2i}, \delta_{1i}, \delta_{2i}, \boldsymbol{x}_i),\; i = 1, \ldots, N$.
+From now on we will assume that these two event types are progression-free survival and overall survival.
+Covariates can be different for PFS, OS and $\pi$ but we shall use $x$ throughout for simplicity.
+
+A multilevel frailty cure fraction model for the latent variable formulation was considered by \cite{Tawiah2020}.
+
+A related generalisation by \cite{Balogun2020} consider a single event type but multiple co-infections with different cure fractions, similar to how we have different cure fractions for each treatment.
+
+\subsubsection{Bayesian inference}
+From (\ref{eqn:basic_posterior}) we can extend the formulation as follows
+
+$$
+p(\pi, \boldsymbol{\beta^{OS}}, \boldsymbol{\beta^{PFS}}, \boldsymbol{\beta^*} | \mathcal{O}_{OS}, \mathcal{O}_{PFS}) \propto
+L(\pi, \boldsymbol{\beta^{OS}}, \boldsymbol{\beta^*} | \mathcal{O}_{OS}) L(\pi, \boldsymbol{\beta^{PFS}}, \boldsymbol{\beta^*} | \mathcal{O}_{PFS}) f(\pi) g_{OS}(\boldsymbol{\beta^{OS}}) g_{PFS}(\boldsymbol{\beta^{PFS}}) g(\boldsymbol{\beta^*})
+$$
+\\
+\noindent
 The (cure subpopulation) incidence model for each individual is expressed in terms of a fixed-effects logistic regression
 
 $$
-\text{logit}[\pi (\beta_{C1}, \beta_{C2})] = \beta_{C1} + \beta_{C2} TRT,
+\text{logit}(\pi) = \beta^{\pi}_1 + \beta^{\pi}_2 TRT,
 $$
-where $\beta_{C1}$ represents an intercept and $\beta_{C2}$ is the regression coefficient for the $TRT$ covariate.
+where $\beta^{\pi}_1$ represents an intercept and $\beta^{\pi}_2$ is the regression coefficient for the $TRT$ covariate.
+Note that we could also include a frailty term for individual $i$.
 
 \subsubsection{Cure fraction}
 There are two obvious ways to represent the uncertainty about the cure
 fraction in the model.
 
 The first is to specify the cure fraction directly using a
-$\pi \sim Beta(a_{cf}, b_{cf})$ prior, most uninformative as a uniform
-$Beta(1,1)$. The parameters can be obtained via transformation of mean
+$\pi \sim \text{Beta}(a_{cf}, b_{cf})$ prior, most uninformative as a uniform
+$\text{Beta}(1,1)$. The parameters can be obtained via transformation of mean
 and standard deviation to allow a more natural scale for elicitation.
 
 Alternatively, we may specify the uncertainty on the real line with a
@@ -214,21 +221,21 @@ A further consideration is how to represent the cure fraction so to
 share information between the OS and PFS data. We will investigate 3
 alternatives.
 
-\begin{itemize}
-    \item *Pooled*: Assume that the cure fraction is the same for OS and PFS
+\begin{description}
+    \item[Pooled] Assume that the cure fraction is the same for OS and PFS
     i.e. $\pi_{os} = \pi_{os} = \pi$ where $$
-    logit(\pi) \sim N(\mu_{cf}, \sigma_{cf}^2), \;\;
+    \text{logit}(\pi) \sim \text{N}(\mu_{cf}, \sigma_{cf}^2), \;\;
     $$
-    \item *Separate*: Model each independently. $$
-    logit(\pi_{os}) \sim N(\mu_{cfos}, \sigma_{cfos}^2), \;\;  
-    logit(\pi_{pfs}) \sim N(\mu_{cfpfs}, \sigma_{cfpfs}^2)  
+    \item[Separate] Model each independently. $$
+    \text{logit}(\pi_{os}) \sim \text{N}(\mu_{cfos}, \sigma_{cfos}^2), \;\;  
+    \text{logit}(\pi_{pfs}) \sim \text{N}(\mu_{cfpfs}, \sigma_{cfpfs}^2)  
     $$
-    \item *Hierarchical*: Assume exchangeability between OS and PFS$$
-    \pi \sim N(\mu_{cf}, \sigma_{cf}^2), \;\;  
-    logit(\pi_{os}) \sim N(\pi, \sigma_{cfos}^2), \;\;  
-    logit(\pi_{pfs}) \sim N(\pi, \sigma_{cfpfs}^2)  
+    \item[Hierarchical] Assume exchangeability between OS and PFS$$
+    \pi \sim \text{N}(\mu_{cf}, \sigma_{cf}^2), \;\;  
+    \text{logit}(\pi_{os}) \sim \text{N}(\pi, \sigma_{cfos}^2), \;\;  
+    \text{logit}(\pi_{pfs}) \sim \text{N}(\pi, \sigma_{cfpfs}^2)  
     $$
-\end{itemize}
+\end{description}
 
 \subsubsection{Background survival}
 We used the World Health Organization
@@ -258,11 +265,17 @@ L(\pi | \boldsymbol{\delta}, \boldsymbol{x}, \hat{S}, \hat{h}) =
 \sum_i \hat{S}_i \hat{h}_i^{\delta_i} \left[ \pi(x) + (1 - \pi(x)) S_{u, i} h_{u , i}^{\delta_i} \right]
 $$
 
-?Sharples ref re Gamma process?
+{\it Sharples ref re Gamma process?}
 
+{\it implications?}
 
-implications
-
+\subsubsection{Prior specification}
+The choice of priors should be informed by expert opinion.
+We specify vague priors on log-scale for the coefficients of the OS and PFS rates. Centering the ages, the baseline is $\beta_0^{PFS} \sim \text{Normal}(0, 100),\; \beta_0^{OS} \sim \text{Normal}(0, 100)$ and for age $\beta_{age}^{PFS} \sim \text{Normal}(0, 100),\; \beta_{age}^{OS} \sim \text{Normal}(0, 100)$.
+This corresponds to median survival time of xxx.
+We don't wish to apply covariate effect to the other parameters of the OS and PFS time distributions so we specify the priors directly on the parameter e.g for the Weibull distribution shape parameter $\nu \sim \text{Gamma}(2, 2)$. 
+The level-one cure fraction is modelled as a fixed effect linear regression with logistic link and coefficient priors $\alpha \sim \text{Normal}(0, 100)$.
+The level-two cure fraction distribution for OS and PFS have logistic-normal priors for the probabilities with variances $\sigma^2_{PFS} \sim \text{Gamma}(2, 2),\; \sigma^2_{OS} \sim \text{Gamma}(2, 2)$.
 
 
 
@@ -275,19 +288,20 @@ Back to BMS data and results, with various scenarios/distributions and all the p
 \subsubsection{Treatments modelled separately}
 \subsubsection{Treatments modelled jointly}
 
-Exponential, Weibull, Gompertz, Log-Normal, Log-Logistic
-
+Exponential, Weibull, Gompertz, Log-Normal, Log-Logistic\\
+{\it model assessment?}
 
 
 
 \section{Discussion}\label{sec:discussion}
 
-Lorem ipsum dolor sit amet
+
 
 %\backmatter
 
-\section*{Acknowledgments}
-This is acknowledgment text.\cite{Kenamond2013} Provide text here. This is acknowledgment text. Provide text here. This 
+\section*{Acknowledgements}
+This is acknowledgement text.
+
 \subsection*{Author contributions}
 
 This is an author contribution text.
@@ -301,33 +315,33 @@ None reported.
 The authors declare no potential conflict of interests.
 
 
-\section*{Supporting information}
+% \section*{Supporting information}
 
-The following supporting information is available as part of the online article:
+% The following supporting information is available as part of the online article:
 
-\noindent
-\textbf{Figure S1.}
-{500{\uns}hPa geopotential anomalies for GC2C calculated against the ERA Interim reanalysis. The period is 1989--2008.}
+% \noindent
+% \textbf{Figure S1.}
+% {500{\uns}hPa geopotential anomalies for GC2C calculated against the ERA Interim reanalysis. The period is 1989--2008.}
 
 
-\appendix
+% \appendix
 
-\section{Section title of first appendix\label{app1}}
+% \section{Section title of first appendix\label{app1}}
 
-with normal text font. Refer below example:
+% with normal text font. Refer below example:
 
-\begin{lstlisting}[caption={Descriptive Caption Text},label=DescriptiveLabel]
-for i:=maxint to 0 do
-\end{lstlisting}
+% \begin{lstlisting}[caption={Descriptive Caption Text},label=DescriptiveLabel]
+% for i:=maxint to 0 do
+% \end{lstlisting}
 
-%\nocite{*}% Show all bib entries - both cited and uncited; comment this line to view only cited bib entries;
-\bibliography{bibliography}%
+% %\nocite{*}% Show all bib entries - both cited and uncited; comment this line to view only cited bib entries;
+\bibliography{bibliography}
 
-\clearpage
+% \clearpage
 
-\section*{Author Biography}
+% \section*{Author Biography}
 
-\begin{biography}{\includegraphics[width=66pt,height=86pt,draft]{empty}}{\textbf{Author Name.} This is sample author is sample author biography text.}
-\end{biography}
+% \begin{biography}{\includegraphics[width=66pt,height=86pt,draft]{empty}}{\textbf{Author Name.} This is sample author is sample author biography text.}
+% \end{biography}
 
 \end{document}
