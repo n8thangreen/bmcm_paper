@@ -1,4 +1,10 @@
 \documentclass[AMA,STIX1COL]{WileyNJD-v2}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{lscape}
+\usepackage{rotating}
+\usepackage{epstopdf}
+\usepackage{float}
 
 \articletype{Article Type}%
 
@@ -10,7 +16,7 @@
 
 \begin{document}
 
-\title{Bayesian hierarchical mixture cure modelling \protect\thanks{This is an example for title footnote.}}
+\title{Bayesian hierarchical mixture cure modelling \protect\thanks{title footnote.}}
 
 \author[1]{Nathan Green*}
 
@@ -92,12 +98,17 @@ However, to our knowledge there has been no Bayesian fully-parametric mixture cu
 Correlation between random effect in the uncured survival and cure fraction has also been investigated using a bivariate Normal distribution \cite{Lai2008}.
 In our analysis, we shall assume that the uncured survival is independent of the cure fraction covariates, namely the treatment.
 
+A suite of distributions given in NICE guidelines for health technology assessments (HTA) [ref] are
+Exponential, Weibull, Gompertz, Log-logistic, Log-Normal and xxx.
+This has been interpreted as meaning all of these distributions should be modelled with a given data set.
+This prescriptive approach does not take into account what we know {\it a priori} about the problem.
+In reality, a subset of these distributions will be more appropriate for the problem.
 
 % software
 This analysis has been carried-out using the Stan inference engine
-\cite{carpenter2017stan} called from R \cite{Rcoreteam} on a Windows PC.
+\cite{carpenter2017stan} called from R \cite{Rcoreteam} on a Windows 10 PC.
 The details of the algorithm can be found in the Appendix.
-The packaged code can be downloaded from here.
+The packaged code is in a generalisable framework and can be downloaded from here.
 
 
 \section{Motivating example}\label{sec:example}
@@ -128,26 +139,30 @@ Median PFS and OS are 6.93 months (95\% confidence interval (CI) 5.32 - 10.41) a
 \centering
 \includegraphics[width=0.6\linewidth]{DAG_with_Tx.png}
 \caption{\label{fig:hier_dag} Hierarchical cure fraction DAG for PFS and OS.
-Uncured and cured patients have two parameter distributions and deterministic survival times respectively. Censoring has been omitted for brevity.}
+Cured patients have fixed hazards.
+The distribution of times for uncured patient regresses on covariates for the rate parameter and $\phi$ may be a vector of length $\geq 1$ depending on the distribution.
+Censoring has been omitted for brevity.}
 \end{figure}
 
 \subsection{The standard mixture cure model} \label{section:basic_model}
 The standard mixture cure model (MCM) (sometimes called a long-term survival model), which is the basis of the proposed model,
 is a type of cure model where survival is modelled as a mixture of two groups of patients:
-those who are cured (and so will never experience the event of interest) and those who are not (and who therefore remain at risk).
+those who are cured and those who are not.
+In the simplest case this consists of those who will never experience the event of interest and those who remain at risk of the event.
+The more general case adopted in this paper is when cured does not mean that an individual will never experience the event of interest but the chance of doing so reverts to a general or background population probability e.g. all-cause mortality.
 The combined survival for a population with a cure fraction can be written as follows
 
 \begin{equation}
 \label{eqn:mcm}
-S(t, x) = S^*(t, x) [\pi(x) + (1 - \pi(x)) S_u(t, x)],
+S(t, x) = S_b(t, x) [\pi(x) + (1 - \pi(x)) S_u(t, x)],
 \end{equation}
 \\
 \noindent
-where $S(t)$ denotes the survival at time $t$, $S^*(t, x)$ denotes the background mortality
-at time $t$ conditional on covariates $x$,
+where $S(t)$ denotes survival at time $t$,
+$S_b(t, x)$ is a function of the background mortality at time $t$ conditional on covariates $x$,
 % some papers denote \pi as _uncured_ fraction
 $\pi(x)$ denotes the probability of being cured conditional on covariates $x$,
-and $S_{u}(t, x)$ denotes the (excess) mortality due to cancer at time $t$ conditional on covariates $x$.
+and $S_u(t, x)$ is a function of the (excess) mortality due to cancer at time $t$ conditional on covariates $x$.
 
 All treatments are included in the same model with the following fixed effect model on the global cure fraction
 $$
@@ -156,16 +171,16 @@ $$
 where $\beta^{\pi}_1$ represents an intercept and $\beta^{\pi}_2$ is the regression coefficient for the $TRT$ covariate.
 Note that we could also include a frailty term for individual $i$.
 The treatment identifier is included in the covariate vector $x$.
-We will assuming without loss of generalisability that all individuals have all treatments.
+We will assume without loss of generalisability that all individuals have all treatments.
 
-In many mixture cure fraction analyses the uncured fraction is represented by a Cox proportional hazard model.
+In many mixture cure fraction analyses the survival associated with the uncured fraction of the population is represented by a Cox proportional hazard model.
 This means that the baseline hazard is left unspecified but still the coefficients can be estimated.
 However, we are concerned with the application of cure models to a health economics context.
-In this case it is important to determine life-time survival in order to calculate total health impact measures such as quality-adjusted life-time (QALY) and life-years lost (LYL).
+In this case it is important to determine life-time survival in order to calculate total health impact measures such as quality-adjusted life-years (QALY) and life-years lost (LYL).
 Therefore, the semi-parametric approach is inadequate because we must extrapolate beyond the observed data.
 In this paper we will adopt a fully-parametric model for the uncured survival.
 
-It is common to have $S^*(t, x) = 1$ which is reasonable in the short-term.
+It is common to have $S_b(t, x) = 1$ which is reasonable in the short-term.
 However, we are focused on the full life-course of an individual and so include this as a general population all-cause mortality.
 
 
@@ -199,8 +214,8 @@ Plugging this directly into the mixture cure equation in (\ref{eqn:mcm}) gives
 
 \begin{equation}
 \label{separate_lik}
-\mathnormal{l}(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{u}}, \boldsymbol{\beta^*} | \mathcal{O}) =
-\sum_{ij} \log\left( S^*(t_{ij} | \boldsymbol{x}_{ij}) h^*(t_{ij} | \boldsymbol{x}_{ij})^{\delta_{ij}} \left[\pi(x_{ij}) +
+\mathnormal{l}(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{u}}, \boldsymbol{\beta_b} | \mathcal{O}) =
+\sum_{ij} \log\left( S_b(t_{ij} | \boldsymbol{x}_{ij}) h^*(t_{ij} | \boldsymbol{x}_{ij})^{\delta_{ij}} \left[\pi(x_{ij}) +
    (1 - \pi(x_{ij})) S_u(t_{ij} | \boldsymbol{x}_{ij}) h_u(t_{ij} | \boldsymbol{x}_{ij})^{\delta_{ij}} \right] \right)
 \end{equation}
 
@@ -213,12 +228,12 @@ Plugging this directly into the mixture cure equation in (\ref{eqn:mcm}) gives
 
 % \begin{equation}
 % \label{eqn:surv_pdf_exp}
-% S^* S_u (h^*)^{\delta} + S^* S_u (h_u)^{\delta} = S^* S_u (h^* + h_u)^{\delta}
+% S_b S_u (h^*)^{\delta} + S_b S_u (h_u)^{\delta} = S_b S_u (h^* + h_u)^{\delta}
 % \end{equation}
 
 \subsubsection{Background survival}
 We used the World Health Organisation (WHO) life tables by country for the latest year available of 2016
-\cite{wholifetables} to inform the background mortality $S^*(t, x)$ in (\ref{eqn:mcm}).
+\cite{wholifetables} to inform the background mortality $S_b(t, x)$ in (\ref{eqn:mcm}).
 The baseline hazards are the expected mortality rate for each
 patient at the age at which they experience the event. The mortality
 data are country, age and gender adjusted, thus providing a granular account of
@@ -240,29 +255,34 @@ data $\mathcal{O}$.
 
 This gives the modified likelihood from (\ref{separate_lik})
 \begin{equation*}
-\mathnormal{l}(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{u}}, \boldsymbol{\beta^*} | \mathcal{O}) =
+\mathnormal{l}(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{u}}, \boldsymbol{\beta_b} | \mathcal{O}) =
 \sum_{ij} \log\left( \hat{S}_{ij} \hat{h}_{ij}^{\delta_{ij}} \left[\pi(x_{ij}) +
    (1 - \pi(x_{ij})) S_u(t_{ij} | \boldsymbol{x}_{ij}) h_u(t_{ij} | \boldsymbol{x}_{ij})^{\delta_{ij}} \right] \right)
 \end{equation*}
 
 {\it Sharples ref re Gamma process?}
 
-\subsubsection{Bayesian inference}
-Using the likelihood function defined above and prior distributions on
-uncertain parameters, we can specify the posterior distribution.
-Defining $g_u$ as the prior distribution for the coefficients of the
-uncured fraction $\beta^u$ and $g_*$ as the prior distribution for the
-coefficients of the cured fraction $\beta^*$, then the general form of
-the posterior distribution can be written as follows.
+% \subsubsection{Bayesian inference}
+% Using the likelihood function defined above and prior distributions on
+% uncertain parameters, we can specify the posterior distribution.
+% Defining $g_u$ as the prior distribution for the coefficients of the
+% uncured fraction $\beta^u$ and $g_*$ as the prior distribution for the
+% coefficients of the cured fraction $\beta_b$, then the general form of
+% the posterior distribution can be written as follows.
 
-\begin{equation}
-\label{eqn:basic_posterior}
-p(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^u}, \boldsymbol{\beta^*} | \mathcal{O}) \propto
-L(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{u}}, \boldsymbol{\beta^*} | \mathcal{O}) f(\boldsymbol{\beta}^{\pi}) g_{u}(\boldsymbol{\beta^{u}})g_*(\boldsymbol{\beta^*})
-\end{equation}
+% \begin{equation}
+% \label{eqn:basic_posterior}
+% p(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^u}, \boldsymbol{\beta_b} | \mathcal{O}) \propto
+% L(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{u}}, \boldsymbol{\beta_b} | \mathcal{O}) f(\boldsymbol{\beta}^{\pi}) g_{u}(\boldsymbol{\beta^{u}})g_*(\boldsymbol{\beta_b})
+% \end{equation}
 
 
 \subsection{The hierarchical mixture cure model}
+{\it PFS and OS are correlated\\
+theres information in one we can use to improve the inference in the other\\
+follow-up time can be relatively short and so in this case it is more important to make use of what information we have\\
+in particular OS is longer than PFS so will have more censoring}\\
+
 Extend the observed data to include multiple event types
 i.e. for the $i$th individual, $j$th treatment and $k$th event type 
 $\mathcal{O} = (t_{ijk}, \delta_{ijk}, \boldsymbol{x}_{ij}), \; k = 1, \ldots, K$.
@@ -271,8 +291,8 @@ The set of covariates used can be different for each $k$ and $\pi$.
 
 The likelihood for an individual is the product of the separate likelihood functions, so from (\ref{separate_lik}),
 $$
-L(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^1}, \ldots, \boldsymbol{\beta^K}, \boldsymbol{\beta^*} | \mathcal{O}) =
-\prod_k L(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{k}}, \boldsymbol{\beta^*} | \mathcal{O})
+L(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^1}, \ldots, \boldsymbol{\beta^K}, \boldsymbol{\beta_b} | \mathcal{O}) =
+\prod_k L(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{k}}, \boldsymbol{\beta_b} | \mathcal{O})
 $$
 A multilevel frailty cure fraction model for the latent variable formulation was considered by \cite{Tawiah2020}.
 A related generalisation by \cite{Balogun2020} consider a single event type but multiple co-infections with different cure fractions,
@@ -308,31 +328,90 @@ alternatives.
     $$
 \end{description}
 
-\subsubsection{Posterior distribution}
-The final posterior is
-\begin{equation}
-\label{eqn:basic_posterior}
-p(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{1}}, \ldots, \boldsymbol{\beta^{K}}, \boldsymbol{\beta^*} | \mathcal{O}) \propto
-L(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{1}}, \ldots, \boldsymbol{\beta^{K}}, \boldsymbol{\beta^*} | \mathcal{O})
-    f(\boldsymbol{\beta}^{\pi}) g_*(\boldsymbol{\beta^*}) \prod_k g_{k}(\boldsymbol{\beta^{k}})
-\end{equation}
-
+% \subsubsection{Posterior distribution}
+% The final posterior is
+% \begin{equation}
+% \label{eqn:basic_posterior}
+% p(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{1}}, \ldots, \boldsymbol{\beta^{K}}, \boldsymbol{\beta_b} | \mathcal{O}) \propto
+% L(\boldsymbol{\beta^{\pi}}, \boldsymbol{\beta^{1}}, \ldots, \boldsymbol{\beta^{K}}, \boldsymbol{\beta_b} | \mathcal{O})
+%     f(\boldsymbol{\beta}^{\pi}) g_*(\boldsymbol{\beta_b}) \prod_k g_{k}(\boldsymbol{\beta^{k}})
+% \end{equation}
 
 \subsubsection{Prior specification for OS, PFS model}
 The choice of priors should be informed by expert opinion.
 We specify vague priors on log-scale for the coefficients of the OS and PFS rates.
-Centering the ages, the baseline is $\beta_0^{PFS} \sim \text{Normal}(0, 100),\; \beta_0^{OS} \sim \text{Normal}(0, 100)$ and for age $\beta_{age}^{PFS} \sim \text{Normal}(0, 100),\; \beta_{age}^{OS} \sim \text{Normal}(0, 100)$.
+Centering the ages, the baseline is $\beta_0^{PFS} \sim \text{Normal}(0, 100),\; \beta_0^{OS} \sim \text{Normal}(0, 100)$
+and for age $\beta_{age}^{PFS} \sim \text{Normal}(0, 100),\; \beta_{age}^{OS} \sim \text{Normal}(0, 100)$.
 This corresponds to median survival time of xxx.
 We don't wish to apply covariate effect to the other parameters of the OS and PFS time distributions so we specify the priors directly on the parameter
 e.g for the Weibull distribution shape parameter $\nu \sim \text{Gamma}(2, 2)$. 
 The level-one cure fraction is modelled as a fixed effect linear regression with logistic link and coefficient priors $\alpha \sim \text{Normal}(0, 100)$.
-The level-two cure fraction distribution for OS and PFS have logistic-normal priors for the probabilities with variances $\sigma^2_{PFS} \sim \text{Gamma}(2, 2),\; \sigma^2_{OS} \sim \text{Gamma}(2, 2)$.
+The level-two cure fraction distribution for OS and PFS have logistic-normal priors for the probabilities with variances
+$\sigma^2_{PFS} \sim \text{Gamma}(2, 2),\; \sigma^2_{OS} \sim \text{Gamma}(2, 2)$.
+
+
+The background is taken directly from the WHO life-tables.
+However, it is believed that the patients in the trial have a worse background survival than the average individual in the general population.
+Using only the complete responders in the sample, who are clinically confirmed as cured, it is possible to obtain a posterior distribution for a hazard ratio between these and a WHO estimate baseline.
+This can serve as a prior in the main model in a two-step approach.
+Alternatively, prior belief could be defined explicitly using expert knowledge.
+This could be elicited directly for the hazard ratio or on a natural scale, such as mean life time, and transformed.
+
+{\it should the complete responders even be included in the main model? we know that they aren't uncured. If they enter via the background adjustment why double-count them?}
+
+
+\subsubsection{Performance measures}
+WAIC, LOO\\
+$\Delta S$ at months $t = 10, 20, 30, ...$\\
+clinical significant vs statistical significant differences.
+hazard ratio?\\
+median/mean survival?
 
 
 
 \section{Application}\label{sec:application}
 
 {\it Back to BMS data and results, with various scenarios/distributions and all the plots and tables, similar to the ones already provided.}
+
+\begin{sidewaysfigure}[H]
+\includegraphics[width=0.9\linewidth]{plot_S_grid.png}
+\caption{\label{fig:S_grid_ipi_nivo} Posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events and {\it nivolumab} and {\it ipilimumab} combination treatment.}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[H]
+\includegraphics[width=0.9\linewidth]{plot_S_grid_IPILIMUMAB.png}
+\caption{\label{fig:S_grid_ipi} Posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events and {\it ipilimumab} treatment.}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[H]
+\includegraphics[width=0.9\linewidth]{plot_S_grid_NIVOLUMAB.png}
+\caption{\label{fig:S_grid_nivo} Posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events and {\it nivolumab} treatment.}
+\end{sidewaysfigure}
+
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=0.6\linewidth]{cf hier_bg_fixed_forest_plot.png}
+% \caption{\label{fig:cf_forest} Posterior cure fraction forest plot. Same distributions for OS and PFS. {\it is this how we want to split this up? E.g. do we want different OS and PFS distributions and same treatment? Or separate plots for each cure fraction type?}}
+% \end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\linewidth]{forest_plot_IPILIMUMAB.png}
+\caption{\label{fig:cf_forest_ipi} Posterior cure fraction forest plot for {\it ipilimumab} treatment.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\linewidth]{forest_plot_NIVOLUMAB.png}
+\caption{\label{fig:cf_forest_nivo} Posterior cure fraction forest plot for {\it nivolumab} treatment.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\linewidth]{forest_plot_NIVOLUMAB+IPILIMUMAB.png}
+\caption{\label{fig:cf_forest_ipi_nivo} Posterior cure fraction forest plot for {\it nivolumab} and {\it ipilimumab} combination treatment.}
+\end{figure}
+
 
 \subsection{PFS and OS modelled separately}
 \subsection{Exchangeable cure fraction}
@@ -346,6 +425,9 @@ Exponential, Weibull, Gompertz, Log-Normal, Log-Logistic\\
 
 \section{Discussion}\label{sec:discussion}
 
+Our approach allows for the incorporation of sensible information.
+Stabilise the inference on the cure fraction but restricting/constraining it values via the prior distributions.
+The priors can be specified on the natural scale to aid elicitation and interpretation.
 
 
 %\backmatter
