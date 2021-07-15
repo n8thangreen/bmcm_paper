@@ -43,7 +43,8 @@ year = {2018}
 title = {{Life tables by country}},
 author = {WHO},
 url = {http://apps.who.int/gho/data/?theme=main&vid=61160},
-year = {2020}
+year = {2020},
+note  = {\url{http://apps.who.int/gho/data/} (accessed on 02/12/20)},
 }
 
 @article{Yu2013,
@@ -168,4 +169,112 @@ title = {{Long-term survivor model with bivariate random effects: Applications t
 url = {http://doi.wiley.com/10.1002/sim.3404},
 volume = {27},
 year = {2008}
+}
+@article{Gelman2006,
+author = {Andrew Gelman},
+journal = {Bayesian Analysis},
+year = {2006},
+volume = {1},
+number = {3},
+pages = {515-–533},
+title = {{Prior distributions for variance parameters in hierarchical models}}
+}
+@article{Chung2013,
+journal = {Psychometrika},
+volumen = {78},
+number = {4},
+pages = {685-–709},
+year = {2013},
+title = {{A nondegenerate penalized likelihood estimator for variance parameters in multilevel models}},
+author = {Yeojin Chung and Sophia Rabe-Hesketh and Vincent Dorie and Andrew Gelman, and Jingchen Liu}
+}
+@article{Neuenschwander2016,
+abstract = {Clinical trials with multiple strata are increasingly used in drug development. They may sometimes be the only option to study a new treatment, for example in small populations and rare diseases. In early phase trials, where data are often sparse, good statistical inference and subsequent decision-making can be challenging. Inferences from simple pooling or stratification are known to be inferior to hierarchical modeling methods, which build on exchangeable strata parameters and allow borrowing information across strata. However, the standard exchangeability (EX) assumption bears the risk of too much shrinkage and excessive borrowing for extreme strata. We propose the exchangeability-nonexchangeability (EXNEX) approach as a robust mixture extension of the standard EX approach. It allows each stratum-specific parameter to be exchangeable with other similar strata parameters or nonexchangeable with any of them. While EXNEX computations can be performed easily with standard Bayesian software, model specifications and prior distributions are more demanding and require a good understanding of the context. Two case studies from phases I and II (with three and four strata) show promising results for EXNEX. Data scenarios reveal tempered degrees of borrowing for extreme strata, and frequentist operating characteristics perform well for estimation (bias, mean-squared error) and testing (less type-I error inflation).},
+author = {Neuenschwander, Beat and Wandel, Simon and Roychoudhury, Satrajit and Bailey, Stuart},
+doi = {10.1002/pst.1730},
+file = {:C\:/Users/Nathan/Documents/docs/pst.1730.pdf:pdf},
+issn = {15391612},
+journal = {Pharmaceutical Statistics},
+keywords = {Bayesian,between-strata heterogeneity,exchangeability-nonexchangeability,hierarchical model,pooling,shrinkage,stratification},
+number = {2},
+pages = {123--134},
+pmid = {26685103},
+title = {{Robust exchangeability designs for early phase clinical trials with multiple strata}},
+volume = {15},
+year = {2016}
+}
+@article{Papanikos2020,
+abstract = {Surrogate endpoints play an important role in drug development when they can be used to measure treatment effect early compared to the final clinical outcome and to predict clinical benefit or harm. Such endpoints are assessed for their predictive value of clinical benefit by investigating the surrogate relationship between treatment effects on the surrogate and final outcomes using meta-analytic methods. When surrogate relationships vary across treatment classes, such validation may fail due to limited data within each treatment class. In this paper, two alternative Bayesian meta-analytic methods are introduced which allow for borrowing of information from other treatment classes when exploring the surrogacy in a particular class. The first approach extends a standard model for the evaluation of surrogate endpoints to a hierarchical meta-analysis model assuming full exchangeability of surrogate relationships across all the treatment classes, thus facilitating borrowing of information across the classes. The second method is able to relax this assumption by allowing for partial exchangeability of surrogate relationships across treatment classes to avoid excessive borrowing of information from distinctly different classes. We carried out a simulation study to assess the proposed methods in nine data scenarios and compared them with subgroup analysis using the standard model within each treatment class. We also applied the methods to an illustrative example in colorectal cancer which led to obtaining the parameters describing the surrogate relationships with higher precision.},
+author = {Papanikos, Tasos and Thompson, John R. and Abrams, Keith R and St{\"{a}}dler, Nicolas and Ciani, Oriana and Taylor, Rod and Bujkiewicz, Sylwia},
+doi = {10.1002/sim.8465},
+file = {:C\:/Users/Nathan/Documents/docs/sim.8465.pdf:pdf},
+issn = {10970258},
+journal = {Statistics in Medicine},
+keywords = {hierarchical models,meta-analysis,partial exchangeability,surrogate endpoints,treatment classes},
+number = {8},
+pages = {1103--1124},
+pmid = {31990083},
+title = {{Bayesian hierarchical meta-analytic methods for modeling surrogate relationships that vary across treatment classes using aggregate data}},
+volume = {39},
+year = {2020}
+}
+@article{Vehtari2017,
+abstract = {Leave-one-out cross-validation (LOO) and the widely applicable information criterion (WAIC) are methods for estimating pointwise out-of-sample prediction accuracy from a fitted Bayesian model using the log-likelihood evaluated at the posterior simulations of the parameter values. LOO and WAIC have various advantages over simpler estimates of predictive error such as AIC and DIC but are less used in practice because they involve additional computational steps. Here we lay out fast and stable computations for LOO and WAIC that can be performed using existing simulation draws. We introduce an efficient computation of LOO using Pareto-smoothed importance sampling (PSIS), a new procedure for regularizing importance weights. Although WAIC is asymptotically equal to LOO, we demonstrate that PSIS-LOO is more robust in the finite case with weak priors or influential observations. As a byproduct of our calculations, we also obtain approximate standard errors for estimated predictive errors and for comparison of predictive errors between two models. We implement the computations in an R package called loo and demonstrate using models fit with the Bayesian inference package Stan.},
+archivePrefix = {arXiv},
+arxivId = {1507.04544},
+author = {Vehtari, Aki and Gelman, Andrew and Gabry, Jonah},
+doi = {10.1007/s11222-016-9696-4},
+eprint = {1507.04544},
+file = {:C\:/Users/Nathan/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Vehtari, Gelman, Gabry - 2017 - Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC.pdf:pdf},
+issn = {15731375},
+journal = {Statistics and Computing},
+keywords = {Bayesian computation,K-fold cross-validation,Leave-one-out cross-validation (LOO),Pareto smoothed importance sampling (PSIS),Stan,Widely applicable information criterion (WAIC)},
+number = {5},
+pages = {1413--1432},
+publisher = {Springer US},
+title = {{Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC}},
+volume = {27},
+year = {2017}
+}
+@article{Latimer2011,
+abstract = {NICE DSU TECHNICAL SUPPORT DOCUMENT 14: SURVIVAL ANALYSIS FOR ECONOMIC EVALUATIONS ALONGSIDE CLINICAL TRIALS - EXTRAPOLATION WITH PATIENT-LEVEL DATA},
+author = {Latimer, Nicholas},
+file = {:C\:/Users/Nathan/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Latimer - 2011 - NICE DSU technical support document 14 survival analysis for economic evaluations alongside clinical trials-extrapolati.pdf:pdf},
+journal = {Sheffield: Report by the Decision Support Unit},
+mendeley-groups = {HTA_in_R_book},
+number = {0},
+pmid = {27905716},
+title = {{NICE DSU technical support document 14: survival analysis for economic evaluations alongside clinical trials-extrapolation with patient-level data}},
+url = {http://www.nicedsu.org.uk/NICE DSU TSD Survival analysis.updated March 2013.v2.pdf},
+year = {2011}
+}
+@article{Tan2018,
+abstract = {In health technology assessment, decisions are based on complex cost-effectiveness models that require numerous input parameters. When not all relevant estimates are available, the model may have to be simplified. Multiparameter evidence synthesis combines data from diverse sources of evidence, which results in obtaining estimates required in clinical decision making that otherwise may not be available. We demonstrate how bivariate meta-analysis can be used to predict an unreported estimate of a treatment effect enabling implementation of a multistate Markov model, which otherwise needs to be simplified. To illustrate this, we used an example of cost-effectiveness analysis for docetaxel in combination with prednisolone in metastatic hormone-refractory prostate cancer. Bivariate meta-analysis was used to model jointly available data on treatment effects on overall survival and progression-free survival (PFS) to predict the unreported effect on PFS in a study evaluating docetaxel with prednisolone. The predicted treatment effect on PFS enabled implementation of a 3-state Markov model comprising stable disease, progressive disease, and dead states, while lack of the estimate restricted the model to a 2-state model (with alive and dead states). The 2-state and 3-state models were compared by calculating the incremental cost-effectiveness ratio (which was much lower in the 3-state model: {\pounds}22,148 per quality-adjusted life year gained compared to {\pounds}30,026 obtained from the 2-state model) and the expected value of perfect information (which increased with the 3-state model). The 3-state model has the advantage of distinguishing surviving patients who progressed from those who did not progress. Hence, the use of advanced meta-analytic techniques allowed obtaining relevant parameter estimates to populate a model describing disease pathway in more detail while helping to prevent valuable clinical data from being discarded.},
+author = {Tan, Sze Huey and Abrams, Keith R and Bujkiewicz, Sylwia},
+doi = {10.1177/0272989X18788537},
+file = {:C\:/Users/Nathan/Documents/docs/10.1177_0272989X18788537.pdf:pdf},
+issn = {1552681X},
+journal = {Medical Decision Making},
+keywords = {Markov multi-state model,bivariate meta-analysis,prostate cancer},
+number = {7},
+pages = {834--848},
+pmid = {30102868},
+title = {{Bayesian Multiparameter Evidence Synthesis to Inform Decision Making: A Case Study in Metastatic Hormone-Refractory Prostate Cancer}},
+volume = {38},
+year = {2018}
+}
+
+@article{OHagan2019,
+abstract = {Expert opinion and judgment enter into the practice of statistical inference and decision-making in numerous ways. Indeed, there is essentially no aspect of scientific investigation in which judgment is not required. Judgment is necessarily subjective, but should be made as carefully, as objectively, and as scientifically as possible. Elicitation of expert knowledge concerning an uncertain quantity expresses that knowledge in the form of a (subjective) probability distribution for the quantity. Such distributions play an important role in statistical inference (for example as prior distributions in a Bayesian analysis) and in evidence-based decision-making (for example as expressions of uncertainty regarding inputs to a decision model). This article sets out a number of practices through which elicitation can be made as rigorous and scientific as possible. One such practice is to follow a recognized protocol that is designed to address and minimize the cognitive biases that experts are prone to when making probabilistic judgments. We review the leading protocols in the field, and contrast their different approaches to dealing with these biases through the medium of a detailed case study employing the SHELF protocol. The article ends with discussion of how to elicit a joint probability distribution for multiple uncertain quantities, which is a challenge for all the leading protocols. Supplementary materials for this article are available online.},
+author = {O'Hagan, Anthony},
+doi = {10.1080/00031305.2018.1518265},
+file = {:C\:/Users/Nathan/Documents/docs/00031305.2018.pdf:pdf},
+issn = {15372731},
+journal = {American Statistician},
+keywords = {Cognitive bias,Elaboration,Elicitation protocol,Facilitator,Heuristics,Independence in subjective distributions,Rational impartial observer,SHELF,Subjective probability},
+number = {sup1},
+pages = {69--81},
+title = {{Expert Knowledge Elicitation: Subjective but Scientific}},
+volume = {73},
+year = {2019}
 }
