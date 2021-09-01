@@ -8,7 +8,6 @@
 \usepackage{float}
 \usepackage{subfig}
 \usepackage{endfloat}
-\usepackage{bm,amssymb,amsmath}
 
 
 \articletype{Article Type}%
@@ -74,72 +73,71 @@ Better diagnosis and screening has lead to more cancer patients with long-term s
 In previous immuno-oncologic (IO) studies for melanoma therapies, such as {\it ipilimumab}, {\it nivolumab}, and dual {\it nivolumab} and {\it ipilimumab} combination,
 results have indicated that survival curves "plateau" for a considerable proportion of LTS patients [ref].
 This proportion of patients is often called the {\it cure fraction}. 
-The term "cured" here means that a patient has responded to treatment and is a LTS.
+The term 'cured' here means that a patient has responded to treatment and is a LTS.
 
 % what are cure models
-The use of cure models is a special type of survival analysis where this cure fraction is accounted for.
+Cure models are a special type of survival analysis where this cure fraction is accounted for.
 Cure models split patients in to two groups (cured or not) and individuals are subject to one or two sources of risk.
 Cure models estimate the cure fraction, in addition to a (parametric) survival function for patients that are not cured.
 The mortality risk in the cured patients is informed by a background mortality rate.
 The population that is not cured is subject both to background mortality and to additional mortality from their disease, estimated using a survival model.
 \cite{Amico2018}
 There are several types of cure models and a rich and growing body of research in this area.
-(see \citep{Yu2013} for a comparison and guidance with application to oncology.)
+(see \cite{Yu2013} for a comparison and guidance with application to oncology.)
 
 % why are cure models important
 Cure models are important because ... if you don't account for a mixture then give the wrong results
 
-Specifically, when applied in health economics modelling, cure models are important because the results of lifetime survival are used in cost-effectiveness analyses which influence policy decisions.
+Specifically when applied in health economics modelling, cure models are important because the results of the life time survival are used in cost-effectiveness analyses which influence policy decisions.
 Incorrect modelling will misinform the decision-makers.
 
 % brief review of existing applications
 
-{\it BMC to give background...}
+BMC to give background...
 
-There are several issues with existing approaches to cure modelling.
+Several issues with existing approaches:
 
 % correlated events
-Firstly, when the event-types are correlated, such as with the common events of interest overall survival (OS) and progression-free survival (PFS), this should be accounted for in the modelling.
-Performing separate, independent analysis may even give counter-intuitive results.
+Firstly, when the event-types are correlated, such as with OS and PFS, this should be accounted for in the modelling.
+Performing separate, independent analysis may give counter-intuitive results.
 In the case of multiple types of end-points in the same trial, since the clinical interpretation of a cure fraction is the proportion of patients that respond to treatment,
 it may make intuitive sense that there is a single underlying cure fraction.
 For example, what would be the interpretation if there are differences in emergent survival plateaus between PFS and OS?
-This is a clinically unintuitive dichotomy between the resulting proportions of long-term survivors.
+This is a clinically unintuitive dichotomy between the resulting proportions of long-term survivors (LTS).
 
 % censoring
-Secondly, time to event data are typically right-censored times due to end to follow-up.
-The censoring times may be too premature to adequately characterise a survival model for a single event-type but by taking advantage of the set of event-types together this may be alleviated to give better survival model estimates.
+Secondly, time to event data is classically right-censored times due to end to follow-up.
+This may be too premature to adequately characterise the survival model for a single event-type but by thinking about the set of event-types together this may be alleviated.
 
 % extrapolation
-Lastly, extrapolation out to the full life times of patients is particularly important for health economics modelling in order to gauge the full effect of an intervention.
-This has not been a focus of cure modelling work.
+Lastly, extrapolation out to life times of patients is important for health economics modelling in order to guage the full effect of an intervention.
 
 % our innovative proposal
-Building on the existing literature, the main contributions of this paper are to address all of these issues.
-We will present a Bayesian hierarchical cure fraction model for multiple event types.
-We will show that this has the double advantage of borrowing information between event types
-(e.g. in the case of OS and PFS, the likely more mature PFS data can inform the often highly censored OS analysis) and obtaining a global cure fraction.
+Building on the existing literature, the main contribution of this paper is to address all of these issues.
+A Bayesian hierarchical model of PFS and OS, which has the double advantage of borrowing information between event types
+(e.g. the likely more mature PFS data to inform the highly censored OS) and obtaining a global cure fraction.
 
 % review of related work
-Survival analysis generally is a core approach used in health economics.
-For a non-cure model survival analysis in health economics see \cite{Demiris2006, Jackson2010}.
-Within a frequentist paradigm, an example of related work is a multi-level modelling approach in mixture cure modelling using random effects to model multilevel clustering structure in the linear predictors in both hazard function and cured probability parts \cite{Lai2009}.
-Correlation between random effects in the uncured survival and cure fraction has also been investigated using a bivariate Normal distribution \cite{Lai2008}.
+For a non-cure fraction model survival analysis in health economics \cite{Demiris2006,Jackson2010}.
+A frequentist multi-level modelling approach in mixture cure modelling has been studies previously \cite{Lai2009}.
+They use random effects to model multilevel clustering structure in the linear predictors in both hazard function and cured probability parts.
 However, to our knowledge there has been no Bayesian fully-parametric mixture cure model with a multi-level modelling structure for event types.
+Correlation between random effect in the uncured survival and cure fraction has also been investigated using a bivariate Normal distribution \cite{Lai2008}.
 
 % which distributions
 A suite of distributions given in NICE guidelines for Health Technology Assessments (HTA) \cite{Latimer2011} include
 Exponential, Weibull, Gompertz, Log-logistic and Log-Normal.
 This has been interpreted as meaning all of these distributions should be modelled with a given data set.
 This prescriptive approach does not take into account what we know {\it a priori} about the problem.
-In reality, a subset of these distributions will be more appropriate for the problem and so these are the ones that should be used.
+In reality, a subset of these distributions will be more appropriate for the problem.
 
 % general HTA survival framework
 In many mixture cure fraction analyses the survival associated with the uncured fraction of the population is represented by a Cox proportional hazard model.
 This means that the baseline hazard is left unspecified but still the coefficients can be estimated.
-However, we are concerned with the application of cure models to a health economics context and so it is important to determine life-time survival in order to calculate total health impact measures such as quality-adjusted life-years (QALY) and life-years lost (LYL).
+However, we are concerned with the application of cure models to a health economics context.
+In this case it is important to determine life-time survival in order to calculate total health impact measures such as quality-adjusted life-years (QALY) and life-years lost (LYL).
 Therefore, the semi-parametric approach is inadequate because we must extrapolate beyond the observed data.
-In this paper, we will adopt a fully-parametric model for the uncured survival.
+In this paper we will adopt a fully-parametric model for the uncured survival.
 
 % software
 This analysis was carried-out using the Stan inference engine
@@ -149,7 +147,7 @@ The details of the algorithm can be found in the Appendix.
 The packaged code is in a generalisable framework and can be downloaded from here.
 
 The paper is structured as follows.
-In the next section the motivating example and data used throughout is outlined.
+Next, the motivating example and data used throughout is outlined in Section~\ref{sec:example}.
 We introduce the basic mixture cure model in Section~\ref{section:basic_model}, before extending this to our Bayesian hierarchical model in Section~\ref{section:hier_model}.
 In Section~\ref{sec:application} our novel modelling approach is applied to the motivating example dataset.
 Comparisons are made between our approach and an independent model analogue.
@@ -186,20 +184,35 @@ Median PFS and OS are 6.93 months (95\% confidence interval (CI) 5.32 - 10.41) a
 A full set of summary statistics can be found in the supplementary material.
 %table
 
-{\it How it compares with other dataset prevalent in our field/applications? BMS?}
+{\it How it compares with dataset prevalent in our field/applications? BMS?}
 
 %
 \section{Modelling framework}\label{sec:methods}
 In this section, we firstly present the standard mixture cure model for a single event of interest.
-Then we give our general modelling framework before focusing on the application of interest.
+Then we given our general modelling framework before focusing on the application of interest.
 The model improves the typical approach used by linking multiple event-type modules using a hierarchical cure fraction.
 Throughout we refer to our motivating example of jointly modelling PFS and OS.
 
-Consider a study in which $n$ individuals are observed and the (non-negative) time to either progression ($T_{1i}$) or death ($T_{2i}$) are recorded for each individual $i=1,\ldots,n$. Also, for each of the two outcomes $j=1=$ PFS and $j=2=$ OS, we consider a censoring time $C_{ji}$ and an event indicator $\delta_{ji}=\mathbb{I}(T_{ji}<C_{ji})$ --- obviously, $\delta_{ji}=1$ if the $j-$th outcome is fully observed for individual $i$ and 0 if it is censored. The observed survival time for the $j-$th outcome is then indicated as $t_{ji}=\min(T_{ji},C_{ji})$.
+There are two main approaches for formulating the MCM likelihood.
+The first is to consider the group membership of an individual to either cured or uncured as missing data [ref].
+Then the likelihood is defined in terms of the complete data and the augmented data are estimated along with the other parameters in the model, commonly using an EM algorithm.
+The second approach is not to be concerned with the individual classification but rather estimate a single cure fraction for the whole sample.
+This is the method used in this paper.
 
-Typically, the study will also measure some individual-level covariates, which we assume are collected in a matrix $\bm{X}_i$. These may include the individual age, sex, comorbidities and, usually a treatment arm indicator. The full data can be then represented as $\mathcal{D}_i=(\bm{t}_i,\bm{\delta}_i,\bm{x}_i)$, where $\bm{t}_i=(\bm{t}_{1i},\bm{t}_{2i})$, $\bm{\delta}_i=(\bm{\delta}_{1i},\bm\delta_{2i})$.
+Assume that some patient-level time to event data are collected from a trial on $i = 1, \ldots, n$ individuals who are given treatments $j = 1, \ldots, m_i$.
+Denote $T_{ij}$ to be the non-negative event times for the $i$th individual and treatment $j$.
+Observe a sample of event times for some parametric distribution
+\[
+T \mid \bm{\theta} \sim p(t \mid \bm{\theta}).
+\]
+Denote $C_{ij}$ a censoring time for the $i$th individual and treatment $j$.
+Then define the censoring indicator $\delta_{ij} = I(T_{ij} < C_{ij})$ and variable denoting the observed survival time $t_{ij} = \min(T_{ij}, C_{ij})$.
+Either $\delta_{ij} = 1$ or $0$ denoting an event or censored observation at $t_{ij}$.
+The observed data on the $i$th individual and treatment $j$ are thus
+$\mathcal{O}_{ij} = (t_{ij}, \delta_{ij}, \boldsymbol{x}_{ij}),\; i = 1, \ldots, N, \; j = 1, \ldots, m_i \leq M$,
+where $\boldsymbol{x}_{ij} = (x_{ij1}, \ldots, x_{ijS})$ is the individual covariate vector.
+Covariates may be experimental (e.g. treatment assignment) or prognostic factors.
 
-We model the observed times using a parametric sampling distribution $t_{ji} \sim p(t_{ji}\mid \bm\theta_j)$ as a function of a set of model parameters $\bm\theta_j=(\bm\alpha_j, \bm\mu_j)$, where HERE USE survHE manual DESCRIPTION OF LOCATION/MEAN vs SHAPE/VARIANCE PARAMETERS TO BE GENERAL. 
 
 \subsection{The standard mixture cure model} \label{section:basic_model}
 
@@ -287,8 +300,7 @@ The event times are often correlated because they are for the same individual.
 In our motivating example, $t_i^{OS} = t_i^{PFS} + t_i^{PPS}$ where $t_i^{PPS}$ is the duration in a post-progression state and can be $0$.\\
 PFS and OS need not be for the same sample of patients.
 
-Bivariate Normal placed on the OS and PFS rates could be one option for modelling the connection\cite{Tan2018}.
-Instead we will impose dependency with hyperparameters.
+Bivariate Normal places on the OS and PFS rates could be one option for modelling the connection\cite{Tan2018} but we will impose dependency with hyperparameters.
 % Tan2018 model log HR rather than cure fraction
 
 Figure~\ref{fig:hier_dag} shows a graphical representation of the general modelling framework described for OS and PFS.
@@ -325,7 +337,7 @@ We consider three alternatives.
 
 Firstly, we can model the cure fraction corresponding to each event type completely separately, assuming that they are independent.
 $$
-\pi_k \perp\!\!\!\perp \pi_{k'}, \; k,k' = 1, \ldots, K.
+\pi_k \perp \pi_{k'}, \; k,k' = 1, \ldots, K.
 %\text{logit}(\pi_k) \sim \text{N}(\mu_k, \sigma_k^2), \; k = 1, \ldots, K.
 $$
 Secondly, we can assume that the cure fraction is the same for all event types and so pool the samples.

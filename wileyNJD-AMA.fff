@@ -1,0 +1,103 @@
+\begin{figure}[!HtH]
+\centering
+\includegraphics[width=0.6\linewidth]{S_raw_data_with_CI.png}
+\caption{\label{fig:S_raw_data} Kaplan-Meier curves of OS and PFS times with 95\% CI for the Checkmate 067 study data and {\it Ipilimumab}, {\it Nivolumab} and combination treatments.
+Median survival times are shown with dashed lines.}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+\centering
+\includegraphics[width=0.6\linewidth]{DAG_with_Tx.png}
+\caption{\label{fig:hier_dag} Hierarchical cure fraction DAG for PFS and OS.
+Solid lines represent stochastic and dashed lines deterministic relationships, respectively.
+Cured patients have fixed hazards taken from WHO life-tables.
+The distribution of times for uncured patient regresses on covariates for the rate parameter and $\phi$ is the set of ancillary parameters.
+Censoring has been omitted for brevity.}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{plot_S_grid_cf_hier.png}
+\caption{\label{fig:S_grid_cf_hier} Hierarchical model posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events and {\it ipilimumab}, {\it nivolumab} and combination treatments. The black lines show the Kaplan-Meier curves.}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{plot_S_grid_cf_separate.png}
+\caption{\label{fig:S_grid_separate} Separate model posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events {\it ipilimumab}, {\it nivolumab} and combination treatments. The black lines show the Kaplan-Meier curves.}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{forest_plot_joint_cf_hier.png}
+\caption{\label{fig:cf_forest_all_tx} Hierarchical model posterior cure fraction forest plots with 95\% credible intervals for (i) {\it ipilimumab} only (ii) {\it nivolumab} only and (iii) combination treatment.}
+% \end{sidewaysfigure}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{forest_plot_joint_all_tx_separate.png}
+\caption{\label{fig:cf_forest_all_tx_sep} Separate model posterior cure fraction forest plots with 95\% credible intervals for (i) {\it ipilimumab} only (ii) {\it nivolumab} only and (iii) combination treatment.}
+% \end{sidewaysfigure}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}[!H]
+\centering
+\includegraphics[width=0.6\linewidth]{forest_plot_cf_sep_cpt.png}
+\caption{\label{fig:forest_plot_cf_cutpoint_sep} Posterior cure fraction forest plot for study data censored at 12 months, 30 months and the complete data set using the separate model.}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}[!H]
+\centering
+\includegraphics[width=0.6\linewidth]{forest_plot_cf_hier_cpt.png}
+\caption{\label{fig:forest_plot_cf_cutpoint_hier} Posterior cure fraction forest plot for study data censored at 12 months, 30 months and the complete data set using the hierarchical model.}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}[!H]
+\centering
+\includegraphics[width=0.6\linewidth]{S_cp_12mo_exp_lognormal_sep.png}
+\caption{\label{fig:S_cutpoint_12mo_sep} Separate model posterior survival curves for exponential/exponential and log-Normal/log-Normal uncured fraction for OS/PFS events and censored times at 12 months. The black lines show the observed data Kaplan-Meier curves.}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}[!H]
+\centering
+\includegraphics[width=0.6\linewidth]{S_cp_12mo_exp_lognormal_hier.png}
+\caption{\label{fig:S_cutpoint_12mo_hier} Hierarchical model posterior survival curves for exponential/exponential and log-Normal/log-Normal uncured fraction for OS/PFS events and censored times at 12 months. The black lines show the observed data Kaplan-Meier curves.}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}[H]
+    \centering
+    \subfloat[\centering OS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_exp_exp_os.png} }}%
+    \qquad
+    \subfloat[\centering PFS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_exp_exp_pfs.png} }}%
+    \caption{Posterior predictive values Kaplan-Meier curves for exponential OS and exponential PFS distributions with the hierarchical model. Black lines represent outcomes for 20 predicted cohorts and the red line is for the observed data.}%
+%     \label{fig:ppv_km_exp}%
+% \end{figure}
+
+% \begin{figure}[H]
+    \centering
+    \subfloat[\centering OS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_weibull_weibull_os.png} }}%
+    \qquad
+    \subfloat[\centering PFS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_weibull_weibull_pfs.png} }}%
+    \caption{Posterior predictive values Kaplan-Meier curves for weibull OS and weibull PFS distributions with the hierarchical model. Black lines represent outcomes for 20 predicted cohorts and the red line is for the observed data.}%
+%     \label{fig:ppc_km_wei}%
+% \end{figure}
+
+% \begin{figure}[H]
+    \centering
+    \subfloat[\centering OS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_gompertz_gompertz_os.png} }}%
+    \qquad
+    \subfloat[\centering PFS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_gompertz_gompertz_pfs.png} }}%
+    \caption{Posterior predictive values Kaplan-Meier curves for gompertz OS and gompertz PFS distributions with the hierarchical model. Black lines represent outcomes for 20 predicted cohorts and the red line is for the observed data.}%
+    % \label{fig:ppv_km_gomp}%
+\end{figure}
