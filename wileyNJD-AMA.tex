@@ -41,6 +41,8 @@
 
 \presentaddress{}
 
+%ORCID ID: 0000-0002-7056-2741
+
 \abstract[Summary]{
 Time to an event of interest over a lifetime is a central measure of the clinical benefit of an intervention used in a health economic evaluation (HEE).
 Within the same trial multiple event-types may also be considered.
@@ -48,9 +50,9 @@ For example, overall and progression-free survival time for different drugs in o
 A common situation is when an intervention is only effective for some unobserved proportion of the population.
 So we need to estimate latent group membership as well as separate survival models for each.
 However, in real-life trials follow-up may be relatively short leading to substantial censoring.
-We present a general Bayesian hierarchical framework that can handle this complexity by exploiting the similarity of cure fractions between event types;
+We present a general Bayesian hierarchical framework that can handle this complexity by exploiting the similarity of cure fractions between outcomes;
 accounting for the correlation between them and improving the extrapolation beyond the observed data.
-Assuming exchangeability between cure fractions facilitates the borrowing of information between event type.
+Assuming exchangeability between cure fractions facilitates the borrowing of information between outcome.
 We show the benefits of using our approach with a motivating example, the Checkmate 067 trial.
 }
 
@@ -67,6 +69,13 @@ We show the benefits of using our approach with a motivating example, the Checkm
 
 
 \section{Introduction}\label{sec:intro}
+
+% how survival data are instrumental to HTA evaluation (you can look at the survHE manual/paper intro)
+% sometimes, especially since the development of potentially highly successful immuno-oncology treatment, you tend to see a plateau in the **limited** range of the available survival curve/data
+% bring these two together by highlighting the fact that often you have consecutive data cuts (with increasingly better information/lower censoring), but decisions are often made on a very early cut. This may be instrumental into justifying how we want to link up PFS and OS.
+% we can bring about the motivating example and the plan of the chapter.
+
+
 
 % set the scene
 % cancer trials have two groups
@@ -116,8 +125,8 @@ This has not been a focus of cure modelling work.
 
 % our innovative proposal
 Building on the existing literature, the main contributions of this paper are to address all of these issues.
-We will present a Bayesian hierarchical cure fraction model for multiple event types.
-We will show that this has the double advantage of borrowing information between event types
+We will present a Bayesian hierarchical cure fraction model for multiple outcomes.
+We will show that this has the double advantage of borrowing information between outcomes
 (e.g. in the case of OS and PFS, the likely more mature PFS data can inform the often highly censored OS analysis) and obtaining a global cure fraction.
 
 % review of related work
@@ -125,14 +134,14 @@ Survival analysis generally is a core approach used in health economics.
 For a non-cure model survival analysis in health economics see \cite{Demiris2006, Jackson2010}.
 Within a frequentist paradigm, an example of related work is a multi-level modelling approach in mixture cure modelling using random effects to model multilevel clustering structure in the linear predictors in both hazard function and cured probability parts \cite{Lai2009}.
 Correlation between random effects in the uncured survival and cure fraction has also been investigated using a bivariate Normal distribution \cite{Lai2008}.
-However, to our knowledge there has been no Bayesian fully-parametric mixture cure model with a multi-level modelling structure for event types.
+However, to our knowledge there has been no Bayesian fully-parametric mixture cure model with a multi-level modelling structure for outcomes.
 
 % which distributions
 A suite of distributions given in NICE guidelines for Health Technology Assessments (HTA) \cite{Latimer2011} include
 Exponential, Weibull, Gompertz, Log-logistic and Log-Normal.
 This has been interpreted as meaning all of these distributions should be modelled with a given data set.
-This prescriptive approach does not take into account what we know {\it a priori} about the problem.
-In reality, a subset of these distributions will be more appropriate for the problem and so these are the ones that should be used.
+This prescriptive approach does not take into account what may be known {\it a priori} about the problem.
+In reality, a subset of these parametric models will be more plausible for the data and so these are the ones that should be investigated.
 
 % general HTA survival framework
 In many mixture cure fraction analyses the survival associated with the uncured fraction of the population is represented by a Cox proportional hazard model.
@@ -156,7 +165,8 @@ Comparisons are made between our approach and an independent model analogue.
 Finally, in Section~\ref{sec:discussion} we discuss the results and future work.
 
 \section{Motivating example}\label{sec:example}
-Our motivating example concerns a long term study of melanoma therapies [ref].
+Our motivating example concerns a long term study of melanoma therapies.
+We give a brief overview of the data (see \cite{Larkin2019} for more details).
 
 \subsection{Checkmate 067 trial data}
 % 2.5 months (and other) follow-up appointments creating interval censored PFS data.
@@ -171,9 +181,9 @@ Figure~\ref{fig:S_raw_data} shows the Kaplan-Meier survival curves for the OS an
 Median survival times are shown with dashed lines.}
 \end{figure}
 
-The data source for the analysis is the patient-level data from the CheckMate 067 trial [ref?].
-Our dataset contains $n = 945$ subjects (8 with a missing treatment indicator, i.e. the actual treatment received).
-The treatment groups are as  follows:
+The data source for the analysis consists of the patient-level data from the CheckMate 067 trial\cite{Larkin2019}.
+The dataset contains $n = 945$ subjects (8 with a missing treatment indicator, i.e. the actual treatment received).
+The treatment groups are as follows:
 \begin{description}
 \item[Nivolumab monotherapy] 3 mg/kg intravenous (IV) once every 2 weeks (Q2W). 313 patients were treated (203 PFS events and 175 OS events).
 Median PFS and OS are 6.93 months (95\% confidence interval (CI) 5.32 - 10.41) and 36.9 months (95\% CI 31.24 - 60.9), respectively. {\it should time be in months/days?}
@@ -195,48 +205,53 @@ Then we give our general modelling framework before focusing on the application 
 The model improves the typical approach used by linking multiple event-type modules using a hierarchical cure fraction.
 Throughout we refer to our motivating example of jointly modelling PFS and OS.
 
-Consider a study in which $n$ individuals are observed and the (non-negative) time to either progression ($T_{1i}$) or death ($T_{2i}$) are recorded for each individual $i=1,\ldots,n$. Also, for each of the two outcomes $j=1=$ PFS and $j=2=$ OS, we consider a censoring time $C_{ji}$ and an event indicator $\delta_{ji}=\mathbb{I}(T_{ji}<C_{ji})$ --- obviously, $\delta_{ji}=1$ if the $j-$th outcome is fully observed for individual $i$ and 0 if it is censored. The observed survival time for the $j-$th outcome is then indicated as $t_{ji}=\min(T_{ji},C_{ji})$.
+Consider a study in which $n$ individuals are observed and the (non-negative) time to either progression ($T_{1i}$) or death ($T_{2i}$) are recorded for each individual $i=1,\ldots,n$.
+Also, for each of the two outcomes $j=1=$ PFS and $j=2=$ OS, we consider a censoring time $C_{ji}$ and an event indicator $\delta_{ji} = \mathbb{I}(T_{ji} < C_{ji})$
+--- obviously, $\delta_{ji} = 1$ if the $j-$th outcome is fully observed for individual $i$ and 0 if it is censored.
+The observed survival time for the $j-$th outcome is then indicated as $t_{ji} = \min(T_{ji}, C_{ji})$.
 
-Typically, the study will also measure some individual-level covariates, which we assume are collected in a matrix $\bm{X}_i$. These may include the individual age, sex, comorbidities and, usually a treatment arm indicator. The full data can be then represented as $\mathcal{D}_i=(\bm{t}_i,\bm{\delta}_i,\bm{x}_i)$, where $\bm{t}_i=(\bm{t}_{1i},\bm{t}_{2i})$, $\bm{\delta}_i=(\bm{\delta}_{1i},\bm\delta_{2i})$.
+Typically, the study will also measure some individual-level covariates, which we assume are collected in a matrix $\bm{x}_i$.
+These may include the individual age, sex, comorbidities and, usually a treatment arm indicator.
+The full data can be then represented as
+$\mathcal{D}_i = (\bm{t}_i, \bm{\delta}_i, \bm{x}_i)$,
+where $\bm{t}_i = (\bm{t}_{1i}, \bm{t}_{2i})$, $\bm{\delta}_i = (\bm{\delta}_{1i}, \bm\delta_{2i})$.
 
-We model the observed times using a parametric sampling distribution $t_{ji} \sim p(t_{ji}\mid \bm\theta_j)$ as a function of a set of model parameters $\bm\theta_j=(\bm\alpha_j, \bm\mu_j)$, where HERE USE survHE manual DESCRIPTION OF LOCATION/MEAN vs SHAPE/VARIANCE PARAMETERS TO BE GENERAL. 
+In general, we model the observed times using a parametric sampling distribution $t_{ji} \sim p(t_{ji} \mid \bm\theta_j)$ as a function of a set of model parameters $\bm\theta_j = (\bm\alpha_j(\bm x), \mu_j(\bm x))$. 
+In this notation, the location parameter $\mu(x)$ indicates the mean or the scale of the probability distribution; and a (set of) ancillary parameters $\bm \alpha(x)$ describe the shape or variance of the distribution.
+Whilst it is possible for both $\mu$ and $\alpha$ to explicitly depend on the covariates $\bm x$, usually the formulation is simplified to assume that these only affect directly the location parameter.
+Since $t > 0$, we typically use a generalized linear formulation
+$$
+g(\mu) = \beta^{\mu}_0 + \sum_{p=1}^P \beta^{\mu}_p x_p \; [+ \ldots ],
+$$
+to model the rate or location parameter,
+where $\beta^{\mu}_0$ represents an intercept and $\beta^{\mu}_j$ are the coefficients for an individual's measurements.
+The $[+ \ldots]$ term indicates additional covariates.
+The function $g(\cdot)$ is typically the logarithm.
 
 \subsection{The standard mixture cure model} \label{section:basic_model}
 
-We believe the individuals to be a mixture of two distinct groups but do not observe to which group each individual belongs.
-Thus, the full set of model parameters consist of two separate groups of parameters $\bm\theta = (\bm\alpha, \bm\mu)$.
-The standard mixture cure model (MCM) (sometimes called a long-term survival model) has such a set-up and is the basis of the proposed model.
-The MCM is a type of cure model where survival is modelled as a mixture of those who are cured and those who are not.
-In the simplest case, this consists of those who will never experience the event of interest and those who remain at risk of the event.
-The more general case adopted in this paper is when cured does not mean that an individual will never experience the event of interest but the chance of doing so reverts to a general or background population probability e.g. all-cause mortality.
-The combined survival for a population with a cure fraction can be written as follows
+The standard mixture cure model (MCM) (sometimes called a long-term survival model), which is the basis of the proposed model, assumes a mixture of two distinct groups so that the full set of model parameters consist of two separate groups of parameters $\bm\omega = (\bm\theta_b, \bm\theta_u)$.
+The combined survival model for a population with a cure fraction can be written as follows
 
 \begin{equation}
 \label{eqn:mcm}
-S(t \mid \bm\theta, \bm{x}) = S_b(t \mid \bm\alpha, \bm{x}) [\pi(\bm{x}) + (1 - \pi(\bm{x})) S_u(t \mid \bm\mu, \bm{x})],
+S(t \mid \bm\omega, \bm{x}) = S_b(t \mid \bm\theta_b, \bm{x}) \left[\pi(\bm{x}) + (1 - \pi(\bm{x})) S_u(t \mid \bm\theta_u, \bm{x}) \right],
 \end{equation}
 \\
 \noindent
-where $S(t) = 1 - \int_0^t p(s \mid \theta) \text{d}s$ denotes survival at time $t$,
-$S_b(t \mid \bm\alpha, \bm{x})$ is a function of the background mortality at time $t$ conditional on covariates $x$,
+where $S(t) = 1 \!-\! \int_0^t p(s \mid \theta)\, \text{d}s$ denotes survival at time $t$,
+$S_b(t \mid \bm\theta_b, \bm{x})$ is a function of the background mortality at time $t$ conditional on covariates $x$,
 % some papers denote \pi as _uncured_ fraction
 $\pi(x)$ denotes the probability of being cured conditional on covariates $x$,
-and $S_u(t \mid \bm\mu, \bm{x})$ is a function of the (excess) mortality due to cancer at time $t$ conditional on covariates $x$.
+and $S_u(t \mid \bm\theta_u, \bm{x})$ is a function of the (excess) mortality due to cancer at time $t$ conditional on covariates $x$.
 
-The survival distributions parameters $\bm\alpha$ and $\bm\mu$ comprise of a {\it rate} $\lambda_{\alpha}$, $\lambda_{\mu}$ and a set of {\it ancillary} parameters $\phi_{\alpha}$ and $\phi_{\mu}$.
-We can model the rate parameter using a generalised linear structure, e.g.
-$$
-g(\lambda_i) = \beta^{\lambda}_0 + \beta^{\lambda}_1 x_{age, i} \; [+ \ldots ],
-$$
-where $\beta^{\lambda}_0$ represents an intercept and $\beta^{\lambda}_1$ the coefficients for an individual's age $x_{age}$.
-The $[+ \ldots]$ term indicates additional covariates.
 All treatments are included in the same model with the following fixed effect model for the cure fraction
 \begin{equation}
 \label{eqn:pi_regn}
-\mbox{logit}(\pi_j) = \sum_j \beta^{\pi}_j \mbox{TRT}_j \;[+ \ldots]
+\mbox{logit}(\pi_k) = \sum_k^K \beta^{\pi}_k \mbox{TRT}_k \;[+ \ldots]
 \end{equation}
 \noindent
-where $\beta^{\pi}_j$ are the regression coefficients quantifying the impact of treatment $\mbox{TRT}_j$.
+where $\beta^{\pi}_k$ are the regression coefficients quantifying the impact of treatment $\mbox{TRT}_k$.
 The $[+ \ldots]$ term could include a frailty term in the model.
 {\it Also, this would be naturally considered a "structured"/random effect in a Bayesian context - worth expanding on that?...}\\
 The treatment identifier is included in the covariate vector $x$.
@@ -263,22 +278,21 @@ For this work we shall use WHO hazard point estimates as fixed and known.
 We could consider the WHO estimates to provide sufficiently accurate estimates
 given the sample size and so incorporating uncertainty is not necessary.
 This also forces consistency across fits.
-Denote the WHO estimates for individual $i$ and treatment $j$ as
-$\hat{p}_{ij}, \hat{S}_{ij}, \hat{h}_{ij}$ for the density,
-survival and hazard respectively, and include these in the set of observed
-data $\mathcal{O}$.
+Denote the WHO estimates for individual $i$ and outcome $j$ as
+$\hat{p}_{ij}, \hat{S}_i, \hat{h}_i$ for the density,
+survival and hazard respectively.
 
 This gives
 \begin{equation*}
-p(t_{ij} \mid \bm\theta, \mathcal{O}_{ij}) = \hat{S}_{ij} \hat{h}_{ij}^{\delta_{ij}} \left[\pi(x_{ij}) + (1 - \pi(x_{ij})) S_u(t_{ij} \mid, \boldsymbol{x}_{ij}) h_u(t_{ij} \mid \boldsymbol{x}_{ij})^{\delta_{ij}} \right]
+p(t_{ij} \mid \bm\theta, x_{ij}) = \hat{S}_i \hat{h}_i^{\delta_{ij}} \left[\pi(x_{ij}) + (1 - \pi(x_{ij})) S_u(t_{ij} \mid \theta_u, \boldsymbol{x}_{ij}) h_u(t_{ij} \mid \boldsymbol{x}_{ij})^{\delta_{ij}} \right]
 \end{equation*}
 
-{\it Sharples ref re Gamma process?}
+Gamma process? \cite{Demiris2006}
 
 
 \subsection{The hierarchical mixture cure model} \label{section:hier_model}
 {\it There may be information in one sample of event times which we can use to improve the inference from another.\\
-Follow-up time can be relatively short for some of the event types and so there is missing data due to censoring.
+Follow-up time can be relatively short for some of the outcomes and so there is missing data due to censoring.
 In this case it is even more important to make use of what information we do have available from related event times, possibly with more complete data.\\
 In particular, OS times are necessarily longer than PFS times so will be subject to more censoring.
 The limited data can lead to considerable uncertainty.}\\
@@ -303,46 +317,45 @@ The distribution of times for uncured patient regresses on covariates for the ra
 Censoring has been omitted for brevity.}
 \end{figure}
 
-We extend the observed data notation and introduce index $k$ for multiple event types of interest
-i.e. for the $i$th individual, $j$th treatment and $k$th event type 
-$\mathcal{O} = (t_{ijk}, \delta_{ijk}, \boldsymbol{x}_{ij}), \; k = 1, \ldots, K$.
-In our motivating example $K = 2$ for progression-free survival and overall survival.
+We extend the observed data notation so that index $j$ is for multiple outcomes of interest
+i.e. for the $i$th individual, $j$th outcome and $k$th treatment.
+In our motivating example $J = 2$ for progression-free survival and overall survival.
 The set of covariates used can be different for each $k$ and $\pi$.
 
 The joint model is
 $$
-p(t \mid \boldsymbol{\beta^{\pi}}, \boldsymbol{\alpha^1}, \ldots, \boldsymbol{\alpha^K}, \boldsymbol{\mu}, \mathcal{O}) =
-\prod_k p(t_k \mid \boldsymbol{\beta^{\pi}}, \boldsymbol{\alpha^{k}}, \boldsymbol{\mu}, \mathcal{O})
+p(t \mid \boldsymbol{\beta^{\pi}}, \boldsymbol{\omega^1}, \ldots, \boldsymbol{\omega^J}) =
+\prod_{j=1}^J p(t_j \mid \boldsymbol{\beta^{\pi}}, \boldsymbol{\omega^j})
 $$
 A multilevel frailty cure fraction model for the latent variable formulation was considered by \cite{Tawiah2020}.
-A related generalisation by \cite{Balogun2020} consider a single event type but multiple co-infections with different cure fractions,
+A related generalisation by \cite{Balogun2020} consider a single outcome but multiple co-infections with different cure fractions,
 similar to how we have different cure fractions for each treatment.
 
 %
-\subsubsection{Representing the cure fraction when there are multiple event types}
+\subsubsection{Representing the cure fraction when there are multiple outcomes}
 In this section we consider how to construct the extended model.
 We consider three alternatives.
 
-Firstly, we can model the cure fraction corresponding to each event type completely separately, assuming that they are independent.
+Firstly, we can model the cure fraction corresponding to each outcome completely separately, assuming that they are independent.
 $$
-\pi_k \perp\!\!\!\perp \pi_{k'}, \; k,k' = 1, \ldots, K.
+\pi_j \perp\!\!\!\perp \pi_{j'}, \; j,j' = 1, \ldots, J.
 %\text{logit}(\pi_k) \sim \text{N}(\mu_k, \sigma_k^2), \; k = 1, \ldots, K.
 $$
-Secondly, we can assume that the cure fraction is the same for all event types and so pool the samples.
+Secondly, we can assume that the cure fraction is the same for all outcomes and so pool the samples.
 In our example, PFS can be used as a proxy for OS since there are fewer missing data.
-There may be no reason why the cure fraction should be different between different event types, especially if individuals are observed for long enough.
+There may be no reason why the cure fraction should be different between different outcomes, especially if individuals are observed for long enough.
 In this case
 $$
-\pi_k = \pi_{k'}, \; k,k' = 1, \ldots, K.
+\pi_j = \pi_{j'}, \; j,j' = 1, \ldots, J.
 $$
 Lastly, and the approach adopted in this paper, is a compromise between the first two approaches called partial-pooling.
-We propose a hierarchical structure on the cure fraction assuming exchangeability between all event types $k$ for each treatment $j$ with mean value from (\ref{eqn:pi_regn}).
+We propose a hierarchical structure on the cure fraction assuming exchangeability between all outcomes $j$ for each treatment $k$ with mean value from (\ref{eqn:pi_regn}).
 $$
-\text{logit}(\pi_{jk}) \sim \text{N}(\pi_j, \sigma_j^2), \; k = 1, \ldots, K.  
+\text{logit}(\pi_{jk}) \sim \text{N}(\pi_k, \sigma_k^2), \; j = 1, \ldots, J.  
 $$
 
 
-\subsubsection{Prior specification for OS, PFS model}
+\subsubsection{Prior specification for motivating example}
 Where possible the choice of priors should be informed by expert opinion and prior results.
 We specify vague priors on log-scale for the coefficients of the OS and PFS rates $\log(\lambda_{OS}),  \log(\lambda_{PFS})$.
 Centering the ages, the baseline is a vague prior ${\beta_0^{PFS} \sim \text{N}(0, 100),}\; {\beta_0^{OS} \sim \text{N}(0, 100)}$
@@ -354,7 +367,7 @@ The hierarchical cure fraction is modelled as a fixed effect linear regression w
 This corresponds to a prior mean cure fraction of just under 0.5, and 10\% and 1\% chance of exceeding 0.6 and 0.7 respectively.  
 
 The random effect variance on the global cure fraction is a noninformative (folded) half-Normal \cite{Gelman2006} with 
-${\sigma^2 \sim \text{N}(0, 2.5)I(0,)}$, where $\text{N}(0, 2.5)I(0,)$ denotes a normal distribution truncated at mean 0.
+${\sigma^2 \sim \text{N}(0, 2.5)\mathbb{I}(0,)}$, where $\text{N}(0, 2.5)\mathbb{I}(0,)$ denotes a normal distribution truncated at mean 0.
 Alternatively, a noninformative uniform prior density on standard deviation parameters $\sigma$ is expected to generally work well when $J > 5$.
 For small hierarchical variance a $\text{Gamma}(2, 0.1)$ may be preferred \cite{Chung2013}.
 
@@ -669,8 +682,8 @@ The hierarchical model, which exhibited more stable estimation, would be more re
 {\it how should the complete responders be included in the main model? If they enter via the background adjustment why double-count them? Landmarking?}
 
 % model structure
-It may be that there is excessive borrowing of information between cure fractions when the event types are distinctly different.
-In our example, this is not necessary since there are only two event types but for a larger number this may be appropriate.
+It may be that there is excessive borrowing of information between cure fractions when the outcomes are distinctly different.
+In our example, this is not necessary since there are only two outcomes but for a larger number this may be appropriate.
 Partial-exchangeability can be used instead in this case \cite{Neuenschwander2016}.
 
 In terms of an outcome of interest and a surrogate end-point Papanikos~(2020) \cite{Papanikos2020} modelled their relationship using a Bivariate Normal distribution.
