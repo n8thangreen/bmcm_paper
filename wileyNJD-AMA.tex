@@ -7,7 +7,7 @@
 \usepackage{epstopdf}
 \usepackage{float}
 \usepackage{subfig}
-\usepackage{endfloat}
+% \usepackage{endfloat}
 \usepackage{bm,amssymb,amsmath}
 
 
@@ -53,7 +53,7 @@ However, in real-life trials follow-up may be relatively short leading to substa
 We present a general Bayesian hierarchical framework that can handle this complexity by exploiting the similarity of cure fractions between outcomes;
 accounting for the correlation between them and improving the extrapolation beyond the observed data.
 Assuming exchangeability between cure fractions facilitates the borrowing of information between outcome.
-We show the benefits of using our approach with a motivating example, the Checkmate 067 trial.
+We show the benefits of using our approach with a motivating example, the CheckMate 067 phase 3 trial.
 }
 
 \keywords{Bayesian, survival analysis, oncology}
@@ -69,25 +69,54 @@ We show the benefits of using our approach with a motivating example, the Checkm
 
 
 \section{Introduction}\label{sec:intro}
+%%% HTA perspective %%%
 
-% how survival data are instrumental to HTA evaluation (you can look at the survHE manual/paper intro)
-% sometimes, especially since the development of potentially highly successful immuno-oncology treatment, you tend to see a plateau in the **limited** range of the available survival curve/data
-% bring these two together by highlighting the fact that often you have consecutive data cuts (with increasingly better information/lower censoring), but decisions are often made on a very early cut. This may be instrumental into justifying how we want to link up PFS and OS.
-% we can bring about the motivating example and the plan of the chapter.
+Survival data are instrumental to Health Technology Assessment (HTA) evaluation.
+Interventions that impact upon the time to some event of interest, such as disease progression or death, form a high proportion of the appraisals by NICE \citep{Latimer2011}.
+For instance, a new intervention may be expected to lengthen the amount of time a patient remains progression-free.
 
+% extrapolation
+In order to quantify accurately the health and economic benefits of a new intervention using survival data it is standard to estimate the {\it mean survival time}.
+This is in contrast to usual survival curve summaries, such as the median time.
+In order to calculate the mean survival time we require the full survival curve, i.e. over a patient's lifetime, but available data often only cover a limited time frame and are subject to a high degree of censoring. Thus, it is necessary to extrapolate the observed survival curve to a longer time horizon.
+A parametric approach to the survival analysis is usually followed to achieve this, as recommended by a highly influential NICE Decision Support Unit (DSU) Technical Support Document (TSD) \citep{Latimer2011}.
 
-
-% set the scene
-% cancer trials have two groups
-Better diagnosis and screening has lead to more cancer patients with long-term survival (LTS) equivalent to the general population.
+% plateau
+In the past decade, the development of potentially highly successful immuno-oncology treatments, and better diagnosis and screening has lead to cancer patients with improved survival outcomes and more long-term survival (LTS) patients comparable to the general population.
 In previous immuno-oncologic (IO) studies for melanoma therapies, such as {\it ipilimumab}, {\it nivolumab}, and dual {\it nivolumab} and {\it ipilimumab} combination,
-results have indicated that survival curves "plateau" for a considerable proportion of LTS patients [ref].
-This proportion of patients is often called the {\it cure fraction}. 
-The term "cured" here means that a patient has responded to treatment and is a LTS.
+results have indicated that survival curves "plateau" for a considerable proportion of LTS patients in the limited range of the available survival curve [ref].
 
+% bring these two together
+Often, available data consist of consecutive data cuts at pre-planned times. This is known as administrative censoring.
+Each data cut refers to the minimum follow-up data available for all patients that are still being followed up within the study.
+Later data cuts have increasingly better information and lower censoring than earlier data cuts.
+However, decisions are often made on an early data cut when the amount of information available to inform the decision is relatively small.
+Specifically, the survival plateau indicating a proportion of LTS may not have been reached at the time of an earlier data cut.
+In order to produce a complete survival curve to use in an HTA evaluation we would need to extrapolate the survival curve to the sustained plateau. 
+% This may be instrumental into justifying how we want to link up PFS and OS.
+How to principally and usefully do this is the subject of this paper.
+
+% plan of the paper
+The paper is structured as follows.
+In the next section the motivating example and data used throughout is outlined.
+We introduce the basic mixture cure model in Section~\ref{section:basic_model}, before extending this to our Bayesian hierarchical model in Section~\ref{section:hier_model}.
+In Section~\ref{sec:application} our novel modelling approach is applied to the motivating example dataset.
+Comparisons are made between our approach and an independent model analogue.
+Finally, in Section~\ref{sec:discussion} we discuss the results and future work.
+
+% software
+This analysis was carried-out using the Stan inference engine
+\cite{carpenter2017stan} called from R \cite{Rcoreteam} using the package \texttt{rstan} on a Windows 10 PC.
+Each fit employed 4 chains of 1000 iterations each, and a burn-in of 100 iterations.
+The details of the algorithm can be found in the Appendix.
+The packaged code is in a generalisable framework and can be downloaded from here.
+
+
+\subsection{Cure models}
 % what are cure models
-The use of cure models is a special type of survival analysis where this cure fraction is accounted for.
-Cure models split patients in to two groups (cured or not) and individuals are subject to one or two sources of risk.
+The use of cure models is a special type of survival analysis where the proportion of LTS or {\it cure fraction} is accounted for.
+The term "cured" here means that a patient has responded to treatment and is a LTS.
+Cure models explicitly split patients in to two groups (cured or not) and individuals are subject to one or two sources of risk.
 Cure models estimate the cure fraction, in addition to a (parametric) survival function for patients that are not cured.
 The mortality risk in the cured patients is informed by a background mortality rate.
 The population that is not cured is subject both to background mortality and to additional mortality from their disease, estimated using a survival model.
@@ -95,16 +124,9 @@ The population that is not cured is subject both to background mortality and to 
 There are several types of cure models and a rich and growing body of research in this area.
 (see \citep{Yu2013} for a comparison and guidance with application to oncology.)
 
-% why are cure models important
-Cure models are important because ... if you don't account for a mixture then give the wrong results
-
-Specifically, when applied in health economics modelling, cure models are important because the results of lifetime survival are used in cost-effectiveness analyses which influence policy decisions.
-Incorrect modelling will misinform the decision-makers.
-
 % brief review of existing applications
 
-{\it BMC to give background...}
-
+% issues
 There are several issues with existing approaches to cure modelling.
 
 % correlated events
@@ -116,12 +138,12 @@ For example, what would be the interpretation if there are differences in emerge
 This is a clinically unintuitive dichotomy between the resulting proportions of long-term survivors.
 
 % censoring
-Secondly, time to event data are typically right-censored times due to end to follow-up.
+Secondly, time to event data are typically right-censored times due to administrative censoring or loss to follow up.
 The censoring times may be too premature to adequately characterise a survival model for a single event-type but by taking advantage of the set of event-types together this may be alleviated to give better survival model estimates.
 
 % extrapolation
-Lastly, extrapolation out to the full life times of patients is particularly important for health economics modelling in order to gauge the full effect of an intervention.
-This has not been a focus of cure modelling work.
+Lastly, extrapolation out to the full lifetimes of patients is particularly important for health economics modelling in order to gauge the full cost and effect of an intervention.
+This has not yet been a focus of cure modelling work.
 
 % our innovative proposal
 Building on the existing literature, the main contributions of this paper are to address all of these issues.
@@ -150,25 +172,12 @@ However, we are concerned with the application of cure models to a health econom
 Therefore, the semi-parametric approach is inadequate because we must extrapolate beyond the observed data.
 In this paper, we will adopt a fully-parametric model for the uncured survival.
 
-% software
-This analysis was carried-out using the Stan inference engine
-\cite{carpenter2017stan} called from R \cite{Rcoreteam} using the package \texttt{rstan} on a Windows 10 PC.
-Each fit employed 4 chains of 1000 iterations each, and a burn-in of 100 iterations.
-The details of the algorithm can be found in the Appendix.
-The packaged code is in a generalisable framework and can be downloaded from here.
-
-The paper is structured as follows.
-In the next section the motivating example and data used throughout is outlined.
-We introduce the basic mixture cure model in Section~\ref{section:basic_model}, before extending this to our Bayesian hierarchical model in Section~\ref{section:hier_model}.
-In Section~\ref{sec:application} our novel modelling approach is applied to the motivating example dataset.
-Comparisons are made between our approach and an independent model analogue.
-Finally, in Section~\ref{sec:discussion} we discuss the results and future work.
 
 \section{Motivating example}\label{sec:example}
 Our motivating example concerns a long term study of melanoma therapies.
 We give a brief overview of the data (see \cite{Larkin2019} for more details).
 
-\subsection{Checkmate 067 trial data}
+\subsection{CheckMate 067 trial data}
 % 2.5 months (and other) follow-up appointments creating interval censored PFS data.
 % should we mention this/ include in modelling?
 
@@ -177,11 +186,11 @@ Figure~\ref{fig:S_raw_data} shows the Kaplan-Meier survival curves for the OS an
 \begin{figure}[!HtH]
 \centering
 \includegraphics[width=0.6\linewidth]{S_raw_data_with_CI.png}
-\caption{\label{fig:S_raw_data} Kaplan-Meier curves of OS and PFS times with 95\% CI for the Checkmate 067 study data and {\it Ipilimumab}, {\it Nivolumab} and combination treatments.
+\caption{\label{fig:S_raw_data} Kaplan-Meier curves of OS and PFS times with 95\% CI for the CheckMate 067 phase 3 trial data and {\it Ipilimumab}, {\it Nivolumab} and combination treatments.
 Median survival times are shown with dashed lines.}
 \end{figure}
 
-The data source for the analysis consists of the patient-level data from the CheckMate 067 trial\cite{Larkin2019}.
+The data source for the analysis consists of the patient-level data from the phase 3 CheckMate 067 trial\cite{Larkin2019}.
 The dataset contains $n = 945$ subjects (8 with a missing treatment indicator, i.e. the actual treatment received).
 The treatment groups are as follows:
 \begin{description}
@@ -263,7 +272,7 @@ However, we are focused on the full life-course of an individual and so include 
 %
 \subsubsection{Background survival}
 We used the World Health Organisation (WHO) life tables by country for the latest year available of 2016
-\cite{wholifetables} to inform the background mortality $S_b(t, x)$ in (\ref{eqn:mcm}).
+\cite{wholifetables} to inform the background mortality in the mixture cure model.
 The baseline hazards are the expected mortality rate for each
 patient at the age at which they experience the event. The mortality
 data are country, age and gender adjusted, thus providing a granular account of
@@ -278,14 +287,8 @@ For this work we shall use WHO hazard point estimates as fixed and known.
 We could consider the WHO estimates to provide sufficiently accurate estimates
 given the sample size and so incorporating uncertainty is not necessary.
 This also forces consistency across fits.
-Denote the WHO estimates for individual $i$ and outcome $j$ as
-$\hat{p}_{ij}, \hat{S}_i, \hat{h}_i$ for the density,
-survival and hazard respectively.
-
-This gives
-\begin{equation*}
-p(t_{ij} \mid \bm\theta, x_{ij}) = \hat{S}_i \hat{h}_i^{\delta_{ij}} \left[\pi(x_{ij}) + (1 - \pi(x_{ij})) S_u(t_{ij} \mid \theta_u, \boldsymbol{x}_{ij}) h_u(t_{ij} \mid \boldsymbol{x}_{ij})^{\delta_{ij}} \right]
-\end{equation*}
+Denote the WHO estimates for individual $i$ used for the background survival in (\ref{eqn:mcm}) as
+$S_b(t_i \mid \bm\theta_b, \bm{x}_i) = \hat{S}_i$.
 
 Gamma process? \cite{Demiris2006}
 
@@ -659,6 +662,7 @@ Earlier cuts can lead to quicker introduction in the market and reimbursement de
 
 % optimal stopping
 Another way to think about the cut-point data is to think about what time should we choose to halt the trial and end the data collection which would maximise some expected overall utility.
+% RSS conference talk ref? Anna?
 That is what is the optimal stopping time $\tau^*$ for the total utility $V$.
 $$
 \mathbb{E} V_{\tau^*} = \sup_{\tau} \mathbb{E} V_{\tau}
@@ -1039,11 +1043,11 @@ $\pi^{pfs}_3$ & 0.420 & (0.363, 0.48) &  & 0.421 & (0.368, 0.471) &  & 0.421 & (
 % \begin{sidewaystable}[H]
 \begin{center}
 \begin{table*}[t]
-\caption{Posterior summary statistics for separate model parameters and all OS distributions with gompertz PFS distribution. \label{tab:post_sep_pfs_gompertz}}
+\caption{Posterior summary statistics for separate model parameters and all OS distributions with Gompertz PFS distribution. \label{tab:post_sep_pfs_gompertz}}
 \centering
 \begin{tabular}{l c c c c c c c c c c c c c c c}
 \toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Gompertz}^1$} & & \multicolumn{2}{c}{\textbf{Gompertz}} & & \multicolumn{2}{c}{\textbf{Gompertz/Gompertz}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Gompertz}} & & \multicolumn{2}{c}{\textbf{log-Normal/Gompertz}}\\
+\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Gompertz}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Gompertz}} & & \multicolumn{2}{c}{\textbf{Gompertz/Gompertz}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Gompertz}} & & \multicolumn{2}{c}{\textbf{log-Normal/Gompertz}}\\
 \cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
 \textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
 \midrule
