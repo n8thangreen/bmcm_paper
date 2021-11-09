@@ -71,106 +71,47 @@ We show the benefits of using our approach with a motivating example, the CheckM
 \section{Introduction}\label{sec:intro}
 %%% HTA perspective %%%
 
-Survival data are instrumental to Health Technology Assessment (HTA) evaluation.
-Interventions that impact upon the time to some event of interest, such as disease progression or death, form a high proportion of the appraisals by NICE \citep{Latimer2011}.
+Survival data are instrumental to Health Technology Assessment (HTA) evaluation \cite{Demiris2006, Jackson2010}..
+Interventions that impact upon the time to events of interest, such as disease progression or death, form a high proportion of the appraisals by NICE \citep{Latimer2011}.
 For instance, a new intervention may be expected to lengthen the amount of time a patient remains progression-free.
+Further, multiple end-points for each patient may we considered in a single analysis.
 
 % extrapolation
 In order to quantify accurately the health and economic benefits of a new intervention using survival data it is standard to estimate the {\it mean survival time}.
-This is in contrast to usual survival curve summaries, such as the median time.
+This is in contrast to general survival curve summaries, such as the median time.
 In order to calculate the mean survival time we require the full survival curve, i.e. over a patient's lifetime, but available data often only cover a limited time frame and are subject to a high degree of censoring. Thus, it is necessary to extrapolate the observed survival curve to a longer time horizon.
 A parametric approach to the survival analysis is usually followed to achieve this, as recommended by a highly influential NICE Decision Support Unit (DSU) Technical Support Document (TSD) \citep{Latimer2011}.
 
 % plateau
-In the past decade, the development of potentially highly successful immuno-oncology treatments, and better diagnosis and screening has lead to cancer patients with improved survival outcomes and more long-term survival (LTS) patients comparable to the general population.
+Another important feature of the survival data has arisen in the past decade due to the development of potentially highly successful immuno-oncology treatments, and better diagnosis and screening.
+This has lead to cancer patients with improved survival outcomes and more long-term survival (LTS) patients comparable to the general population.
 In previous immuno-oncologic (IO) studies for melanoma therapies, such as {\it ipilimumab}, {\it nivolumab}, and dual {\it nivolumab} and {\it ipilimumab} combination,
-results have indicated that survival curves "plateau" for a considerable proportion of LTS patients in the limited range of the available survival curve [ref].
+results have indicated that survival curves "plateau" for a considerable proportion of LTS patients in the limited range of the available survival curve \citep{Wolchok2017, Larkin2019}.
+That is, the survival curve converges to a probability greater than zero and does not appear to decrease further.
 
-% bring these two together
+% bring these together
 Often, available data consist of consecutive data cuts at pre-planned times. This is known as administrative censoring.
 Each data cut refers to the minimum follow-up data available for all patients that are still being followed up within the study.
 Later data cuts have increasingly better information and lower censoring than earlier data cuts.
-However, decisions are often made on an early data cut when the amount of information available to inform the decision is relatively small.
-Specifically, the survival plateau indicating a proportion of LTS may not have been reached at the time of an earlier data cut.
-In order to produce a complete survival curve to use in an HTA evaluation we would need to extrapolate the survival curve to the sustained plateau. 
+However, decisions are often made on an early data cut when the amount of information available to inform the decision is relatively small \citep{Bullement2020}.
+Thus, the survival plateaus, from e.g. IO studies, indicating a proportion of LTS may not have been reached at the time of an earlier data cut.
+In order to obtain complete survival curves to use in an HTA evaluation we need to extrapolate the survival curves to the sustained plateau. 
 % This may be instrumental into justifying how we want to link up PFS and OS.
-How to principally and usefully do this is the subject of this paper.
+How to principally and usefully do this for trials with multiple treatments and end-points is the subject of this paper.
 
 % plan of the paper
 The paper is structured as follows.
-In the next section the motivating example and data used throughout is outlined.
+In the next section, the motivating example and data used throughout is outlined.
 We introduce the basic mixture cure model in Section~\ref{section:basic_model}, before extending this to our Bayesian hierarchical model in Section~\ref{section:hier_model}.
 In Section~\ref{sec:application} our novel modelling approach is applied to the motivating example dataset.
 Comparisons are made between our approach and an independent model analogue.
 Finally, in Section~\ref{sec:discussion} we discuss the results and future work.
 
 % software
-This analysis was carried-out using the Stan inference engine
-\cite{carpenter2017stan} called from R \cite{Rcoreteam} using the package \texttt{rstan} on a Windows 10 PC.
+This analysis was carried-out using the Stan inference engine \cite{carpenter2017stan} called from R \cite{Rcoreteam} using the package \texttt{rstan} on a Windows 10 PC.
 Each fit employed 4 chains of 1000 iterations each, and a burn-in of 100 iterations.
 The details of the algorithm can be found in the Appendix.
 The packaged code is in a generalisable framework and can be downloaded from here.
-
-
-\subsection{Cure models}
-% what are cure models
-The use of cure models is a special type of survival analysis where the proportion of LTS or {\it cure fraction} is accounted for.
-The term "cured" here means that a patient has responded to treatment and is a LTS.
-Cure models explicitly split patients in to two groups (cured or not) and individuals are subject to one or two sources of risk.
-Cure models estimate the cure fraction, in addition to a (parametric) survival function for patients that are not cured.
-The mortality risk in the cured patients is informed by a background mortality rate.
-The population that is not cured is subject both to background mortality and to additional mortality from their disease, estimated using a survival model.
-\cite{Amico2018}
-There are several types of cure models and a rich and growing body of research in this area.
-(see \citep{Yu2013} for a comparison and guidance with application to oncology.)
-
-% brief review of existing applications
-
-% issues
-There are several issues with existing approaches to cure modelling.
-
-% correlated events
-Firstly, when the event-types are correlated, such as with the common events of interest overall survival (OS) and progression-free survival (PFS), this should be accounted for in the modelling.
-Performing separate, independent analysis may even give counter-intuitive results.
-In the case of multiple types of end-points in the same trial, since the clinical interpretation of a cure fraction is the proportion of patients that respond to treatment,
-it may make intuitive sense that there is a single underlying cure fraction.
-For example, what would be the interpretation if there are differences in emergent survival plateaus between PFS and OS?
-This is a clinically unintuitive dichotomy between the resulting proportions of long-term survivors.
-
-% censoring
-Secondly, time to event data are typically right-censored times due to administrative censoring or loss to follow up.
-The censoring times may be too premature to adequately characterise a survival model for a single event-type but by taking advantage of the set of event-types together this may be alleviated to give better survival model estimates.
-
-% extrapolation
-Lastly, extrapolation out to the full lifetimes of patients is particularly important for health economics modelling in order to gauge the full cost and effect of an intervention.
-This has not yet been a focus of cure modelling work.
-
-% our innovative proposal
-Building on the existing literature, the main contributions of this paper are to address all of these issues.
-We will present a Bayesian hierarchical cure fraction model for multiple outcomes.
-We will show that this has the double advantage of borrowing information between outcomes
-(e.g. in the case of OS and PFS, the likely more mature PFS data can inform the often highly censored OS analysis) and obtaining a global cure fraction.
-
-% review of related work
-Survival analysis generally is a core approach used in health economics.
-For a non-cure model survival analysis in health economics see \cite{Demiris2006, Jackson2010}.
-Within a frequentist paradigm, an example of related work is a multi-level modelling approach in mixture cure modelling using random effects to model multilevel clustering structure in the linear predictors in both hazard function and cured probability parts \cite{Lai2009}.
-Correlation between random effects in the uncured survival and cure fraction has also been investigated using a bivariate Normal distribution \cite{Lai2008}.
-However, to our knowledge there has been no Bayesian fully-parametric mixture cure model with a multi-level modelling structure for outcomes.
-
-% which distributions
-A suite of distributions given in NICE guidelines for Health Technology Assessments (HTA) \cite{Latimer2011} include
-Exponential, Weibull, Gompertz, Log-logistic and Log-Normal.
-This has been interpreted as meaning all of these distributions should be modelled with a given data set.
-This prescriptive approach does not take into account what may be known {\it a priori} about the problem.
-In reality, a subset of these parametric models will be more plausible for the data and so these are the ones that should be investigated.
-
-% general HTA survival framework
-In many mixture cure fraction analyses the survival associated with the uncured fraction of the population is represented by a Cox proportional hazard model.
-This means that the baseline hazard is left unspecified but still the coefficients can be estimated.
-However, we are concerned with the application of cure models to a health economics context and so it is important to determine life-time survival in order to calculate total health impact measures such as quality-adjusted life-years (QALY) and life-years lost (LYL).
-Therefore, the semi-parametric approach is inadequate because we must extrapolate beyond the observed data.
-In this paper, we will adopt a fully-parametric model for the uncured survival.
 
 
 \section{Motivating example}\label{sec:example}
@@ -183,6 +124,7 @@ We give a brief overview of the data (see \cite{Larkin2019} for more details).
 
 Figure~\ref{fig:S_raw_data} shows the Kaplan-Meier survival curves for the OS and PFS study data.
 
+% swap order so PFS is before OS
 \begin{figure}[!HtH]
 \centering
 \includegraphics[width=0.6\linewidth]{S_raw_data_with_CI.png}
@@ -190,7 +132,7 @@ Figure~\ref{fig:S_raw_data} shows the Kaplan-Meier survival curves for the OS an
 Median survival times are shown with dashed lines.}
 \end{figure}
 
-The data source for the analysis consists of the patient-level data from the phase 3 CheckMate 067 trial\cite{Larkin2019}.
+The data source for the analysis consists of the patient-level data from the phase 3 CheckMate 067 trial\citep{Wolchok2017, Larkin2019}.
 The dataset contains $n = 945$ subjects (8 with a missing treatment indicator, i.e. the actual treatment received).
 The treatment groups are as follows:
 \begin{description}
@@ -211,7 +153,6 @@ A full set of summary statistics can be found in the supplementary material.
 \section{Modelling framework}\label{sec:methods}
 In this section, we firstly present the standard mixture cure model for a single event of interest.
 Then we give our general modelling framework before focusing on the application of interest.
-The model improves the typical approach used by linking multiple event-type modules using a hierarchical cure fraction.
 Throughout we refer to our motivating example of jointly modelling PFS and OS.
 
 Consider a study in which $n$ individuals are observed and the (non-negative) time to either progression ($T_{1i}$) or death ($T_{2i}$) are recorded for each individual $i=1,\ldots,n$.
@@ -228,7 +169,7 @@ where $\bm{t}_i = (\bm{t}_{1i}, \bm{t}_{2i})$, $\bm{\delta}_i = (\bm{\delta}_{1i
 In general, we model the observed times using a parametric sampling distribution $t_{ji} \sim p(t_{ji} \mid \bm\theta_j)$ as a function of a set of model parameters $\bm\theta_j = (\bm\alpha_j(\bm x), \mu_j(\bm x))$. 
 In this notation, the location parameter $\mu(x)$ indicates the mean or the scale of the probability distribution; and a (set of) ancillary parameters $\bm \alpha(x)$ describe the shape or variance of the distribution.
 Whilst it is possible for both $\mu$ and $\alpha$ to explicitly depend on the covariates $\bm x$, usually the formulation is simplified to assume that these only affect directly the location parameter.
-Since $t > 0$, we typically use a generalized linear formulation
+Since $t > 0$, we typically use a generalised linear formulation
 $$
 g(\mu) = \beta^{\mu}_0 + \sum_{p=1}^P \beta^{\mu}_p x_p \; [+ \ldots ],
 $$
@@ -239,7 +180,27 @@ The function $g(\cdot)$ is typically the logarithm.
 
 \subsection{The standard mixture cure model} \label{section:basic_model}
 
-The standard mixture cure model (MCM) (sometimes called a long-term survival model), which is the basis of the proposed model, assumes a mixture of two distinct groups so that the full set of model parameters consist of two separate groups of parameters $\bm\omega = (\bm\theta_b, \bm\theta_u)$.
+% what are cure models
+The standard mixture cure model (MCM) (sometimes called a long-term survival model) is the basis of the proposed model.
+The use of cure models is a special type of survival analysis where the proportion of LTS or {\it cure fraction} is accounted for.
+The term "cured" here means that a patient has responded to treatment and is a LTS.
+Cure models explicitly split patients in to two groups (cured or not) and individuals are subject to one or two sources of risk.
+Cure models estimate the cure fraction, in addition to a (parametric) survival function for patients that are not cured.
+The mortality risk in the cured patients is informed by a background mortality rate.
+The population that is not cured is subject both to background mortality and to additional mortality from their disease, estimated using a survival model.
+\cite{Amico2018}
+There are several types of cure models and a rich and growing body of research in this area.
+(see \citep{Yu2013} for a comparison and guidance with application to oncology.)
+It assumes a mixture of two distinct groups so that the full set of model parameters consist of two separate groups of parameters $\bm\omega = (\bm\theta_b, \bm\theta_u)$.
+
+% general HTA survival framework
+In many mixture cure fraction analyses the survival associated with the uncured fraction of the population is represented by a Cox proportional hazard model.
+This means that the baseline hazard is left unspecified but still the coefficients can be estimated.
+However, we are concerned with the application of cure models to a health economics context and so it is important to determine life-time survival in order to calculate total health impact measures such as quality-adjusted life-years (QALY) and life-years lost (LYL).
+Therefore, the semi-parametric approach is inadequate because we must extrapolate beyond the observed data.
+In this paper, we will adopt a fully-parametric model for the uncured survival.
+
+
 The combined survival model for a population with a cure fraction can be written as follows
 
 \begin{equation}
@@ -290,9 +251,28 @@ This also forces consistency across fits.
 Denote the WHO estimates for individual $i$ used for the background survival in (\ref{eqn:mcm}) as
 $S_b(t_i \mid \bm\theta_b, \bm{x}_i) = \hat{S}_i$.
 
-Gamma process? \cite{Demiris2006}
 
+\subsubsection{Issues in an HTA context}
+There are several issues with existing approaches to cure modelling in an HTA context in particular.
 
+% correlated events
+Firstly, when the event-types are correlated, such as with the common events of interest overall survival (OS) and progression-free survival (PFS), this should be accounted for in the modelling.
+Performing separate, independent analysis may even give counter-intuitive results.
+In the case of multiple types of end-points in the same trial, since the clinical interpretation of a cure fraction is the proportion of patients that respond to treatment,
+it may make intuitive sense that there is a single underlying cure fraction.
+For example, what would be the interpretation if there are differences in emergent survival plateaus between PFS and OS?
+This is a clinically unintuitive dichotomy between the resulting proportions of long-term survivors.
+
+% censoring
+Secondly, time to event data are typically right-censored times due to administrative censoring or loss to follow up.
+The censoring times may be too premature to adequately characterise a survival model for a single event-type but by taking advantage of the set of event-types together this may be alleviated to give better fits and extrapolation out to the full lifetimes of patients which is particularly important for health economics modelling in order to gauge the full cost and effect of an intervention.
+
+% our innovative proposal
+We will now present a Bayesian hierarchical cure fraction model for multiple outcomes.
+We will show that this has the double advantage of borrowing information between outcomes
+(e.g. in the case of OS and PFS, the likely more mature PFS data can inform the often highly censored OS analysis) and obtaining a global cure fraction.
+
+%
 \subsection{The hierarchical mixture cure model} \label{section:hier_model}
 {\it There may be information in one sample of event times which we can use to improve the inference from another.\\
 Follow-up time can be relatively short for some of the outcomes and so there is missing data due to censoring.
@@ -304,9 +284,12 @@ The event times are often correlated because they are for the same individual.
 In our motivating example, $t_i^{OS} = t_i^{PFS} + t_i^{PPS}$ where $t_i^{PPS}$ is the duration in a post-progression state and can be $0$.\\
 PFS and OS need not be for the same sample of patients.
 
-Bivariate Normal placed on the OS and PFS rates could be one option for modelling the connection\cite{Tan2018}.
+% review of related work
+Within a frequentist paradigm, an example of related work is a multi-level modelling approach in mixture cure modelling using random effects to model multilevel clustering structure in the linear predictors in both hazard function and cured probability parts \cite{Lai2009}.
+Correlation between random effects in the uncured survival and cure fraction has also been investigated using a bivariate Normal distribution \cite{Lai2008} \cite{Tan2018}.
 Instead we will impose dependency with hyperparameters.
 % Tan2018 model log HR rather than cure fraction
+To our knowledge there has been no Bayesian fully-parametric mixture cure model with a multi-level modelling structure for outcomes.
 
 Figure~\ref{fig:hier_dag} shows a graphical representation of the general modelling framework described for OS and PFS.
 
@@ -403,8 +386,14 @@ Define as the ratio of the widths of the CrIs of $\pi_{os}$ and $\pi_{pfs}$ from
 
 \section{Application}\label{sec:application}
 
-In this section we apply the models from Section~\ref{section:hier_model} to the Checkmate 067 dataset.
+In this section we apply the models from Section~\ref{section:hier_model} to the CheckMate 067 dataset.
 The hierarchical and separate models are fit for Exponential, Weibull, Gompertz, Log-Normal, Log-Logistic to the OS and PFS event times.
+
+% which distributions
+These are distributions from a suite of distributions given in NICE guidelines for Health Technology Assessments (HTA) \cite{Latimer2011}.
+In general, providing this list has been interpreted by many in the HTA literature as meaning all of these distributions should be modelled with a given data set.
+This prescriptive approach does not take into account what may be known {\it a priori} about the problem.
+In reality, a subset of these parametric models will be more plausible for the data and so these are the ones that should be investigated.
 
 \subsection{Overall results}
 
