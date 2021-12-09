@@ -9,7 +9,10 @@
 \usepackage{subfig}
 % \usepackage{endfloat}
 \usepackage{bm,amssymb,amsmath}
+\usepackage{trackchanges}  %http://trackchanges.sourceforge.net/help_stylefile.html
 
+\addeditor{NGreen}
+\addeditor{GBaio}
 
 \articletype{Article Type}%
 
@@ -42,7 +45,6 @@
 \presentaddress{}
 
 %ORCID ID: 0000-0002-7056-2741
-
 \abstract[Summary]{
 Time to an event of interest over a life time is a central measure of the clinical benefit of an intervention used in a health economic evaluation (HEE).
 Within the same trial multiple event-types may also be considered.
@@ -69,35 +71,43 @@ We show the benefits of using our approach with a motivating example, the CheckM
 
 \section{Introduction}\label{sec:intro}
 %%% HTA perspective %%%
-
+% survival data
 Interventions that impact upon the time to events of interest, such as disease progression or death in a cancer trial, form a high proportion of the appraisals by Health Technology Assessment (HTA) agencies, such as the National Institute for Health and Care Excellence (NICE), in England \citep{Latimer2011}.
 For instance, a new intervention may be expected to lengthen the amount of time a patient remains progression-free. For this reason, "survival data" are instrumental to modelling in HTA \cite{Demiris2006, Jackson2010}.
 
+% what is a data cut?
+A feature of survival data from a trial is that they are monitored and reported on during as well as at the end of the trial period.
+This enables on-going assessments and can inform decisions such as an early termination.
+However, in reality it is normally not possible to make use of the data collected in real time because there is a period in which the data need to be cleaned due to issues such as missing data and other data quality errors.
+So, snapshots of the trial data are made at pre-specified points given in the protocol.
+This can be at a particular date, follow-up time, or a particular number of patients.
+These subsets of survival data made at discrete times are called \textit{data cuts}.
 
 % extrapolation
 In order to quantify accurately the health and economic benefits of a new intervention using survival data it is necessary to estimate the {\it mean survival time}, i.e.~the \textit{long term} effects of a given intervention.
 This is in contrast to general survival curve summaries, such as the median time, which are typically used in standard "biostatistical" analyses.
 
-This idiosyncrasy has important implications because, in order to calculate the mean survival time we require the full survival curve, i.e. over a patient's lifetime, but available data (e.g.~from a randomised trial) almost inevitably only cover a limited time frame and are subject to a high degree of censoring.
+This idiosyncrasy has important implications because, in order to calculate the mean survival time we require the full survival curve, i.e. over a patient's lifetime, but available data (e.g.~data cuts from a randomised trial) almost inevitably only cover a limited time frame and are subject to a high degree of censoring.
 Thus, it is necessary to \textit{extrapolate} the observed survival curve to a time horizon that is typically much longer than the one considered in the experimental study.
 Consequently, unlike "standard" time-to-event analyses that are often based on semi-parametric models (e.g.~Cox regression), HTA modelling is based on a fully parametric approach to the survival analysis, as recommended by a highly influential NICE Decision Support Unit (DSU) Technical Support Document (TSD) \citep{Latimer2011}.
 
-% plateau
-Another important feature of the survival data has arisen in the past decade due to the development of potentially highly successful immuno-oncology treatments, and better diagnosis and screening.
-This has lead to cancer patients with improved survival outcomes and more long-term survival (LTS) patients comparable to the general population.
-In previous immuno-oncologic (IO) studies for melanoma therapies, such as {\it ipilimumab}, {\it nivolumab}, and dual {\it nivolumab} and {\it ipilimumab} combination,
+% plateaus
+Another important feature of the survival data has arisen in the past decade due to the development of potentially highly successful immuno-oncology treatments.
+These treatments aim to stimulate the body’s immune system to recognise and kill cancer cells \cite{Ouwens2019}. Several types of immunotherapy can be used to treat melanoma including immune checkpoint inhibitors, interleukin-2 (IL-2) and oncolytic virus therapy.
+In particular, inhibitory immune checkpoint blockade combination therapies have shown significant success in promoting immune responses against cancer and can result in tumor regression in many patients \cite{Khair2019}.
+These advances have lead to cancer patients with improved survival outcomes and more long-term survival (LTS) patients comparable to the general population.
+In previous immuno-oncologic studies for melanoma therapies, such as {\it ipilimumab} and {\it nivolumab},
 results have indicated that survival curves "plateau" for a considerable proportion of LTS patients in the limited range of the available survival curve \citep{Wolchok2017, Larkin2019}.
 That is, the survival curve converges to a probability (substantially) greater than zero and does not appear to decrease further.
 
-% bring these together
-Often, available data consist of consecutive data cuts at pre-planned times: this is known as "administrative censoring".
-Each data cut refers to the minimum follow-up data available for all patients that are still being followed up within the study.
-Later data cuts have increasingly better information and lower censoring than earlier data cuts.
-However, decisions are often made on an early data cut when the amount of information available to inform the decision is relatively small \citep{Bullement2020}.
-Thus, the survival plateaus, from e.g.~IO studies, indicating a proportion of LTS may not have been reached at the time of an earlier data cut.
-In order to obtain complete survival curves to use in an HTA evaluation we need to extrapolate the survival curves to the sustained plateau. 
-% This may be instrumental into justifying how we want to link up PFS and OS.
-The question of how to principally and usefully do this in situations where trials include multiple treatments and end-points is the subject of this paper.
+% mixture cure models
+% to deal with the plateaus people usually use this kind of structure
+
+% data cut extrapolation 
+The survival plateaus indicating a proportion of LTS may not have been reached at the time of a data cut (including the planned end of the study).
+In order to obtain complete survival curves to use in an HTA evaluation we need to extrapolate the survival curves to the sustained plateaus.
+Ideally, these extrapolations should be consistent between data cuts \citep{Bullement2020}.
+The question of how to principally and usefully do this in situations where trials include multiple treatment arms and end-points is the subject of this paper.
 
 % plan of the paper
 The paper is structured as follows.
@@ -107,13 +117,6 @@ In Section~\ref{sec:application} our novel modelling approach is applied to the 
 Comparisons are made between our approach and an independent model analogue.
 Finally, in Section~\ref{sec:discussion} we discuss the results and future work.
 
-% software
-This analysis was carried-out using the Stan inference engine \cite{carpenter2017stan} called from R \cite{Rcoreteam} using the package \texttt{rstan} on a Windows 10 PC.
-Each fit employed 4 chains of 1000 iterations each, and a burn-in of 100 iterations.
-The details of the algorithm can be found in the Appendix.
-The packaged code is in a generalisable framework and can be downloaded from here.
-
-
 \section{Motivating example}\label{sec:example}
 Our motivating example concerns a long term study of melanoma therapies.
 We give a brief overview of the data (see \cite{Larkin2019} for more details).
@@ -121,15 +124,16 @@ We give a brief overview of the data (see \cite{Larkin2019} for more details).
 \subsection{CheckMate 067 trial data}
 % 2.5 months (and other) follow-up appointments creating interval censored PFS data.
 % should we mention this/ include in modelling?
+Ipilimumab is an anti–cytotoxic T-lymphocyte–associated antigen 4 monoclonal antibody and 
+nivolumab is an anti–programmed death 1 agent.
 
 Figure~\ref{fig:S_raw_data} shows the Kaplan-Meier survival curves for the OS and PFS study data.
 
 % swap order so PFS is before OS
 \begin{figure}[!HtH]
 \centering
-\includegraphics[width=0.6\linewidth]{S_raw_data_with_CI.png}
-\caption{\label{fig:S_raw_data} Kaplan-Meier curves of OS and PFS times with 95\% CI for the CheckMate 067 phase 3 trial data and {\it Ipilimumab}, {\it Nivolumab} and combination treatments.
-Median survival times are shown with dashed lines.}
+\includegraphics[width=0.6\linewidth]{km_raw_data.png}
+\caption{\label{fig:S_raw_data} Kaplan-Meier curves of PFS and OS times with 95\% CI for the CheckMate 067 phase 3 trial data and {\it Ipilimumab}, {\it Nivolumab} and combination treatments.}
 \end{figure}
 
 The data source for the analysis consists of the patient-level data from the phase 3 CheckMate 067 trial\citep{Wolchok2017, Larkin2019}.
@@ -312,6 +316,12 @@ $$
 \section{Application}\label{sec:application}
 In this section we apply the models from Section~\ref{section:hier_model} to the CheckMate 067 dataset.
 We first detail the modelling aspects specific to this analysis before presenting the results.
+
+% software
+This analysis was carried-out using the Stan inference engine \cite{carpenter2017stan} called from R \cite{Rcoreteam} using the package \texttt{rstan} on a Windows 10 PC.
+Each fit employed 4 chains of 1000 iterations each, and a burn-in of 100 iterations.
+The details of the algorithm can be found in the Appendix.
+The packaged code is in a generalisable framework and can be downloaded from here.
 
 %
 \subsection{Background survival}
@@ -526,7 +536,6 @@ This results in the stabilisation of the cure fraction estimates, as we shall se
 
 Figures~\ref{fig:forest_plot_cf_cutpoint_sep} and \ref{fig:forest_plot_cf_cutpoint_hier} show forest plots of the cure fraction estimate for 12, 30 and 60 months and for the separate and hierarchical models, respectively.
 Results are shown for the OS exponential with PFS exponential model and the OS log-Normal with PFS log-Normal model.
-
 
 We can see that in Figure~\ref{fig:forest_plot_cf_cutpoint_sep} for the exponential model in the OS survival curves for the separate model there is more uncertainty than in the equivalent plot for the hierarchical model in Figure~\ref{fig:forest_plot_cf_cutpoint_hier}.
 
