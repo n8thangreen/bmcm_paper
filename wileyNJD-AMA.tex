@@ -28,9 +28,13 @@
 
 \author[1]{Nathan Green*}
 
-\author[2,3]{Gianluca Baio}
+\author[4]{Murat Kurt}
 
-\author[3]{Author Three}
+\author[4]{Andriy Moshyk}
+
+\author[2]{Victoria Federico Paly}
+
+\author[1,3]{Gianluca Baio}
 
 \authormark{N Green \textsc{et al}}
 
@@ -40,18 +44,20 @@
 
 \address[3]{\orgdiv{Org Division}, \orgname{Org Name}, \orgaddress{\state{State name}, \country{Country name}}}
 
+\address[4]{\orgdiv{Org Division}, \orgname{Bristol Myers Squibb}, \orgaddress{\state{State name}, \country{Country name}}}
+
 \corres{*Nathan Green \email{n.green@ucl.ac.uk}}
 
 \presentaddress{}
 
 %ORCID ID: 0000-0002-7056-2741
 \abstract[Summary]{
-Time to an event of interest over a lifetime is a central measure of the clinical benefit of an intervention used in a health economic evaluation (HEE).
+Time to an event of interest over a lifetime is a central measure of the clinical benefit of an intervention used in a health technology assessment (HTA).
 Within the same trial multiple end-points may also be considered.
 For example, overall and progression-free survival time for different drugs in oncology studies.
-A common situation is when an intervention is only effective for some unobserved proportion of the population.
+A common situation is when an intervention is only effective for some proportion of the population who are not clinically identifiable.
 So we need to estimate latent group membership as well as separate survival models for each.
-However, in real-life trials follow-up may be relatively short leading to substantial censoring.
+However, follow-up in trials may be relatively short leading to substantial censoring.
 We present a general Bayesian hierarchical framework that can handle this complexity by exploiting the similarity of cure fractions between end-points;
 accounting for the correlation between them and improving the extrapolation beyond the observed data.
 Assuming exchangeability between cure fractions facilitates the borrowing of information between end-point.
@@ -73,11 +79,11 @@ We show the benefits of using our approach with a motivating example, the CheckM
 %%% HTA perspective %%%
 % survival data
 Interventions that impact upon the time to an event of interest, such as disease progression or death in a cancer trial, form a high proportion of appraisals by Health Technology Assessment (HTA) agencies, such as the National Institute for Health and Care Excellence (NICE), in England \citep{Latimer2011}.
-For instance, a new intervention may be expected to lengthen the amount of time a patient remains progression-free. For this reason, "survival data" are instrumental to modelling in HTA \cite{Demiris2006, Jackson2010}.
+For instance, a new intervention may be expected to increase the amount of time until a patient experiences disease progression or death from any cause. For this reason, ``survival data'' are instrumental to modelling in HTA \cite{Demiris2006, Jackson2010}.
 
 % what is a data-cut?
-A feature of survival data from a trial is that they are reported on during as well as at the end of the trial period.
-This enables on-going assessments and can inform decisions such as an early end to the trial.
+A feature of survival data from a trial is that they are often reported on during as well as at the end of the trial period.
+This enables on-going assessments and can inform decisions such as an early end to the trial due to harm or futility.
 However, in reality it is normally not possible to make use of the collected data in real time because there is a period in which they need to be cleaned due to issues, such as missingness and other data quality errors.
 So, snapshots of the trial data are made at pre-specified points defined in the study protocol.
 This can be at a particular date, follow-up time, or a particular number of patients.
@@ -85,25 +91,24 @@ These subsets of survival data made at discrete times are called \textit{data-cu
 
 % extrapolation
 In order to quantify accurately the health and economic benefits of a new intervention using such survival data it is necessary to estimate the {\it mean survival time}, i.e.~the \textit{long term} effects of a given intervention.
-This is in contrast to general survival curve summaries, such as the median time, which are typically used in standard "biostatistical" analyses.
+This is in contrast to general survival curve summaries, such as the median time, which are typically used in standard ``biostatistical'' analyses.
 This idiosyncrasy has important implications because, in order to calculate the mean survival time we require the full survival curve, i.e. over a patient's lifetime, but available data (e.g.~data-cuts from a randomised trial) almost inevitably only cover a limited time frame and are subject to a high degree of censoring.
 Thus, it is necessary to \textit{extrapolate} the observed survival curve to a time horizon that is typically much longer than the one considered in the experimental study.
-Consequently, unlike "standard" time-to-event analyses that are often based on semi-parametric models (e.g.~Cox regression), HTA modelling is based on a fully parametric approach to the survival analysis, as recommended by a highly influential NICE Decision Support Unit (DSU) Technical Support Document (TSD) \citep{Latimer2011}.
+Consequently, unlike ``standard'' time-to-event analyses that are often based on semi-parametric models (e.g.~Cox regression), HTA modelling is based on a fully parametric approach to the survival analysis, as recommended by a highly influential NICE Decision Support Unit (DSU) Technical Support Document (TSD) \citep{Latimer2011}.
 
 % plateaus
 Another important feature of survival data in the field of cancer research has arisen in the past decade due to the development of potentially highly successful immuno-oncology treatments.
-These treatments aim to stimulate the body’s immune system to recognise and kill cancer cells \cite{Ouwens2019}. Several types of immunotherapy can be used to treat melanoma including immune checkpoint inhibitors, interleukin-2 (IL-2) and oncolytic virus therapy.
+These aim to stimulate the body’s immune system to recognise and kill cancer cells \cite{Ouwens2019}. Several types of immunotherapy can be used to treat melanoma including immune checkpoint inhibitors, interleukin-2 (IL-2) and oncolytic virus therapy.
 In particular, inhibitory immune checkpoint blockade combination therapies have shown significant success in promoting immune responses against cancer and can result in tumor regression in many patients \cite{Khair2019}.
 These advances have lead to cancer patients with improved survival end-points and more long-term survival (LTS) patients comparable to the general population.
 In previous immuno-oncologic studies for melanoma therapies, such as ipilimumab and nivolumab,
-results have indicated that survival curves "plateau" for a considerable proportion of LTS patients in the limited range of the available survival curve \citep{Wolchok2017, Larkin2019}.
+results have indicated that survival curves ``plateau'' for a considerable proportion of LTS patients in the limited range of the available survival curve \citep{Wolchok2017, Larkin2019}.
 That is, the survival curve converges to a probability (substantially) greater than zero and does not appear to decrease further.
 % mixture cure models
-When a survival curve exhibits this plateau behaviour it is common to adopt a \textit{mixture cure model (MCM)} to describe the generation of the underlying data.
+When a survival curve exhibits this plateau behaviour, it is common to adopt a \textit{mixture cure model} (MCM) approach to describe the generation of the underlying data.
 A MCM considers a population as a mixture of two groups: the cured and not cured.
 In our case, the cured group contains the LTS patients.
 In many MCM analyses the survival associated with the uncured fraction of the population is represented by a Cox proportional hazard model.
-This means that the baseline hazard is left unspecified but still the coefficients can be estimated.
 
 % data-cut extrapolation 
 However, the survival plateaus indicating a proportion of LTS may not have been reached at the time of a data-cut (including the planned end of the study).
@@ -132,24 +137,31 @@ Finally, in Section~\ref{sec:discussion} we discuss the results and future work.
 \section{Motivating example}\label{sec:example}
 Our motivating example concerns a long term study of melanoma therapies.
 The study has been described in detail elsewhere so we give a brief overview of the data here (see \citep{Wolchok2017, Larkin2019, Hodi2018} for more details).
-The CheckMate 067 trial is a phase 3 randomised, double-blind study conducted on eligible patients aged 18 years of older with previously untreated, unresectable stage III or IV melanoma.
-They were randomly assigned in a 1:1:1 ratio and stratified by PD-L1 status, BRAF mutation status, and metastasis stage.
+The \textit{CheckMate 067} trial is a phase 3 randomised, double-blind study conducted on eligible patients aged 18 years or older with previously untreated, unresectable stage III or IV melanoma.
+They were randomly assigned in a 1:1:1 ratio and stratified by anti–programmed death-1 ligand 1 (PD-L1) antibodies status, whether there is a change in the BRAF gene that makes it work incorrectly (BRAF mutation), and metastasis stage.
 The purpose of the trial was to test the effectiveness of ipilimumab, an anti–cytotoxic T-lymphocyte–associated antigen 4 monoclonal antibody, and nivolumab, an anti–programmed death 1 agent.
 The total baseline sample consists of $n = 945$ subjects divided across three treatment arms
 i) Ipilimumab monotherapy with regimen of 3 mg/kg IV once every 3 weeks (Q3W) for a total of 4 doses;
 ii) Nivolumab monotherapy with regimen of 3 mg/kg intravenous (IV) once every 2 weeks (Q2W);
 iii) Combined nivolumab with ipilimumab with regimen of 1 mg/kg IV and 3 mg/kg IV Q3W for 4 doses followed by nivolumab 3 mg/kg IV Q2W.
-The co-primary endpoints were progression-free survival (PFS), from randomisation until the first of disease progression or death, and overall survival (OS), from randomisation to time of death.
+Nivolumab alone or nivolumab plus ipilimumab was compared with ipilimumab alone in patients with metastatic melanoma.
+The co-primary end-points were \textit{progression-free survival} (PFS; i.e.~the time from randomisation until the first of disease progression or death) and \textit{overall survival} (OS; i.e.~the time from randomisation to time of death).
 The data source for the analysis consists of patient-level data of times to PFS and OS with covariates sex, age at start of trial and nationality.
-We considered 3 data-cuts at 12 and 30 months and the end of study at 60 months.
-Figure~\ref{fig:S_raw_data} shows the Kaplan-Meier PFS and OS survival curves for the complete CheckMate 067 phase 3 trial data.
+
+In our data set the minimum study follow-up from randomisation was 60 months so this was used as the final data-cut time.
+We also considered two earlier artificial data-cuts by truncating the 60-month data at 12 and 30 months.
+These particular times were chosen for this analysis because the actual study had a planned data-cut at approximately 30 months (28 months) and the largest observed median time for OS was just over 30 months. Thus, this time is relevant to the trial and at this time it may be possible to make comparable inferences to the complete 60-months data set but at a significantly earlier time.
+Further, the latest median time between all treatment regimens for PFS was approximately 12 months. Therefore, at 12 months it may be possible to characterise the PFS survival curves but not the less mature OS and so borrowing information between PFS and OS may be advantageous. Taking a data-cut at an even earlier time would probably not provide sufficient information to enable any useful extrapolation. Primarily, the data-cut points were selected to demonstrate the theoretical justification of our method and not to strictly follow the study data-cut protocol.
+
+Figure~\ref{fig:S_raw_data} shows the Kaplan-Meier estimates of the PFS and OS survival curves for the complete CheckMate 067 phase 3 trial data.
 Summary statistics are presented in Table~\ref{tab:checkmate_summary}.
 Both sets of curves for PFS and OS appear to tend toward positive asymptotes, the PFS curves more clearly.
 
-\note[NGreen]{How does it compares with other dataset prevalent in our field/applications? BMS?}
+%%TODO: should we remove table?
+% There is a lot of information about CM067 trial results. It is helpful for the reader to get all info in one place. However, 5y DBL was published in Larkin et al. 2019 NEJM. We would have to compare every data point as it was presented in the clinical manuscript. An easier approach is to describe high level and point to the clinical manuscript.
 
 \begin{center}
-\begin{table*}[!h]
+\begin{table*}[!ht]
 \caption{Summary statistics of the CheckMate 067 phase 3 trial, for progression-free survival (PFS) and overall survival (OS). \label{tab:checkmate_summary}}
 \centering
 \begin{tabular}{r c c c c c c}
@@ -159,15 +171,15 @@ Both sets of curves for PFS and OS appear to tend toward positive asymptotes, th
  Treatment arm & Median time (months) & Events & & Median time (months) & Events & N\\
                & (95\% CI)            &        & & (95\% CI)            &        & \\
  \midrule
- Ipilimumab  & 2.86 (2.79-3.29)   & 261 & & 20.0 (17.22-25.6) & 228 & 311\\ 
- Nivolumab   & 6.93 (5.32-10.41)  & 203 & & 36.9 (31.24-60.9) & 175 & 313\\ 
+ Ipilimumab  & 2.86 (2.79-3.29)   & 261 & & 20.0 (17.22-25.6) & 228 & 311\\
+ Nivolumab   & 6.93 (5.32-10.41)  & 203 & & 36.9 (31.24-60.9) & 175 & 313\\
  Combination & 11.50 (9.26-20.80) & 182 & & - & 151 & 313\\ 
 \bottomrule
 \end{tabular}
 \end{table*}
 \end{center}
 
-\begin{figure}[!HtH]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.6\linewidth]{km_raw_data.png}
 \caption{\label{fig:S_raw_data} Kaplan-Meier curves of PFS and OS times with 95\% CI for the complete CheckMate 067 phase 3 trial data and ipilimumab, nivolumab and combination treatments.}
@@ -177,90 +189,82 @@ Both sets of curves for PFS and OS appear to tend toward positive asymptotes, th
 \section{Modelling framework}\label{sec:methods}
 \note[GBaio]{I wonder whether you could simplify the notation in this section and remove the index j throughout?}
 Consider a study in which $n$ individuals are observed and the (non-negative) time to either progression ($T^{prog}_{i}$) or death ($T^{death}_{i}$) are recorded for each individual $i=1,\ldots,n$.
-Denote the event time for individual $i$ and end-point $j = 1, \ldots, J$ by $T_{ji}$.
-In our motivating example, PFS corresponds to $j=1$ and OS to $j=2$.
-So, PFS times are $T_{1i} = \min(T^{prog}_{i}, T^{death}_{i})$ and OS times are $T_{2i} = T^{death}_{i}$.
-Event times may be censored so we consider a censoring time $C_{ji}$ and an event indicator $\delta_{ji} = \mathbb{I}(T_{ji} < C_{ji})$
---- obviously, $\delta_{ji} = 1$ if the $j-$th end-point is fully observed for individual $i$ and 0 if it is censored.
-The observed survival time for the $j-$th end-point is then indicated as $t_{ji} = \min(T_{ji}, C_{ji})$.
+Denote the event time for individual $i$ by $T_{i}$.
+In our motivating example, we would have a separate set of $T_{i}$ for either end-point, PFS or OS.
+Thus, PFS times are $T_{i} = \min(T^{prog}_{i}, T^{death}_{i})$ and OS times are $T_{i} = T^{death}_{i}$.
+Event times may be censored and therefore we consider a censoring time $C_{i}$ and an event indicator $\delta_{i} = \mathbb{I}(T_{i} < C_{i})$
+--- so that $\delta_{i} = 1$ if the end-point is fully observed for individual $i$ and 0 if it is censored.
+The observed survival time is then indicated as $t_{i} = \min(T_{i}, C_{i})$.
 
-Typically, a study will also measure some individual-level covariates, which we assume are collected in a vector $\bm{x}_{ji} = (x_{1ji}, \ldots, x_{Pji})^\top$.
+Typically, a study will also measure some individual-level covariates, which we assume are collected in a vector $\bm{x}_{i} = (x_{1i}, \ldots, x_{Pi})^\top$.
 These may include the individual's age, sex, comorbidities and, usually, a treatment arm indicator.
 The full data can then be represented as
-$\mathcal{D}_i = (\bm{t}_i, \bm{\delta}_i, \bm{x}_i)$,
-where $\bm{t}_i = (\bm{t}_{1i}, \bm{t}_{2i})$, $\bm{x}_i = (\bm{x}_{1i}, \bm{x}_{2i})$ and $\bm{\delta}_i = (\bm{\delta}_{1i}, \bm\delta_{2i})$.
+$\mathcal{D}_i = (t_i, \delta_i, \bm{x}_i)$.
+% $\mathcal{D}_i = (\bm{t}_i, \bm{\delta}_i, \bm{x}_i)$.
+% where $\bm{t}_i = (\bm{t}_{1i}, \bm{t}_{2i})$, $\bm{x}_i = (\bm{x}_{1i}, \bm{x}_{2i})$ and $\bm{\delta}_i = (\bm{\delta}_{1i}, \bm\delta_{2i})$.
 In our example, the covariates are the same between PFS ans OS.
 
-In a general HTA analysis, we model the observed times using a parametric sampling distribution $T_{ji} \sim p(t_{ji} \mid \bm\theta_j)$ as a function of a set of model parameters $\bm\theta_j = (\bm\alpha_j(\bm x), \mu_j(\bm x))$. 
-In this notation, the location parameter $\mu_j(x)$ indicates the mean or the scale of the probability distribution; and a (set of) ancillary parameters $\bm \alpha_j(x)$ describe the shape or variance of the distribution.
-Whilst it is possible for both $\mu_j$ and $\bm\alpha_j$ to explicitly depend on the covariates $\bm x$, usually the formulation is simplified to assume that these only affect directly the location parameter.
-Since $t > 0$, we typically use a generalised linear formulation.
+We model the observed times using a parametric sampling distribution $t_{i} \sim p(t_{i} \mid \bm\theta)$ as a function of a set of model parameters $\bm\theta = (\bm\alpha(\bm x), \mu(\bm x))$. 
+In this notation, the location parameter $\mu(x)$ indicates the mean or the scale of the probability distribution; and a (set of) ancillary parameters $\bm \alpha(x)$ describe the shape or variance of the distribution.
+Whilst it is possible for both $\mu$ and $\bm\alpha$ to explicitly depend on the covariates $\bm x$, usually the formulation is simplified to assume that these only affect directly the location parameter.
+Since $t>0$, we typically use a generalised linear formulation.
 So, for an individual $i$
 $$
-g(\mu_{j}) = \beta^{\mu}_{0j} + \sum_{p=1}^P \beta^{\mu}_{pj} x_{pji} \; [+ \ldots ], \;\;\; j = 1, \ldots, J
+g(\mu) = \beta^{\mu}_{0} + \sum_{p=1}^P \beta^{\mu}_{p} x_{pi} \; [+ \ldots ],
 $$
 to model the rate or location parameter,
-where $\beta^{\mu}_{0j}$ represents an intercept for end-point $j$,
-and $\beta^{\mu}_{pj}$ are the coefficients for an individual's measurements for end-point $j$.
-The $[+ \ldots]$ term indicates additional covariates.
+where $\beta^{\mu}_{0}$ represents an intercept,
+and $\beta^{\mu}_{p}$ are the coefficients for an individual's measurements.
+The $[+ \ldots]$ term indicates additional components for the linear predictor (e.g.~structured random effects).
 The function $g(\cdot)$ is typically the logarithm.
 
 \subsection{The standard mixture cure model} \label{section:basic_model}
 Suppose that we observe a sustained plateau in the survival time data or have some other reason to believe that there is a long-term survivor group in our sample. We will now present the standard mixture cure model (sometimes called a long-term survival model) as the basis of the proposed model.
-The use of cure models is a special type of survival analysis where the proportion of LTS or {\it cure fraction} is accounted for.
-Denote this probability of being cured by $\pi$.
-The term "cured" here means that a patient has responded to treatment and is a LTS.
-Cure models explicitly split patients in to two groups (cured or not) and individuals are subject to one or two sources of risk.
-The mixture of two distinct groups means that the full set of model parameters consists of two separate groups.
-So, for each end-point define $\bm\omega_j = (\bm\theta^b_j, \bm\theta^u_j)$, where superscript $b$ denotes the \textit{background} model and $u$ denotes the \textit{uncured} model.
-E.g. in our example the parameters for PFS and OS are $\bm\omega_1, \bm\omega_2$.
-Cure models estimate the cure fraction, in addition to a (parametric) survival function for patients that are not cured.
+Denote the probability of being cured by the {\it cure fraction}, $\pi$.
+The term "cure" here refers to the type of statistical model and does not literally mean that they are cured of disease. In our case, cured means that a patient has responded to treatment and is a LTS.
+Because the cure models explicitly split patients in to two groups (cured or not) then the full set of model parameters consists of two separate groups.
+Define $\bm\omega = (\bm\theta^b, \bm\theta^u)$, where superscript $b$ denotes the \textit{background} model and $u$ denotes the \textit{uncured} model.
 In the standard cure model, cured individuals are usually assumed to have no chance of experiencing the event of interest in the period under consideration, simplifying the model.
 There are several types of cure models and a rich and growing body of research in this area.
 (see \citep{Yu2013} for a comparison and guidance with application to oncology.)
 
-\note[GBaio]{Incidentally, I've always found this a bit confusing... I can understand \_b for "background", but why do we use \_u? Can we find a more straightforward notation?}
+\note[GBaio]{I can understand \_b for "background", but why do we use \_u? Can we find a more straightforward notation?}
 \note[NGreen]{this just seems to be what everyone else uses. "u"ncured perhaps?}
 
-In the simplest case, the standard mixture cure model is for when we only have a single end-point but we will explicitly indicate that the following represent one of potentially multiple end-points since we will be formally combining these separate model components in to a single model in the subsequent sections.  
-For an individual $i$ in a population with a cure fraction the MCM has the following survival model
+For an individual $i$ in a population with a cure fraction, the mixture cure model has the following survival model
 
 \begin{equation}
 \label{eqn:mcm}
-S(t_{ji} \mid \bm\omega_j, \bm{x}_i) = S_b(t_{ji} \mid \bm\theta^b_j, \bm{x}_{ji}) \left[\pi_j + (1 - \pi_j) S_u(t_{ji} \mid \bm\theta^u_j, \bm{x}_{ji}) \right], \;\;\; j = 1, \ldots, J
+S(t_{i} \mid \bm\omega, \bm{x}_i) = S_b(t_{i} \mid \bm\theta^b, \bm{x}_{i}) \left[\pi + (1 - \pi) S_u(t_{i} \mid \bm\theta^u, \bm{x}_{i}) \right],
 \end{equation}
 \\
 \noindent
 where $S(t) = 1 \!-\! \int_0^t p(s \mid \theta)\, \text{d}s$ denotes survival at time $t$,
-$S_b(t \mid \bm\theta^b, \bm{x})$ is a function of the background mortality at time $t$ conditional on covariates $x$,
+$S_b(t \mid \bm\theta^b, \bm{x})$ is a function of the background mortality at time $t$ conditional on covariates $\bm{x}$,
 % some papers denote \pi as _uncured_ fraction
-and $S_u(t \mid \bm\theta^u, \bm{x})$ is a function of the (excess) mortality due to cancer at time $t$ conditional on covariates $\bm{x}$.
-The formulation in equation~(\ref{eqn:mcm}) can be thought of as comprising of two submodels: an \textit{incidence} model for the cure fraction $\pi$ and a \textit{latency} model for the survival curve $S_u$. 
+and $S_u(t \mid \bm\theta^u, \bm{x})$ is a function of the (excess) mortality due to cancer at time $t$, conditional on covariates $\bm{x}$.
+The formulation in equation~(\ref{eqn:mcm}) can be thought of as comprising of two submodels: i) an \textit{incidence} model for the cure fraction $\pi$. The general term from epidemiology is the rate or probability of a disease; ii) a \textit{latency} model for the survival function of the uncured population $S_u$. This is 'hidden' since it cannot be directly observed from the data.
 
-\note[NGreen]{note sure about this notation. actually its on the global cure fraction so don't need $j$ but we haven't introduced that yet?}
-All treatments are included in the same model. Define a treatment index $k = 1, \ldots, K$.
-Thus, in the example $K=3$.
-The cure fraction for treatment $k$ is given by the following fixed effect model
+The model above can be extended to account for multiple treatments, $K$; for instance, in our running example, $K=3$ and we could specify the cure fraction for treatment $k=1,\ldots,K$ using the following ``fixed'' effect model
 \begin{equation}
 \label{eqn:pi_regn}
-\mbox{logit}(\pi_{kj}) = \sum_{k=1}^K \beta^{\pi}_{kj} \mbox{TRT}_k \;[+ \ldots], \;\;\; j = 1, \ldots, J
+\mbox{logit}(\pi_{k}) = \beta^{\pi}_{k} \; [+ \ldots],
 \end{equation}
 \noindent
-where $\beta^{\pi}_k$ are the regression coefficients quantifying the impact of treatment $\mbox{TRT}_k$.
+where $\beta^{\pi}_k$ are the regression coefficients quantifying the impact of treatment $k$.
 The $[+ \ldots]$ term could include a frailty term in the model.
-The treatment identifier is included in the covariate vector $x$.
-We will assume without loss of generalisability that all individuals have all treatments.
-
-\note[GBaio]{I think we need to be a bit better at creating a consistent narrative. It's a bit hard to follow through all the bits and pieces without losing focus and why you're telling me about MCMs and then multiple end-points...}
+The treatment index for an individual is included in the covariate vector $\bm{x}$ so that $\pi$ is replaced by $\pi(\bm{x})$ in equation~(\ref{eqn:mcm}).
+% We will assume without loss of generalisability that all individuals have all treatments.
+Note that although we are including all treatments arms in the same model we are not assuming any relationship between them. In particular, we do not suppose proportional hazards. This allows greater flexibility for the cases when proportional hazards is violated.
 
 \subsubsection{Issues modelling multiple end-points in an HTA context} \label{section:issues}
 There are several potential issues with existing approaches to cure modelling applied to an HTA context in particular.
 
 % correlated events
-Firstly, when the end-points are correlated, such as with the common events of interest overall survival (OS) and progression-free survival (PFS), this should be accounted for in the modelling.
+Firstly, when the end-points are correlated, such as with the common events of interest overall survival (OS) and progression-free survival (PFS), this ought to be accounted for in the modelling.
 There may be information in one sample of event times which we can use to improve the inference from another.
 Performing separate, independent analyses may even give counter-intuitive results.
-In the case of multiple types of end-points in the same trial, since the clinical interpretation of a cure fraction is the proportion of patients that respond to treatment,
+In the case of multiple types of end-points in the same trial, since the clinical interpretation of a cure fraction is the proportion of patients that are LTS,
 it may make intuitive sense that there is a single underlying cure fraction.
 For example, what would be the interpretation if there are differences in emergent survival plateaus between PFS and OS?
 This is a clinically unintuitive dichotomy between the resulting proportions of long-term survivors.
@@ -273,20 +277,20 @@ By taking advantage of the set of end-points together the data paucity may be al
 This is particularly important for health economics modelling in order to gauge the full cost and effect of an intervention.
 
 % our innovative proposal
-We will now present a Bayesian hierarchical cure fraction model for multiple end-points.
+We will now present a Bayesian hierarchical mixture cure model for multiple end-points.
 This has the double advantage of borrowing information between end-points
 (e.g. in the case of OS and PFS, the likely more mature PFS data can inform the often highly censored OS analysis) and obtaining a single cure fraction estimate.
 
-\note[GBaio]{I think this needs some work. It needs to be integrated more with the revised notation & setup of the models. For example, you could bring some of the discussion here forward to earlier on. The current text is also not great at times (see comment below)}
-
 %
 \subsection{The hierarchical mixture cure model} \label{section:hier_model}
-In this section, we discuss how to construct the extended mixture cure model in order to model all end-points together and alleviate the issues posed in the Section \ref{section:issues}.
-Let us consider three alternative approaches of modelling the cure fractions. 
+In this section, we show how to construct the extended mixture cure model in order to model multiple end-points together and alleviate the issues posed in the Section \ref{section:issues}.
+In order to do this we must first introduce an additional index to denote an end-point $j = 1, \ldots, J$ --- typically, $J=2$ for PFS and OS.
+We can now define a separate mixture cure model, as described in equation~(\ref{eqn:mcm}), for each of the end-points $j$.
+With this in mind, let us consider three alternative multiple end-point incidence models for the estimation of the cure fraction for treatment $k$ and end-point $j$, denoted $\pi_{kj}$.
 
-Firstly, the approach taken so far, presented in Section \ref{section:basic_model}, is to model the cure fraction corresponding to each end-point completely separately (no pooling), assuming that they are independent.
+Firstly, the approach taken so far, and presented in Section \ref{section:basic_model}, is to model the cure fraction corresponding to each end-point completely separately (no pooling), assuming that they are independent.
 $$
-\pi_j \perp\!\!\!\perp \pi_{j'}, \; j,j' = 1, \ldots, J.
+\pi_{kj} \perp\!\!\!\perp \pi_{kj'}, \; j,j' = 1, \ldots, J.
 %\text{logit}(\pi_k) \sim \text{N}(\mu_k, \sigma_k^2), \; k = 1, \ldots, K.
 $$
 Secondly, we can assume that the cure fraction is the same for all end-points and so pool the samples (complete pooling).
@@ -294,32 +298,30 @@ In our example, PFS can be used as a proxy for OS since there are fewer missing 
 There may be no reason why the cure fraction should be different between different end-points, especially if individuals are observed for long enough.
 In this case
 $$
-\pi_j = \pi_{j'}, \; j,j' = 1, \ldots, J.
+\pi_{kj} = \pi_{kj'}, \; j,j' = 1, \ldots, J.
 $$
-A potential issue with this approach is that the complete pooling approach would ignore any variation in cure fraction that exists between end-points.
+A potential issue with the complete pooling approach is that it ignores any variation in cure fraction that exists between end-points.
 
-Lastly, and the approach adopted in this paper, is a compromise between the first two approaches called partial-pooling.
+Lastly, and the approach proposed in this paper, is a compromise between the first two approaches called partial-pooling.
 We propose a hierarchical structure on the cure fraction assuming exchangeability between all end-points $j$ for each treatment $k$.
-The first-level "global" cure fraction, corresponding to (\ref{eqn:pi_regn}), is given by
-\begin{equation*}
-\mbox{logit}(\pi_{k}) = \sum_{k=1}^K \beta^{\pi}_{k} \mbox{TRT}_k \;[+ \ldots]
-\end{equation*}
-and define the second-level end-point specific cure fractions to be Normally distributed 
+We assume that there is a single, shared "common" cure fraction from which the separate end-point specific cure fractions are obtained, corresponding to equation~(\ref{eqn:pi_regn})
+but where $\pi_{k}, \beta^{\pi}_{k}$ are no longer for particular end-points as before but now represent "global" values.
+Using the global cure fraction we can define the second-level end-point specific cure fractions to be normally distributed as
 $$
-\text{logit}(\pi_{kj}) \sim \text{N}(\pi_k, \sigma_k^2), \; j = 1, \ldots, J.  
+\text{logit}(\pi_{kj}) \sim \text{N}(\text{logit}(\pi_k), \sigma_k^2), \; j = 1, \ldots, J.  
 $$
 where $\sigma_k^2$ is the between-group (end-points) variance.
 The end-point specific cure fractions in our example are denoted $\pi_{PFS}, \pi_{OS}$.
-Figure~\ref{fig:hier_dag} shows a directed acyclic graphical (DAG) representation of the Bayesian hierarchical mixture cure modelling framework for two endpoints.
+Figure~\ref{fig:hier_dag} shows a directed acyclic graphical (DAG) representation of the Bayesian hierarchical mixture cure modelling framework for two end-points.
 The equivalent DAGs for the complete and no pooling models are given in the Appendix.
-Note that pooling refers to the cure fractions (the incidence model). The survival times are not pooled; the parameters for the uncured survival models ($\phi$, $\beta^{\lambda}$ in the latency model) are estimated using the separate sets of survival times for each end-point.
+Note that pooling refers to the cure fractions. The survival times are not pooled; the parameters for the uncured survival models ($\phi$, $\beta^{\lambda}$ in the latency model) are estimated using the separate sets of survival times for each end-point.
 E.g. in the complete pooling case we're not assuming that PFS and OS have the same survival time distributions.
 However, in the complete and partial pooling case there is an indirect pooling effect for the latency models via the incidence model, so the fact that the cure fractions are similar/the same will influence the shapes of the survival curves.
 
-\begin{figure}
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.6\linewidth]{DAG_with_Tx.png}
-\caption{\label{fig:hier_dag} A hierarchical mixture cure model DAG for a trial with two end-points. The trial indexes correspond to the motivating example end-points of PFS (1) and OS (2).
+\caption{\label{fig:hier_dag} A hierarchical mixture cure model DAG for a trial with two end-points. The trial indices correspond to the motivating example end-points of PFS (1) and OS (2).
 Solid lines represent stochastic and dashed lines deterministic relationships, respectively.
 Cured patients have fixed hazards e.g. taken from life tables.
 The distribution of times for uncured patient regresses on covariates for the rate parameter and $\phi$ is the set of ancillary parameters.}
@@ -342,18 +344,16 @@ In many cure fraction models it is common to have $S_b(t, x) = 1$ for all $t$ un
 However, we are focused on the full life-course of an individual in an HTA context and so include a general population all-cause mortality competing risk.
 Thus, the uncured population is subject to a background mortality risk in addition to the risk from the event of interest.
 
-We used the World Health Organisation (WHO) life tables by country for the latest year available of 2016
-\cite{wholifetables} to inform the background mortality in the mixture cure model.
+We used the World Health Organisation (WHO) life tables by country for the latest year available of 2016 \cite{wholifetables} to inform the background mortality in the mixture cure model.
 The baseline hazards are the expected mortality rate for each patient at the age at which they experience the event.
-The mortality data are country, age and gender adjusted, thus providing a granular account of
-the different patient profiles in the trial.
+The mortality data are country, age and gender adjusted, thus providing a granular account of the different patient profiles in the trial.
 The WHO reports conditional probabilities of death in 5-year intervals until age 85.
 A constant annual mortality rate is reported for individuals over 85. They assumed that no-one lives beyond 100 years.
+Further details are provided in the supplementary material.
 
 In a Bayesian analysis there are alternative ways in which we could model the background mortality.
 For this work we used WHO hazard point estimates as fixed and known.
-We could consider the WHO estimates to provide sufficiently accurate estimates
-given the sample size and so incorporating uncertainty is not necessary. This also forces consistency across fits.
+We could consider the WHO estimates to provide sufficiently accurate estimates given the sample size and so incorporating uncertainty is not necessary. This also forces consistency across fits.
 Denote the fixed WHO estimates for individual $i$ used for the background survival in (\ref{eqn:mcm}) as
 $S_b(t_i \mid \bm\theta_b, \bm{x}_i) = \hat{S}_i$.
 
@@ -373,8 +373,9 @@ and for age $\beta_{age}^{PFS} \sim \text{N}(0, 100),\; \beta_{age}^{OS} \sim \t
 Alternatively, we could specify the cure fraction directly using a a Beta prior distribution $\pi \sim \text{Beta}(a, b)$.
 The parameters can be obtained via transformation of the mean and standard deviation to allow a more natural scale for elicitation.
 
-The hierarchical cure fraction is modelled as a fixed effect linear regression with logistic link. Each treatment coefficient prior is $\beta^{\pi}_j \sim \text{N}(-0.1, 0.4)$.
-This corresponds to a prior mean cure fraction of just under 0.5, and 10\% and 1\% chance of exceeding 0.6 and 0.7 respectively.  
+The hierarchical cure fraction is modelled as a fixed effect linear regression with logistic link. Each treatment coefficient prior is independent $\beta^{\pi}_k \sim \text{N}(-0.1, 0.2)$.
+This corresponds to a prior mean cure fraction of just under 0.5, and approximately 10\% and 1\% chance of exceeding 0.6 and 0.7 respectively.
+Prior predictive plots and further discussion are provided in the supplementary material.
 
 The random effect variance on the global cure fraction is a noninformative (folded) half-Normal \cite{Gelman2006} with 
 ${\sigma^2 \sim \text{N}(0, 2.5)\mathbb{I}(0,)}$, where $\text{N}(0, 2.5)\mathbb{I}(0,)$ denotes a normal distribution truncated at mean 0.
@@ -382,7 +383,7 @@ Alternatively, a noninformative uniform prior density on standard deviation para
 For small hierarchical variance a $\text{Gamma}(2, 0.1)$ may be preferred \cite{Chung2013}.
 
 %
-\subsection{Choice of distribution}
+\subsection{Choice of survival distributions}
 The hierarchical and separate models were fit for Exponential, Weibull, Gompertz, Log-Normal, Log-Logistic to the OS and PFS event times.
 % which distributions
 These are distributions from a suite of distributions given in NICE guidelines for Health Technology Assessments (HTA) \cite{Latimer2011}.
@@ -414,8 +415,9 @@ There has not been much work carried-out to date on model assessment methods spe
 For the basic mixture cure model assessment may focus on the model as a whole or on the incidence and latency submodels separately.
 The fit of the latency submodel can be examined using a revised Schoenfeld residual \cite{Wileyto2013} and the performance of the incidence submodel can be checked with concordance measures such as AUC \cite{Peng2021}.
 However, these incidence model approaches are best used directly with known cure status and are designed for models which consider individual cure fractions, unlike our model which assumed a single population cure fraction.
-Of course, we also extend the basic mixture cure model so it is not yet clear how to use these methods in this situation. 
-\note[NGreen]{are we interested in showing PH between treatments?}
+Of course, we also extend the basic mixture cure model so it is not yet clear how to best use these methods in this situation. 
+\note[NGreen]{are we interested in PH between treatments? [Tori] PH has been shown to be violated for these treatments for both endpoints (BMS should be able to provide references for that)}
+
 %
 \subsection{Complete data only results} \label{sec:results}
 In this section, we will explore the mixture cure model fits using the complete 60-months CheckMate 067 trial data.
@@ -438,7 +440,7 @@ The uncured median survival times for the exponential model are 5 and 15 months,
 
 %% restricted mean survival times
 The restricted mean survival times at 60 months (RMST) are greater for the exponential models.
-The RMST for the background is exactly 58.2 months.
+The RMST for the cured population is exactly value corresponding to the general population of 58.2 months.
 For the exponential model the RMST (95\% credible interval, CrI) for the uncured group is 20.6 (18.4, 23.1) and 6.66 (6.09, 7.39) months, for OS and PFS, respectively. 
 For the OS end-point the RMST is 28.7 (26.3, 31.1), 36.5 (34.1, 38.9) and 39.6 (37.1, 42.1) months, for ipilimumab, nivolumab and combined, respectively.
 For the PFS end-point the RMST is 11.9 (9.96, 14.1), 24.3 (21.1, 27.4) and 27.7 (24.7, 30.8) months, for ipilimumab, nivolumab and combined, respectively.
@@ -454,7 +456,7 @@ The survival plots for the complete set of distributions are given in the supple
 %%TODO: include a table of survival statistics?
 %%      compare curves formally? e.g. ANOVA, t-test RMST or HR?
 
-\begin{figure}
+\begin{figure}[!ht]
 \centering
 % produced using paper_output_plots.R
 \includegraphics[width=0.7\linewidth]{plot_S_exp_lognormal_grid_cf_hier.png}
@@ -482,7 +484,7 @@ There is a small amount of shrinkage such that the posterior distributions for O
 % \begin{landscape}
 % \begin{sidewaystable}[H]
 \begin{center}
-\begin{table*}[t]
+\begin{table*}[!ht]
 \caption{WAIC statistics for hierarchical and separate models, and all distributions. \label{tab:waic}}
 \begin{tabular}{llrrrrrrrrrrrr}
 \toprule
@@ -527,7 +529,7 @@ weibull & exp & -5063.26 & 80.70 & 11.93 & 0.46 & 10126.53 & 161.40 & -5064.74 &
 
 % \begin{landscape}
 % \begin{sidewaysfigure}[H]
-\begin{figure}
+\begin{figure}[hbt!]
 \centering
 \includegraphics[height=10cm, width=0.9\linewidth]{forest_plot_joint_cf_hier.png}
 \caption{\label{fig:cf_forest_all_tx} Hierarchical mixture cure model posterior cure fraction forest plots with 95\% credible intervals for (i) ipilimumab only (ii) nivolumab only and (iii) combination treatment.}
@@ -537,14 +539,13 @@ weibull & exp & -5063.26 & 80.70 & 11.93 & 0.46 & 10126.53 & 161.40 & -5064.74 &
 
 % \begin{landscape}
 % \begin{sidewaysfigure}[H]
-\begin{figure}
+\begin{figure}[hbt!]
 \centering
 \includegraphics[height=10cm, width=0.9\linewidth]{forest_plot_joint_all_tx_separate.png}
 \caption{\label{fig:cf_forest_all_tx_sep} Separate mixture cure models posterior cure fraction forest plots with 95\% credible intervals for (i) ipilimumab only (ii) nivolumab only and (iii) combination treatment.}
 % \end{sidewaysfigure}
 \end{figure}
 % \end{landscape}
-
 
 %
 \subsection{All data-cuts results}\label{sec:results-data-cut}
@@ -575,13 +576,13 @@ For the log-Normal hierarchical model the RMST for OS end-point is 6.6 (6.17, 7.
 Finally, the separate model gives 6.59 (6.18, 7.07) months for OS and 3.98 (3.85, 4.1) months for PFS.
 
 
-\begin{figure}[!H]
+\begin{figure}[!ht]
 \centering
 \includegraphics[height=10cm, width=0.6\linewidth]{forest_plot_cf_sep_cpt.png}
 \caption{\label{fig:forest_plot_cf_cutpoint_sep} Posterior cure fraction forest plot with 95\% credible intervals for study data with cutpoint censoring at 12 months, 30 months and the complete data set using the separate mixture cure models.}
 \end{figure}
 
-\begin{figure}[!H]
+\begin{figure}[!ht]
 \centering
 \includegraphics[height=10cm, width=0.6\linewidth]{forest_plot_cf_hier_cpt.png}
 \caption{\label{fig:forest_plot_cf_cutpoint_hier} Posterior cure fraction forest plot with 95\% credible intervals for study data with cutpoint censoring at 12 months, 30 months and the complete data set using the hierarchical mixture cure model.}
@@ -589,13 +590,13 @@ Finally, the separate model gives 6.59 (6.18, 7.07) months for OS and 3.98 (3.85
 
 \note[NGreen]{show complete data with dotted line?}
 
-\begin{figure}[!H]
+\begin{figure}[!ht]
 \centering
 \includegraphics[height=10cm, width=0.6\linewidth]{plot_S_grid_cf_sep_cpt_12m.png}
 \caption{\label{fig:S_cutpoint_12mo_sep} Separate mixture cure models posterior survival curves with 95\% credible intervals for (I) PFS and OS exponential uncured survival curves and (II) PFS and OS log-Normal uncured survival curves and censored times at a 12 month cutpoint. The black lines show the observed data Kaplan-Meier curves.}
 \end{figure}
 
-\begin{figure}[!H]
+\begin{figure}[!ht]
 \centering
 \includegraphics[height=10cm, width=0.6\linewidth]{plot_S_grid_cf_hier_cpt_12m.png}
 \caption{\label{fig:S_cutpoint_12mo_hier} Hierarchical mixture cure model posterior survival curves with 95\% credible intervals for (I) PFS and OS exponential uncured survival curves and (II) PFS and OS log-Normal uncured survival curves and censored times at a 12 month cutpoint. The black lines show the observed data Kaplan-Meier curves.}
@@ -611,7 +612,7 @@ Finally, the separate model gives 6.59 (6.18, 7.07) months for OS and 3.98 (3.85
 %
 \section{Discussion}\label{sec:discussion}
 We have presented a Bayesian hierarchical mixture cure model to obtain complete survival curves which exhibit plateau behaviour. These curves can then be used in HTA to inform functions of patient lifetime.
-We have demonstrated the novel method using the CheckMate 067 trial data set at different data-cuts.
+We have demonstrated the novel method using the CheckMate 067 trial data set at different artificial data-cuts.
 The hierarchical model was compared with the separate model analogue and has been shown to be superior as well as both principled and applicable to situations where trials include multiple treatment arms and end-points.
 
 One of the benefit of adopting a hierarchical Bayesian approach is robustness to smaller sample sizes due to providing prior information and borrowing of strength between data for different end-points.
@@ -633,28 +634,34 @@ If a (cancer) patient enters the study at 60 years old then there is a high degr
 In the case of sparse data e.g. when there is a large amount of missing data perhaps due to right censoring, then 'regularising' the inference based on available prior information could make a significant and important difference.
 How to elicit this prior information in practice may not be simple and a formal protocol should be adopted \cite{OHagan2019}.
 
-Health care regulators may value the fact that a hierarchical model can embed some form of prior knowledge to account for scepticism.
+Health care regulators, such as the European Medicines Agency (EMA) and U.S. Food and Drug Administration (FDA), may value the fact that a hierarchical model can embed some form of prior knowledge to account for scepticism.
 This will prevent the cure rates to be taken at face value, particularly with limited data.
 The hierarchical model seems to give a more precise estimate of the cure rate, even with earlier data-cuts (especially for the Exponential model).
 The hierarchical model is more aligned, which means possibly you have more reliable estimates early on, which is a good argument to complement modelling based on earlier cuts.
-Earlier cuts can lead to quicker introduction in the market and reimbursement decisions.
+% Earlier cuts can lead to quicker introduction in the market and reimbursement decisions.
+
+% data
+Future work should test the proposed hierarchical MCM on a variety of data sets and at data-cuts reflecting their actual trial protocols.
+The modelling framework is generalisable to any number of end-points and treatments. Further work could investigate the benefit to including additional end-point data even if it does not clearly demonstrate plateauing behaviour.
+The survival curve used in the model for the general population background 'cured' survival can be refined to be appropriate to specific cohort characteristics. For instance, long term survival of clinically identified complete responders (CR) could be used to somehow bridge the gap between statistical cure and clinical cure/functional cure. The shorter-term CR individual-level survival data can be combined with longer-term external data such as from WHO life table as in the current analysis (see \citep{Jackson2017} for potential approaches).
 
 % optimal stopping
-Another way to think about the cut-point data is to think about what time should we choose to halt the trial and end the data collection which would maximise some expected overall utility.
+Another way to think about the cut-point data is to think about what is the minimum follow-up time should we choose to halt the trial and end the data collection which would maximise some expected overall utility.
 % RSS conference talk ref? Anna?
 That is, put another way, what is the optimal stopping time $\tau^*$ for the total utility $V$?
 $$
 \mathbb{E} V_{\tau^*} = \sup_{\tau} \mathbb{E} V_{\tau}
 $$
-The stopping utility may include benefits such as smaller costs, freed-up time from the trial for patients and those running the study, quicker time to market for a drug, avoidance of side-effects etc.
+The stopping utility should incorporate a measure of the survival extrapolation robustness and may include benefits such as smaller costs, freed-up time from the trial for patients and those running the study, quicker time to market for a drug, avoidance of side-effects etc.
 The utility would also depend on estimating 'correct' parameters values from the available data i.e. that they are within some acceptable threshold of the true values.
-This could be directly on the parameters of interest or an order statistics for which drug is deemed the preferable.
+This could be applied directly on the parameters of interest or an order statistics for which drug is deemed the preferable.
 
-This may be framed in terms of value of information (VoI) [ref].
+This may be framed in terms of value of information (VoI) \citep{Heath2017}.
 For example, in the case given above, what is the additional value of obtaining further data after 12 and 30 months.
 In practice, deriving a set of heuristics may be better than formalising a general rule.
-A discrete set of cut-point may be used, similar to our selection of 12 and 30 months, rather than considering the whole real line.
+A discrete set of cut-point may be used, similar to our artificial selection of rounded times 12 and 30 months, rather than considering the whole real line.
 
+As well as during a study, the model can be used in advance of a study to inform on optimal follow-up time to support the choice of data-cuts used in practice.
 
 % implications for HTA
 There are several implications for HTA by using the hierarchical mixture cure model presented here.
@@ -667,6 +674,7 @@ In our example, the OS cure fraction is accurate and stable at 12 months for the
 Additional benefits are potential early stopping (cheaper, improved health, quicker drugs to market for producers and patients benefit),
 smaller trials,
 
+The key conclusion of this paper is that data are available for better more efficient estimation of the outcomes of trials. Standard models are generally not up to the task but we have demonstrated a novel model which can achieve this.
 
 \note[NGreen]{how should the complete responders be included in the main model? If they enter via the background adjustment why double-count them?}
 \note[NGreen]{model averaging using all distributions and weights from LOO/WAIC?}
@@ -700,744 +708,6 @@ The authors declare no potential conflict of interests.
 % \section*{Supporting information}
 
 % The following supporting information is available as part of the online article:
-
-\appendix
-
-\section{Posterior parameter statistics \label{app1}}
-
-
-% \begin{center}
-% \begin{table*}[t]
-% \caption{Posterior summary statistics separate treatment models \label{tab:posterior}}
-% \centering
-% \begin{tabular}{llll}
-% \toprule
-% Variable & IPILIMUMAB & NIVOLUMAB & NIVOLUMAB+IPILIMUMAB\\
-% \midrule
-% $\beta^{os}_0$ & -3.167 (-3.408, -2.947) & -3.157 (-3.476, -2.899) & -2.922 (-3.219, -2.657)\\
-% $\beta^{os}_1$ & -0.014 (-0.025, -0.002) & -0.014 (-0.029, 0.004) & -0.012 (-0.036, 0.012)\\
-% $\beta^{pfs}_0$ & 1.575 (1.471, 1.672) & 1.985 (1.798, 2.148) & 2.014 (1.847, 2.206)\\
-% $\beta^{pfs}_1$ & -0.005 (-0.012, 0.001) & 0.013 (0.003, 0.023) & -0.001 (-0.01, 0.008)\\
-% $\pi_{global}$ & 0.17 (0.09, 0.291) & 0.371 (0.205, 0.568) & 0.46 (0.271, 0.659)\\
-% $\pi_{os}$ & 0.195 (0.148, 0.253) & 0.415 (0.34, 0.485) & 0.527 (0.458, 0.591)\\
-% $\pi_{pfs}$ & 0.137 (0.102, 0.185) & 0.321 (0.262, 0.386) & 0.397 (0.34, 0.46)\\
-% \bottomrule
-% \end{tabular}
-% \begin{tablenotes}%%[341pt]
-% \item Source: Example for table source text.
-% \item[1] Example for a first table footnote.
-% \item[2] Example for a first table footnote.
-% \end{tablenotes}
-% \end{table*}
-% \end{center}
-
-
-%%%%%%%%%%%%%%%%%%
-% hierarchical
-
-% \begin{landscape}
-% \begin{sidewaysfigure}[H]
-\begin{figure}
-\centering
-% paper_output_plots.R
-\includegraphics[width=0.9\linewidth]{plot_S_grid_cf_hier.png}
-\caption{\label{fig:S_grid_cf_hier} Hierarchical model posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events and ipilimumab, nivolumab and combination treatments. The black lines show the Kaplan-Meier curves using CheckMate 067 trial data.}
-\end{figure}
-% \end{sidewaysfigure}
-% \end{landscape}
-
-% \begin{sidewaysfigure}[H]
-% \includegraphics[width=0.9\linewidth]{plot_S_grid.png}
-% \caption{\label{fig:S_grid_ipi_nivo} Hierarchical model posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events and nivolumab and ipilimumab combination treatment. The black lines show the Kaplan-Meier curves.}
-% \end{sidewaysfigure}
-
-% \begin{sidewaysfigure}[H]
-% \includegraphics[width=0.9\linewidth]{plot_S_grid_IPILIMUMAB.png}
-% \caption{\label{fig:S_grid_ipi} Hierarchical model posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events and ipilimumab treatment. The black lines show the Kaplan-Meier curves.}
-% \end{sidewaysfigure}
-
-% \begin{sidewaysfigure}[H]
-% \includegraphics[width=0.9\linewidth]{plot_S_grid_NIVOLUMAB.png}
-% \caption{\label{fig:S_grid_nivo} Hierarchical model posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events and nivolumab treatment. The black lines show the Kaplan-Meier curves.}
-% \end{sidewaysfigure}
-
-% \begin{landscape}
-% \begin{sidewaysfigure}[H]
-\begin{figure}
-\centering
-\includegraphics[width=0.9\linewidth]{plot_S_grid_cf_separate.png}
-\caption{\label{fig:S_grid_separate} Separate model posterior survival curves for exponential, weibull, gompertz, log-logistic and log-Normal uncured fraction for OS and PFS events ipilimumab, nivolumab and combination treatments. The black lines show the Kaplan-Meier curves using CheckMate 067 trial data.}
-\end{figure}
-% \end{sidewaysfigure}
-% \end{landscape}
-
-% \begin{figure}[H]
-% \centering
-% \includegraphics[width=0.6\linewidth]{cf hier_bg_fixed_forest_plot.png}
-% \caption{\label{fig:cf_forest} Posterior cure fraction forest plot. Same distributions for OS and PFS. {\it is this how we want to split this up? E.g. do we want different OS and PFS distributions and same treatment? Or separate plots for each cure fraction type?}}
-% \end{figure}
-
-% \begin{figure}[H]
-% \centering
-% \includegraphics[width=0.6\linewidth]{forest_plot_IPILIMUMAB.png}
-% \caption{\label{fig:cf_forest_ipi} Posterior cure fraction forest plot for ipilimumab treatment.}
-% \end{figure}
-
-% \begin{figure}[H]
-% \centering
-% \includegraphics[width=0.6\linewidth]{forest_plot_NIVOLUMAB.png}
-% \caption{\label{fig:cf_forest_nivo} Posterior cure fraction forest plot for nivolumab treatment.}
-% \end{figure}
-
-% \begin{figure}[H]
-% \centering
-% \includegraphics[width=0.6\linewidth]{forest_plot_NIVOLUMAB+IPILIMUMAB.png}
-% \caption{\label{fig:cf_forest_ipi_nivo} Posterior cure fraction forest plot for nivolumab and ipilimumab combination treatment.}
-% \end{figure}
-
-% \begin{sidewaysfigure}[H]
-% \includegraphics[width=0.9\linewidth]{forest_plot_all_tx.png}
-% \caption{\label{fig:cf_forest_all_tx} Posterior cure fraction forest plots for (i) ipilimumab only (ii) nivolumab only and (iii) combination treatment.}
-% \end{sidewaysfigure}
-
-\begin{figure}
-\centering
-% produced using paper_output_plots.R
-\includegraphics[width=0.7\linewidth]{plot_S_exp_lognormal_grid_cf_separate.png}
-\caption{\label{fig:S_exp_lnorm_cf_sep} Separate mixture cure models posterior survival curves for uncured fraction assumed (I) exponential; and (II) log-Normal for both OS and PFS, and ipilimumab, nivolumab and combination treatments. The black lines show the Kaplan-Meier curves using the complete CheckMate 067 trial data.}
-\end{figure}
-
-%% cut-point survival plots
-\begin{figure}[!H]
-\centering
-\includegraphics[height=10cm, width=0.6\linewidth]{plot_S_grid_cf_sep_cpt_30m.png}
-\caption{\label{fig:S_cutpoint_30mo_sep} Separate mixture cure models posterior survival curves with 95\% credible intervals for (I) PFS and OS exponential uncured survival curves and (II) PFS and OS log-Normal uncured survival curves and censored times at a 30 month cutpoint. The black lines show the observed data Kaplan-Meier curves.}
-\end{figure}
-
-\begin{figure}[!H]
-\centering
-\includegraphics[height=10cm, width=0.6\linewidth]{plot_S_grid_cf_hier_cpt_30m.png}
-\caption{\label{fig:S_cutpoint_30mo_hier} Hierarchical mixture cure model posterior survival curves with 95\% credible intervals for (I) PFS and OS exponential uncured survival curves and (II) PFS and OS log-Normal uncured survival curves and censored times at a 30 month cutpoint. The black lines show the observed data Kaplan-Meier curves.}
-\end{figure}
-
-%%%%%%%%%%%
-% tables
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for hierarchical mixture cure model parameters and all OS distributions with exponential PFS distribution. \label{tab:post_hier_pfs_exp}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Exp}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Exp}} & & \multicolumn{2}{c}{\textbf{Gompertz/Exp}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Exp}} & & \multicolumn{2}{c}{\textbf{log-Normal/Exp}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta_{os, 0}$ & -3.093 & (-3.249, -2.956) &  & 3.032 & (2.903, 3.221) &  & -3.094 & (-3.264, -2.948) &  & 2.831 & (2.659, 3.023) &  & 2.478 & (2.406, 2.559) & \\
-$\beta_{os, 1}$ & -0.014 & (-0.023, -0.005) &  & 0.011 & (0.003, 0.021) &  & -0.014 & (-0.024, -0.003) &  & 0.011 & (0, 0.021) &  & 0.001 & (-0.004, 0.006) & \\
-$\beta_{pfs, 0}$ & -1.825 & (-1.939, -1.728) &  & -1.828 & (-1.925, -1.738) &  & -1.827 & (-1.92, -1.73) &  & -1.831 & (-1.921, -1.734) &  & -1.831 & (-1.924, -1.732) & \\
-$\beta_{pfs, 1}$ & -0.003 & (-0.009, 0.004) &  & -0.003 & (-0.009, 0.003) &  & -0.003 & (-0.01, 0.003) &  & -0.003 & (-0.009, 0.003) &  & -0.003 & (-0.009, 0.004) & \\
-$\beta^{\pi}_1$ & -1.179 & (-2.283, 0.153) &  & -1.102 & (-2.009, 0.28) &  & -1.168 & (-2.115, 0.18) &  & -1.447 & (-2.351, 0.022) &  & -1.005 & (-1.966, 0.386) & \\
-$\beta^{\pi}_2$ & -0.527 & (-1.604, 0.351) &  & -0.494 & (-1.337, 0.485) &  & -0.496 & (-1.4, 0.341) &  & -0.625 & (-1.509, 0.231) &  & -0.463 & (-1.565, 0.498) & \\
-$\beta^{\pi}_3$ & -0.311 & (-1.382, 0.508) &  & -0.324 & (-1.392, 0.62) &  & -0.348 & (-1.422, 0.565) &  & -0.354 & (-1.35, 0.318) &  & -0.228 & (-1.269, 0.706) & \\
-$\sigma_1$ & 1.403 & (0.339, 3.87) &  & 1.486 & (0.325, 4.266) &  & 1.542 & (0.302, 4.395) &  & 1.268 & (0.058, 4.274) &  & 1.514 & (0.399, 3.907) & \\
-$\sigma_2$ & 0.791 & (0.056, 2.834) &  & 0.868 & (0.111, 3.433) &  & 0.846 & (0.064, 2.911) &  & 0.701 & (0.012, 2.897) &  & 1.132 & (0.197, 4.121) & \\
-$\sigma_3$ & 0.852 & (0.091, 2.636) &  & 0.985 & (0.146, 3.444) &  & 1.008 & (0.116, 3.424) &  & 0.703 & (0.016, 2.906) &  & 1.102 & (0.213, 3.506) & \\
-$\pi_{global, 1}$ & 0.252 & (0.093, 0.538) &  & 0.265 & (0.118, 0.57) &  & 0.253 & (0.108, 0.545) &  & 0.209 & (0.087, 0.505) &  & 0.282 & (0.123, 0.595) & \\
-$\pi_{global, 2}$ & 0.377 & (0.167, 0.587) &  & 0.384 & (0.208, 0.619) &  & 0.384 & (0.198, 0.584) &  & 0.354 & (0.181, 0.557) &  & 0.393 & (0.173, 0.622) & \\
-$\pi_{global, 3}$ & 0.427 & (0.201, 0.624) &  & 0.425 & (0.199, 0.65) &  & 0.420 & (0.194, 0.638) &  & 0.416 & (0.206, 0.579) &  & 0.447 & (0.219, 0.67) & \\
-$\pi_{os, 1}$ & 0.216 & (0.158, 0.275) &  & 0.238 & (0.181, 0.302) &  & 0.219 & (0.156, 0.278) &  & 0.130 & (0.033, 0.211) &  & 0.286 & (0.228, 0.344) & \\
-$\pi_{os, 2}$ & 0.423 & (0.359, 0.484) &  & 0.440 & (0.375, 0.499) &  & 0.429 & (0.364, 0.494) &  & 0.366 & (0.291, 0.447) &  & 0.483 & (0.426, 0.546) & \\
-$\pi_{os, 3}$ & 0.505 & (0.437, 0.569) &  & 0.523 & (0.45, 0.593) &  & 0.508 & (0.439, 0.569) &  & 0.455 & (0.388, 0.524) &  & 0.557 & (0.503, 0.611) & \\
-$\pi_{pfs, 1}$ & 0.101 & (0.068, 0.139) &  & 0.099 & (0.065, 0.135) &  & 0.100 & (0.065, 0.137) &  & 0.102 & (0.068, 0.137) &  & 0.099 & (0.067, 0.142) & \\
-$\pi_{pfs, 2}$ & 0.341 & (0.282, 0.404) &  & 0.340 & (0.281, 0.401) &  & 0.342 & (0.284, 0.398) &  & 0.338 & (0.285, 0.386) &  & 0.338 & (0.276, 0.4) & \\
-$\pi_{pfs, 3}$ & 0.409 & (0.351, 0.468) &  & 0.410 & (0.353, 0.472) &  & 0.407 & (0.351, 0.466) &  & 0.411 & (0.345, 0.472) &  & 0.407 & (0.348, 0.467) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for hierarchical mixture cure model parameters and all OS distributions with weibull PFS distribution. \label{tab:post_hier_pfs_weibull}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Weibull}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Weibull}} & & \multicolumn{2}{c}{\textbf{Gompertz/Weibull}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Weibull}} & & \multicolumn{2}{c}{\textbf{log-Normal/Weibull}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta_{os, 0}$ & -3.097 & (-3.247, -2.968) &  & 3.032 & (2.894, 3.198) &  & -3.092 & (-3.243, -2.949) &  & 2.826 & (2.661, 3.011) &  & 2.478 & (2.408, 2.548) & \\
-$\beta_{os, 1}$ & -0.014 & (-0.023, -0.005) &  & 0.011 & (0.002, 0.02) &  & -0.013 & (-0.023, -0.004) &  & 0.011 & (0.002, 0.022) &  & 0.000 & (-0.004, 0.005) & \\
-$\beta_{pfs, 0}$ & 1.799 & (1.705, 1.899) &  & 1.797 & (1.7, 1.899) &  & 1.798 & (1.711, 1.904) &  & 1.802 & (1.711, 1.901) &  & 1.795 & (1.696, 1.903) & \\
-$\beta_{pfs, 1}$ & 0.002 & (-0.004, 0.007) &  & 0.001 & (-0.005, 0.007) &  & 0.001 & (-0.005, 0.008) &  & 0.002 & (-0.004, 0.007) &  & 0.001 & (-0.005, 0.008) & \\
-$\beta^{\pi}_1$ & -1.208 & (-2.243, 0.204) &  & -1.056 & (-2.104, 0.188) &  & -1.159 & (-2.094, 0.307) &  & -1.450 & (-2.403, 0.021) &  & -1.035 & (-2.091, 0.319) & \\
-$\beta^{\pi}_2$ & -0.518 & (-1.498, 0.286) &  & -0.482 & (-1.445, 0.439) &  & -0.487 & (-1.319, 0.3) &  & -0.612 & (-1.554, -0.001) &  & -0.393 & (-1.525, 0.595) & \\
-$\beta^{\pi}_3$ & -0.306 & (-1.473, 0.563) &  & -0.324 & (-1.51, 0.557) &  & -0.259 & (-1.334, 0.428) &  & -0.340 & (-1.353, 0.327) &  & -0.239 & (-1.429, 0.632) & \\
-$\sigma_1$ & 1.359 & (0.223, 4.202) &  & 1.485 & (0.267, 4.21) &  & 1.335 & (0.247, 3.67) &  & 1.089 & (0.036, 3.606) &  & 1.568 & (0.389, 3.867) & \\
-$\sigma_2$ & 0.764 & (0.026, 3.09) &  & 0.851 & (0.071, 3.113) &  & 0.704 & (0.033, 2.6) &  & 0.639 & (0.015, 2.502) &  & 0.984 & (0.174, 3.182) & \\
-$\sigma_3$ & 0.888 & (0.09, 2.978) &  & 1.081 & (0.125, 3.455) &  & 0.825 & (0.09, 2.732) &  & 0.572 & (0.01, 2.264) &  & 1.032 & (0.179, 3.115) & \\
-$\pi_{global, 1}$ & 0.247 & (0.096, 0.551) &  & 0.273 & (0.109, 0.547) &  & 0.255 & (0.11, 0.576) &  & 0.209 & (0.083, 0.505) &  & 0.277 & (0.11, 0.579) & \\
-$\pi_{global, 2}$ & 0.378 & (0.183, 0.571) &  & 0.387 & (0.191, 0.608) &  & 0.385 & (0.211, 0.574) &  & 0.356 & (0.175, 0.5) &  & 0.409 & (0.179, 0.644) & \\
-$\pi_{global, 3}$ & 0.429 & (0.186, 0.637) &  & 0.426 & (0.181, 0.636) &  & 0.440 & (0.209, 0.605) &  & 0.419 & (0.205, 0.581) &  & 0.445 & (0.193, 0.653) & \\
-$\pi_{os, 1}$ & 0.211 & (0.147, 0.266) &  & 0.236 & (0.177, 0.296) &  & 0.219 & (0.156, 0.281) &  & 0.134 & (0.049, 0.222) &  & 0.285 & (0.232, 0.331) & \\
-$\pi_{os, 2}$ & 0.421 & (0.359, 0.482) &  & 0.438 & (0.369, 0.501) &  & 0.426 & (0.356, 0.49) &  & 0.366 & (0.3, 0.437) &  & 0.483 & (0.429, 0.538) & \\
-$\pi_{os, 3}$ & 0.506 & (0.436, 0.572) &  & 0.522 & (0.456, 0.58) &  & 0.511 & (0.438, 0.567) &  & 0.454 & (0.377, 0.532) &  & 0.557 & (0.489, 0.615) & \\
-$\pi_{pfs, 1}$ & 0.108 & (0.072, 0.146) &  & 0.109 & (0.077, 0.15) &  & 0.109 & (0.073, 0.156) &  & 0.109 & (0.076, 0.147) &  & 0.108 & (0.069, 0.146) & \\
-$\pi_{pfs, 2}$ & 0.359 & (0.304, 0.417) &  & 0.358 & (0.301, 0.414) &  & 0.356 & (0.301, 0.413) &  & 0.354 & (0.297, 0.409) &  & 0.359 & (0.301, 0.424) & \\
-$\pi_{pfs, 3}$ & 0.416 & (0.358, 0.479) &  & 0.419 & (0.36, 0.476) &  & 0.417 & (0.356, 0.477) &  & 0.420 & (0.361, 0.478) &  & 0.415 & (0.363, 0.472) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for hierarchical mixture cure model parameters and all OS distributions with gompertz PFS distribution. \label{tab:post_hier_pfs_gompertz}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Gompertz}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Gompertz}} & & \multicolumn{2}{c}{\textbf{Gompertz/Gompertz}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Gompertz}} & & \multicolumn{2}{c}{\textbf{log-Normal/Gompertz}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta_{os, 0}$ & -3.094 & (-3.247, -2.956) &  & 3.036 & (2.922, 3.196) &  & -3.091 & (-3.27, -2.944) &  & 2.844 & (2.671, 3.03) &  & 2.477 & (2.41, 2.553) & \\
-$\beta_{os, 1}$ & -0.014 & (-0.023, -0.005) &  & 0.011 & (0.002, 0.02) &  & -0.013 & (-0.023, -0.004) &  & 0.011 & (0.002, 0.021) &  & 0.001 & (-0.004, 0.006) & \\
-$\beta_{pfs, 0}$ & -1.827 & (-1.929, -1.727) &  & -1.834 & (-1.933, -1.729) &  & -1.831 & (-1.947, -1.721) &  & -1.828 & (-1.92, -1.726) &  & -1.828 & (-1.933, -1.729) & \\
-$\beta_{pfs, 1}$ & -0.003 & (-0.01, 0.004) &  & -0.003 & (-0.009, 0.004) &  & -0.003 & (-0.009, 0.003) &  & -0.003 & (-0.01, 0.003) &  & -0.003 & (-0.009, 0.004) & \\
-$\beta^{\pi}_1$ & -1.171 & (-2.273, 0.111) &  & -1.120 & (-2.117, 0.125) &  & -1.105 & (-2.281, 0.272) &  & -1.465 & (-2.526, 0.364) &  & -1.017 & (-2.152, 0.291) & \\
-$\beta^{\pi}_2$ & -0.521 & (-1.482, 0.441) &  & -0.526 & (-1.562, 0.259) &  & -0.490 & (-1.468, 0.38) &  & -0.579 & (-1.427, 0.235) &  & -0.478 & (-1.687, 0.523) & \\
-$\beta^{\pi}_3$ & -0.350 & (-1.62, 0.563) &  & -0.311 & (-1.36, 0.785) &  & -0.299 & (-1.299, 0.579) &  & -0.375 & (-1.256, 0.46) &  & -0.214 & (-1.539, 0.759) & \\
-$\sigma_1$ & 1.362 & (0.3, 4.001) &  & 1.481 & (0.38, 4.043) &  & 1.548 & (0.324, 3.606) &  & 1.142 & (0.034, 3.456) &  & 1.640 & (0.463, 4.084) & \\
-$\sigma_2$ & 0.810 & (0.06, 3.291) &  & 0.960 & (0.092, 3.207) &  & 0.933 & (0.088, 3.125) &  & 0.607 & (0.013, 2.766) &  & 1.070 & (0.218, 3.189) & \\
-$\sigma_3$ & 0.973 & (0.081, 3.63) &  & 0.990 & (0.151, 3.144) &  & 0.912 & (0.07, 3.307) &  & 0.692 & (0.033, 3.032) &  & 1.068 & (0.176, 3.85) & \\
-$\pi_{global, 1}$ & 0.254 & (0.093, 0.528) &  & 0.262 & (0.107, 0.531) &  & 0.267 & (0.093, 0.568) &  & 0.208 & (0.074, 0.59) &  & 0.281 & (0.104, 0.572) & \\
-$\pi_{global, 2}$ & 0.378 & (0.185, 0.608) &  & 0.377 & (0.173, 0.564) &  & 0.386 & (0.187, 0.594) &  & 0.363 & (0.194, 0.559) &  & 0.390 & (0.156, 0.628) & \\
-$\pi_{global, 3}$ & 0.420 & (0.165, 0.637) &  & 0.428 & (0.204, 0.687) &  & 0.429 & (0.214, 0.641) &  & 0.411 & (0.222, 0.613) &  & 0.452 & (0.177, 0.681) & \\
-$\pi_{os, 1}$ & 0.214 & (0.148, 0.282) &  & 0.235 & (0.169, 0.304) &  & 0.219 & (0.163, 0.275) &  & 0.128 & (0.051, 0.208) &  & 0.287 & (0.232, 0.355) & \\
-$\pi_{os, 2}$ & 0.421 & (0.352, 0.485) &  & 0.439 & (0.372, 0.509) &  & 0.426 & (0.36, 0.492) &  & 0.363 & (0.287, 0.436) &  & 0.485 & (0.425, 0.551) & \\
-$\pi_{os, 3}$ & 0.507 & (0.441, 0.576) &  & 0.522 & (0.453, 0.588) &  & 0.507 & (0.444, 0.571) &  & 0.452 & (0.378, 0.521) &  & 0.554 & (0.497, 0.618) & \\
-$\pi_{pfs, 1}$ & 0.101 & (0.063, 0.139) &  & 0.099 & (0.066, 0.14) &  & 0.100 & (0.066, 0.137) &  & 0.100 & (0.068, 0.139) &  & 0.100 & (0.065, 0.137) & \\
-$\pi_{pfs, 2}$ & 0.341 & (0.282, 0.4) &  & 0.342 & (0.282, 0.401) &  & 0.343 & (0.283, 0.397) &  & 0.341 & (0.286, 0.394) &  & 0.341 & (0.287, 0.398) & \\
-$\pi_{pfs, 3}$ & 0.411 & (0.35, 0.471) &  & 0.408 & (0.349, 0.469) &  & 0.410 & (0.351, 0.47) &  & 0.404 & (0.349, 0.462) &  & 0.410 & (0.346, 0.472) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for hierarchical mixture cure model parameters and all OS distributions with log-logistic PFS distribution. \label{tab:post_hier_pfs_llogistic}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Log-logistic}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Log-logistic}} & & \multicolumn{2}{c}{\textbf{Gompertz/Log-logistic}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Log-logistic}} & & \multicolumn{2}{c}{\textbf{log-Normal/Log-logistic}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta_{os, 0}$ & -3.093 & (-3.258, -2.954) &  & 3.025 & (2.915, 3.185) &  & -3.090 & (-3.241, -2.923) &  & 2.842 & (2.659, 3.034) &  & 2.478 & (2.419, 2.556) & \\
-$\beta_{os, 1}$ & -0.014 & (-0.022, -0.005) &  & 0.011 & (0.003, 0.02) &  & -0.013 & (-0.023, -0.004) &  & 0.011 & (0.002, 0.021) &  & 0.000 & (-0.005, 0.006) & \\
-$\beta_{pfs, 0}$ & 1.334 & (1.257, 1.41) &  & 1.337 & (1.269, 1.406) &  & 1.334 & (1.264, 1.406) &  & 1.340 & (1.259, 1.413) &  & 1.336 & (1.272, 1.406) & \\
-$\beta_{pfs, 1}$ & 0.002 & (-0.002, 0.007) &  & 0.002 & (-0.002, 0.008) &  & 0.002 & (-0.002, 0.007) &  & 0.002 & (-0.002, 0.007) &  & 0.003 & (-0.002, 0.008) & \\
-$\beta^{\pi}_1$ & -1.170 & (-2.267, 0.343) &  & -1.085 & (-2.176, 0.456) &  & -1.209 & (-2.253, 0.164) &  & -1.440 & (-2.431, 0.204) &  & -0.972 & (-2.091, 0.444) & \\
-$\beta^{\pi}_2$ & -0.529 & (-1.444, 0.278) &  & -0.508 & (-1.428, 0.449) &  & -0.506 & (-1.671, 0.614) &  & -0.611 & (-1.555, 0.235) &  & -0.417 & (-1.429, 0.442) & \\
-$\beta^{\pi}_3$ & -0.302 & (-1.419, 0.533) &  & -0.292 & (-1.407, 0.578) &  & -0.265 & (-1.314, 0.505) &  & -0.355 & (-1.209, 0.372) &  & -0.261 & (-1.31, 0.625) & \\
-$\sigma_1$ & 1.535 & (0.312, 4.338) &  & 1.632 & (0.381, 4.085) &  & 1.517 & (0.368, 4.542) &  & 1.311 & (0.065, 3.968) &  & 1.662 & (0.572, 4.064) & \\
-$\sigma_2$ & 0.883 & (0.045, 3.188) &  & 0.831 & (0.048, 2.777) &  & 0.924 & (0.037, 3.221) &  & 0.646 & (0.01, 2.516) &  & 1.015 & (0.169, 3.317) & \\
-$\sigma_3$ & 0.902 & (0.07, 2.804) &  & 0.998 & (0.152, 3.23) &  & 0.883 & (0.092, 3.001) &  & 0.674 & (0.024, 2.829) &  & 1.074 & (0.209, 3.007) & \\
-$\pi_{global, 1}$ & 0.255 & (0.094, 0.585) &  & 0.270 & (0.102, 0.612) &  & 0.247 & (0.095, 0.541) &  & 0.213 & (0.081, 0.551) &  & 0.290 & (0.11, 0.609) & \\
-$\pi_{global, 2}$ & 0.376 & (0.191, 0.569) &  & 0.381 & (0.193, 0.61) &  & 0.382 & (0.158, 0.649) &  & 0.357 & (0.174, 0.559) &  & 0.402 & (0.193, 0.609) & \\
-$\pi_{global, 3}$ & 0.430 & (0.195, 0.63) &  & 0.432 & (0.197, 0.641) &  & 0.438 & (0.212, 0.624) &  & 0.415 & (0.23, 0.592) &  & 0.439 & (0.212, 0.651) & \\
-$\pi_{os, 1}$ & 0.214 & (0.153, 0.276) &  & 0.239 & (0.181, 0.304) &  & 0.220 & (0.159, 0.285) &  & 0.127 & (0.044, 0.206) &  & 0.290 & (0.234, 0.345) & \\
-$\pi_{os, 2}$ & 0.423 & (0.354, 0.493) &  & 0.438 & (0.369, 0.498) &  & 0.428 & (0.365, 0.492) &  & 0.362 & (0.291, 0.432) &  & 0.482 & (0.431, 0.537) & \\
-$\pi_{os, 3}$ & 0.508 & (0.445, 0.568) &  & 0.523 & (0.456, 0.589) &  & 0.510 & (0.443, 0.572) &  & 0.451 & (0.381, 0.531) &  & 0.554 & (0.495, 0.619) & \\
-$\pi_{pfs, 1}$ & 0.095 & (0.062, 0.142) &  & 0.091 & (0.061, 0.13) &  & 0.094 & (0.061, 0.135) &  & 0.096 & (0.06, 0.139) &  & 0.093 & (0.061, 0.136) & \\
-$\pi_{pfs, 2}$ & 0.343 & (0.282, 0.402) &  & 0.347 & (0.292, 0.413) &  & 0.344 & (0.287, 0.406) &  & 0.339 & (0.28, 0.398) &  & 0.343 & (0.283, 0.407) & \\
-$\pi_{pfs, 3}$ & 0.412 & (0.35, 0.47) &  & 0.412 & (0.354, 0.472) &  & 0.414 & (0.359, 0.47) &  & 0.410 & (0.354, 0.472) &  & 0.409 & (0.349, 0.462) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for hierarchical mixture cure model parameters and all OS distributions with log-Normal PFS distribution. \label{tab:post_hier_pfs_lnormal}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/log-Normal}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Log-Normal}} & & \multicolumn{2}{c}{\textbf{Gompertz/Log-Normal}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Log-Normal}} & & \multicolumn{2}{c}{\textbf{log-Normal/Log-Normal}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta_{os, 0}$ & -3.085 & (-3.248, -2.943) &  & 3.027 & (2.893, 3.19) &  & -3.086 & (-3.244, -2.956) &  & 2.802 & (2.646, 2.985) &  & 2.481 & (2.399, 2.551) & \\
-$\beta_{os, 1}$ & -0.014 & (-0.023, -0.005) &  & 0.011 & (0.003, 0.02) &  & -0.013 & (-0.022, -0.005) &  & 0.010 & (0, 0.019) &  & 0.000 & (-0.004, 0.005) & \\
-$\beta_{pfs, 0}$ & 1.250 & (1.206, 1.297) &  & 1.249 & (1.204, 1.301) &  & 1.251 & (1.205, 1.299) &  & 1.252 & (1.205, 1.299) &  & 1.248 & (1.202, 1.297) & \\
-$\beta_{pfs, 1}$ & 0.000 & (-0.003, 0.003) &  & 0.000 & (-0.003, 0.003) &  & 0.000 & (-0.004, 0.004) &  & 0.000 & (-0.003, 0.003) &  & 0.000 & (-0.003, 0.003) & \\
-$\beta^{\pi}_1$ & -1.134 & (-1.973, 0.179) &  & -1.133 & (-2.027, 0.034) &  & -1.175 & (-2.171, 0.071) &  & -1.383 & (-2.181, 0.117) &  & -0.976 & (-1.875, 0.358) & \\
-$\beta^{\pi}_2$ & -0.379 & (-1.346, 0.166) &  & -0.338 & (-1.213, 0.314) &  & -0.366 & (-1.339, 0.281) &  & -0.457 & (-1.326, 0.208) &  & -0.313 & (-1.075, 0.281) & \\
-$\beta^{\pi}_3$ & -0.109 & (-1.035, 0.607) &  & -0.112 & (-1.109, 0.525) &  & -0.104 & (-1.075, 0.625) &  & -0.179 & (-1.153, 0.438) &  & -0.123 & (-1.113, 0.646) & \\
-$\sigma_1$ & 1.114 & (0.131, 3.274) &  & 1.167 & (0.17, 3.696) &  & 1.141 & (0.095, 3.668) &  & 0.885 & (0.017, 3.264) &  & 1.242 & (0.292, 4.03) & \\
-$\sigma_2$ & 0.603 & (0.013, 2.647) &  & 0.570 & (0.015, 2.431) &  & 0.548 & (0.011, 2.397) &  & 0.586 & (0.011, 2.643) &  & 0.719 & (0.026, 3.029) & \\
-$\sigma_3$ & 0.629 & (0.015, 2.941) &  & 0.677 & (0.034, 3.101) &  & 0.569 & (0.016, 2.282) &  & 0.571 & (0.008, 2.638) &  & 0.763 & (0.048, 2.756) & \\
-$\pi_{global, 1}$ & 0.256 & (0.122, 0.545) &  & 0.256 & (0.116, 0.508) &  & 0.250 & (0.102, 0.518) &  & 0.215 & (0.101, 0.529) &  & 0.285 & (0.133, 0.589) & \\
-$\pi_{global, 2}$ & 0.410 & (0.206, 0.541) &  & 0.419 & (0.229, 0.578) &  & 0.413 & (0.208, 0.57) &  & 0.391 & (0.21, 0.552) &  & 0.425 & (0.254, 0.57) & \\
-$\pi_{global, 3}$ & 0.475 & (0.262, 0.647) &  & 0.474 & (0.248, 0.628) &  & 0.476 & (0.254, 0.651) &  & 0.457 & (0.24, 0.608) &  & 0.472 & (0.247, 0.656) & \\
-$\pi_{os, 1}$ & 0.212 & (0.15, 0.273) &  & 0.236 & (0.172, 0.296) &  & 0.216 & (0.156, 0.282) &  & 0.145 & (0.069, 0.217) &  & 0.288 & (0.231, 0.342) & \\
-$\pi_{os, 2}$ & 0.433 & (0.375, 0.489) &  & 0.440 & (0.381, 0.502) &  & 0.429 & (0.367, 0.487) &  & 0.382 & (0.3, 0.456) &  & 0.479 & (0.42, 0.543) & \\
-$\pi_{os, 3}$ & 0.509 & (0.449, 0.567) &  & 0.521 & (0.458, 0.583) &  & 0.509 & (0.451, 0.565) &  & 0.468 & (0.396, 0.539) &  & 0.554 & (0.5, 0.607) & \\
-$\pi_{pfs, 1}$ & 0.143 & (0.101, 0.189) &  & 0.144 & (0.098, 0.188) &  & 0.145 & (0.105, 0.19) &  & 0.141 & (0.103, 0.184) &  & 0.145 & (0.103, 0.193) & \\
-$\pi_{pfs, 2}$ & 0.420 & (0.364, 0.469) &  & 0.423 & (0.37, 0.478) &  & 0.420 & (0.361, 0.479) &  & 0.414 & (0.356, 0.472) &  & 0.424 & (0.365, 0.48) & \\
-$\pi_{pfs, 3}$ & 0.487 & (0.426, 0.545) &  & 0.486 & (0.43, 0.549) &  & 0.485 & (0.427, 0.543) &  & 0.478 & (0.419, 0.538) &  & 0.486 & (0.424, 0.545) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-
-%%%%%%%%%%%%%%%%%
-% separate
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for separate mixture cure models parameters and all OS distributions with exponential PFS distribution. \label{tab:post_sep_pfs_exp}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Exp}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Exp}} & & \multicolumn{2}{c}{\textbf{Gompertz/Exp}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Exp}} & & \multicolumn{2}{c}{\textbf{log-Normal/Exp}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta^{os}_0$ & -3.042 & (-3.203, -2.909) &  & 3.002 & (2.886, 3.141) &  & -3.051 & (-3.197, -2.914) &  & 2.715 & (2.583, 2.858) &  & 2.472 & (2.392, 2.547) & \\
-$\beta^{os}_1$ & -0.012 & (-0.021, -0.003) &  & 0.009 & (0.001, 0.018) &  & -0.012 & (-0.021, -0.003) &  & 0.007 & (-0.001, 0.016) &  & 0.000 & (-0.004, 0.005) & \\
-$\beta^{pfs}_0$ & -1.817 & (-1.915, -1.719) &  & -1.815 & (-1.917, -1.728) &  & -1.816 & (-1.929, -1.712) &  & -1.817 & (-1.919, -1.718) &  & -1.815 & (-1.91, -1.719) & \\
-$\beta^{pfs}_1$ & -0.003 & (-0.009, 0.004) &  & -0.002 & (-0.009, 0.004) &  & -0.002 & (-0.008, 0.005) &  & -0.003 & (-0.009, 0.003) &  & -0.003 & (-0.009, 0.003) & \\
-$\beta^{\pi}_{os, 1}$ & -1.084 & (-1.399, -0.816) &  & -1.008 & (-1.32, -0.756) &  & -1.077 & (-1.39, -0.787) &  & -1.308 & (-1.699, -0.999) &  & -0.805 & (-1.05, -0.528) & \\
-$\beta^{\pi}_{os, 2}$ & -0.245 & (-0.488, 0.014) &  & -0.190 & (-0.429, 0.08) &  & -0.238 & (-0.486, 0.017) &  & -0.398 & (-0.715, -0.15) &  & -0.057 & (-0.323, 0.168) & \\
-$\beta^{\pi}_{os, 3}$ & 0.068 & (-0.185, 0.318) &  & 0.102 & (-0.125, 0.344) &  & 0.070 & (-0.183, 0.324) &  & -0.066 & (-0.382, 0.196) &  & 0.218 & (-0.014, 0.425) & \\
-$\beta^{\pi}_{pfs, 1}$ & -1.848 & (-2.174, -1.508) &  & -1.839 & (-2.158, -1.542) &  & -1.829 & (-2.171, -1.502) &  & -1.831 & (-2.191, -1.507) &  & -1.836 & (-2.128, -1.525) & \\
-$\beta^{\pi}_{pfs, 2}$ & -0.626 & (-0.878, -0.385) &  & -0.625 & (-0.86, -0.398) &  & -0.617 & (-0.881, -0.36) &  & -0.622 & (-0.872, -0.372) &  & -0.613 & (-0.869, -0.402) & \\
-$\beta^{\pi}_{pfs, 3}$ & -0.361 & (-0.595, -0.088) &  & -0.353 & (-0.582, -0.11) &  & -0.348 & (-0.545, -0.11) &  & -0.359 & (-0.59, -0.117) &  & -0.353 & (-0.591, -0.141) & \\
-$\pi^{os}_1$ & 0.254 & (0.198, 0.307) &  & 0.268 & (0.211, 0.32) &  & 0.255 & (0.199, 0.313) &  & 0.214 & (0.155, 0.269) &  & 0.310 & (0.259, 0.371) & \\
-$\pi^{os}_2$ & 0.439 & (0.38, 0.504) &  & 0.453 & (0.394, 0.52) &  & 0.441 & (0.381, 0.504) &  & 0.402 & (0.328, 0.463) &  & 0.486 & (0.42, 0.542) & \\
-$\pi^{os}_3$ & 0.517 & (0.454, 0.579) &  & 0.525 & (0.469, 0.585) &  & 0.518 & (0.454, 0.58) &  & 0.484 & (0.406, 0.549) &  & 0.554 & (0.497, 0.605) & \\
-$\pi^{pfs}_1$ & 0.137 & (0.102, 0.181) &  & 0.138 & (0.104, 0.176) &  & 0.140 & (0.102, 0.182) &  & 0.139 & (0.101, 0.181) &  & 0.139 & (0.106, 0.179) & \\
-$\pi^{pfs}_2$ & 0.349 & (0.294, 0.405) &  & 0.349 & (0.297, 0.402) &  & 0.351 & (0.293, 0.411) &  & 0.350 & (0.295, 0.408) &  & 0.352 & (0.296, 0.401) & \\
-$\pi^{pfs}_3$ & 0.411 & (0.355, 0.478) &  & 0.413 & (0.358, 0.472) &  & 0.414 & (0.367, 0.473) &  & 0.411 & (0.357, 0.471) &  & 0.413 & (0.356, 0.465) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for separate mixture cure models parameters and all OS distributions with weibull PFS distribution. \label{tab:post_sep_pfs_weibull}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Weibull}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Weibull}} & & \multicolumn{2}{c}{\textbf{Gompertz/Weibull}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Weibull}} & & \multicolumn{2}{c}{\textbf{log-Normal/Weibull}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta^{os}_0$ & -3.040 & (-3.18, -2.913) &  & 2.996 & (2.877, 3.125) &  & -3.052 & (-3.182, -2.914) &  & 2.717 & (2.585, 2.853) &  & 2.474 & (2.398, 2.546) & \\
-$\beta^{os}_1$ & -0.012 & (-0.022, -0.003) &  & 0.009 & (0.001, 0.018) &  & -0.012 & (-0.022, -0.003) &  & 0.008 & (0, 0.016) &  & 0.000 & (-0.005, 0.006) & \\
-$\beta^{pfs}_0$ & 1.780 & (1.682, 1.887) &  & 1.778 & (1.683, 1.864) &  & 1.774 & (1.675, 1.869) &  & 1.775 & (1.683, 1.87) &  & 1.775 & (1.676, 1.87) & \\
-$\beta^{pfs}_1$ & 0.001 & (-0.005, 0.007) &  & 0.000 & (-0.006, 0.006) &  & 0.001 & (-0.005, 0.007) &  & 0.000 & (-0.004, 0.006) &  & 0.001 & (-0.006, 0.007) & \\
-$\beta^{\pi}_{os, 1}$ & -1.075 & (-1.395, -0.786) &  & -1.004 & (-1.315, -0.736) &  & -1.068 & (-1.364, -0.792) &  & -1.309 & (-1.659, -0.978) &  & -0.817 & (-1.085, -0.56) & \\
-$\beta^{\pi}_{os, 2}$ & -0.239 & (-0.475, 0.005) &  & -0.188 & (-0.43, 0.038) &  & -0.244 & (-0.495, 0.004) &  & -0.401 & (-0.711, -0.101) &  & -0.048 & (-0.276, 0.202) & \\
-$\beta^{\pi}_{os, 3}$ & 0.062 & (-0.196, 0.335) &  & 0.107 & (-0.18, 0.34) &  & 0.071 & (-0.184, 0.343) &  & -0.069 & (-0.325, 0.218) &  & 0.236 & (0.009, 0.448) & \\
-$\beta^{\pi}_{pfs, 1}$ & -1.772 & (-2.083, -1.467) &  & -1.763 & (-2.077, -1.437) &  & -1.770 & (-2.116, -1.473) &  & -1.762 & (-2.084, -1.432) &  & -1.754 & (-2.09, -1.445) & \\
-$\beta^{\pi}_{pfs, 2}$ & -0.562 & (-0.813, -0.31) &  & -0.545 & (-0.806, -0.301) &  & -0.543 & (-0.791, -0.301) &  & -0.558 & (-0.799, -0.312) &  & -0.548 & (-0.81, -0.316) & \\
-$\beta^{\pi}_{pfs, 3}$ & -0.323 & (-0.562, -0.081) &  & -0.319 & (-0.541, -0.115) &  & -0.319 & (-0.557, -0.077) &  & -0.323 & (-0.586, -0.102) &  & -0.330 & (-0.553, -0.082) & \\
-$\pi^{os}_1$ & 0.256 & (0.199, 0.313) &  & 0.269 & (0.212, 0.324) &  & 0.257 & (0.204, 0.312) &  & 0.214 & (0.16, 0.273) &  & 0.307 & (0.253, 0.363) & \\
-$\pi^{os}_2$ & 0.441 & (0.383, 0.501) &  & 0.453 & (0.394, 0.51) &  & 0.439 & (0.379, 0.501) &  & 0.402 & (0.329, 0.475) &  & 0.488 & (0.431, 0.55) & \\
-$\pi^{os}_3$ & 0.515 & (0.451, 0.583) &  & 0.527 & (0.455, 0.584) &  & 0.518 & (0.454, 0.585) &  & 0.483 & (0.419, 0.554) &  & 0.559 & (0.502, 0.61) & \\
-$\pi^{pfs}_1$ & 0.146 & (0.111, 0.187) &  & 0.148 & (0.111, 0.192) &  & 0.147 & (0.108, 0.187) &  & 0.148 & (0.111, 0.193) &  & 0.149 & (0.11, 0.191) & \\
-$\pi^{pfs}_2$ & 0.364 & (0.307, 0.423) &  & 0.368 & (0.309, 0.425) &  & 0.368 & (0.312, 0.425) &  & 0.365 & (0.31, 0.423) &  & 0.367 & (0.308, 0.422) & \\
-$\pi^{pfs}_3$ & 0.420 & (0.363, 0.48) &  & 0.421 & (0.368, 0.471) &  & 0.421 & (0.364, 0.481) &  & 0.420 & (0.357, 0.474) &  & 0.419 & (0.365, 0.479) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for separate mixture cure models parameters and all OS distributions with Gompertz PFS distribution. \label{tab:post_sep_pfs_gompertz}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Gompertz}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Gompertz}} & & \multicolumn{2}{c}{\textbf{Gompertz/Gompertz}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Gompertz}} & & \multicolumn{2}{c}{\textbf{log-Normal/Gompertz}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta^{os}_0$ & -3.039 & (-3.171, -2.896) &  & 2.998 & (2.887, 3.118) &  & -3.043 & (-3.196, -2.915) &  & 2.716 & (2.582, 2.854) &  & 2.475 & (2.413, 2.546) & \\
-$\beta^{os}_1$ & -0.012 & (-0.02, -0.003) &  & 0.009 & (0.001, 0.018) &  & -0.011 & (-0.02, -0.001) &  & 0.007 & (-0.002, 0.016) &  & 0.000 & (-0.005, 0.004) & \\
-$\beta^{pfs}_0$ & -1.815 & (-1.903, -1.707) &  & -1.818 & (-1.915, -1.721) &  & -1.814 & (-1.914, -1.713) &  & -1.815 & (-1.914, -1.725) &  & -1.817 & (-1.913, -1.713) & \\
-$\beta^{pfs}_1$ & -0.003 & (-0.009, 0.004) &  & -0.003 & (-0.009, 0.004) &  & -0.002 & (-0.009, 0.003) &  & -0.002 & (-0.008, 0.004) &  & -0.002 & (-0.008, 0.003) & \\
-$\beta^{\pi}_{os, 1}$ & -1.072 & (-1.344, -0.767) &  & -1.004 & (-1.337, -0.718) &  & -1.076 & (-1.368, -0.793) &  & -1.295 & (-1.652, -0.976) &  & -0.807 & (-1.051, -0.559) & \\
-$\beta^{\pi}_{os, 2}$ & -0.242 & (-0.479, -0.009) &  & -0.183 & (-0.432, 0.051) &  & -0.221 & (-0.434, -0.001) &  & -0.382 & (-0.667, -0.116) &  & -0.064 & (-0.279, 0.149) & \\
-$\beta^{\pi}_{os, 3}$ & 0.069 & (-0.204, 0.34) &  & 0.113 & (-0.119, 0.388) &  & 0.066 & (-0.165, 0.294) &  & -0.067 & (-0.326, 0.18) &  & 0.217 & (-0.01, 0.465) & \\
-$\beta^{\pi}_{pfs, 1}$ & -1.845 & (-2.166, -1.564) &  & -1.834 & (-2.156, -1.516) &  & -1.829 & (-2.136, -1.519) &  & -1.822 & (-2.134, -1.515) &  & -1.847 & (-2.182, -1.523) & \\
-$\beta^{\pi}_{pfs, 2}$ & -0.623 & (-0.857, -0.383) &  & -0.624 & (-0.874, -0.372) &  & -0.619 & (-0.848, -0.403) &  & -0.624 & (-0.856, -0.39) &  & -0.612 & (-0.864, -0.364) & \\
-$\beta^{\pi}_{pfs, 3}$ & -0.370 & (-0.602, -0.125) &  & -0.362 & (-0.583, -0.131) &  & -0.358 & (-0.592, -0.124) &  & -0.347 & (-0.58, -0.119) &  & -0.356 & (-0.595, -0.132) & \\
-$\pi^{os}_1$ & 0.256 & (0.207, 0.317) &  & 0.269 & (0.208, 0.328) &  & 0.255 & (0.203, 0.311) &  & 0.216 & (0.161, 0.274) &  & 0.309 & (0.259, 0.364) & \\
-$\pi^{os}_2$ & 0.440 & (0.383, 0.498) &  & 0.454 & (0.394, 0.513) &  & 0.445 & (0.393, 0.5) &  & 0.406 & (0.339, 0.471) &  & 0.484 & (0.431, 0.537) & \\
-$\pi^{os}_3$ & 0.517 & (0.449, 0.584) &  & 0.528 & (0.47, 0.596) &  & 0.516 & (0.459, 0.573) &  & 0.483 & (0.419, 0.545) &  & 0.554 & (0.497, 0.614) & \\
-$\pi^{pfs}_1$ & 0.138 & (0.103, 0.173) &  & 0.139 & (0.104, 0.18) &  & 0.139 & (0.106, 0.18) &  & 0.140 & (0.106, 0.18) &  & 0.137 & (0.101, 0.179) & \\
-$\pi^{pfs}_2$ & 0.350 & (0.298, 0.405) &  & 0.349 & (0.294, 0.408) &  & 0.351 & (0.3, 0.401) &  & 0.349 & (0.298, 0.404) &  & 0.352 & (0.297, 0.41) & \\
-$\pi^{pfs}_3$ & 0.409 & (0.354, 0.469) &  & 0.411 & (0.358, 0.467) &  & 0.412 & (0.356, 0.469) &  & 0.414 & (0.359, 0.47) &  & 0.412 & (0.356, 0.467) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for separate mixture cure models parameters and all OS distributions with log-logistic PFS distribution. \label{tab:post_sep_pfs_llogistic}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/Log-logistic}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/Log-logistic}} & & \multicolumn{2}{c}{\textbf{Gompertz/Log-logistic}} & & \multicolumn{2}{c}{\textbf{Log-logistic/Log-logistic}} & & \multicolumn{2}{c}{\textbf{log-Normal/Log-logistic}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta^{os}_0$ & -3.047 & (-3.201, -2.914) &  & 2.995 & (2.875, 3.127) &  & -3.048 & (-3.183, -2.91) &  & 2.717 & (2.578, 2.867) &  & 2.477 & (2.405, 2.543) & \\
-$\beta^{os}_1$ & -0.012 & (-0.021, -0.003) &  & 0.009 & (0.001, 0.018) &  & -0.012 & (-0.02, -0.002) &  & 0.008 & (-0.001, 0.017) &  & 0.000 & (-0.004, 0.005) & \\
-$\beta^{pfs}_0$ & 1.328 & (1.262, 1.395) &  & 1.329 & (1.26, 1.4) &  & 1.331 & (1.263, 1.406) &  & 1.328 & (1.253, 1.417) &  & 1.326 & (1.258, 1.401) & \\
-$\beta^{pfs}_1$ & 0.002 & (-0.002, 0.007) &  & 0.002 & (-0.002, 0.007) &  & 0.002 & (-0.003, 0.007) &  & 0.002 & (-0.002, 0.007) &  & 0.002 & (-0.003, 0.007) & \\
-$\beta^{\pi}_{os, 1}$ & -1.087 & (-1.409, -0.804) &  & -1.001 & (-1.3, -0.704) &  & -1.061 & (-1.364, -0.799) &  & -1.300 & (-1.69, -0.952) &  & -0.821 & (-1.055, -0.569) & \\
-$\beta^{\pi}_{os, 2}$ & -0.239 & (-0.473, -0.007) &  & -0.200 & (-0.423, 0.051) &  & -0.243 & (-0.471, 0.006) &  & -0.383 & (-0.661, -0.099) &  & -0.062 & (-0.296, 0.162) & \\
-$\beta^{\pi}_{os, 3}$ & 0.060 & (-0.169, 0.294) &  & 0.092 & (-0.13, 0.329) &  & 0.069 & (-0.17, 0.318) &  & -0.073 & (-0.305, 0.195) &  & 0.214 & (-0.018, 0.425) & \\
-$\beta^{\pi}_{pfs, 1}$ & -1.870 & (-2.199, -1.517) &  & -1.866 & (-2.228, -1.535) &  & -1.862 & (-2.201, -1.539) &  & -1.871 & (-2.207, -1.566) &  & -1.864 & (-2.18, -1.549) & \\
-$\beta^{\pi}_{pfs, 2}$ & -0.618 & (-0.875, -0.372) &  & -0.619 & (-0.855, -0.372) &  & -0.621 & (-0.858, -0.369) &  & -0.618 & (-0.858, -0.356) &  & -0.610 & (-0.838, -0.381) & \\
-$\beta^{\pi}_{pfs, 3}$ & -0.360 & (-0.596, -0.148) &  & -0.347 & (-0.569, -0.12) &  & -0.348 & (-0.568, -0.083) &  & -0.358 & (-0.581, -0.122) &  & -0.330 & (-0.547, -0.121) & \\
-$\pi^{os}_1$ & 0.253 & (0.196, 0.309) &  & 0.270 & (0.214, 0.331) &  & 0.258 & (0.204, 0.31) &  & 0.216 & (0.156, 0.279) &  & 0.306 & (0.258, 0.362) & \\
-$\pi^{os}_2$ & 0.441 & (0.384, 0.498) &  & 0.450 & (0.396, 0.513) &  & 0.440 & (0.384, 0.502) &  & 0.406 & (0.341, 0.475) &  & 0.485 & (0.427, 0.541) & \\
-$\pi^{os}_3$ & 0.515 & (0.458, 0.573) &  & 0.523 & (0.468, 0.581) &  & 0.517 & (0.458, 0.579) &  & 0.482 & (0.424, 0.549) &  & 0.553 & (0.495, 0.605) & \\
-$\pi^{pfs}_1$ & 0.135 & (0.1, 0.18) &  & 0.135 & (0.097, 0.177) &  & 0.136 & (0.1, 0.177) &  & 0.135 & (0.099, 0.173) &  & 0.135 & (0.102, 0.175) & \\
-$\pi^{pfs}_2$ & 0.351 & (0.294, 0.408) &  & 0.351 & (0.298, 0.408) &  & 0.350 & (0.298, 0.409) &  & 0.351 & (0.298, 0.412) &  & 0.352 & (0.302, 0.406) & \\
-$\pi^{pfs}_3$ & 0.411 & (0.355, 0.463) &  & 0.414 & (0.361, 0.47) &  & 0.414 & (0.362, 0.479) &  & 0.412 & (0.359, 0.47) &  & 0.418 & (0.366, 0.47) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-\begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
-\begin{table*}[t]
-\caption{Posterior summary statistics for separate mixture cure models parameters and all OS distributions with log-Normal PFS distribution. \label{tab:post_sep_pfs_lnormal}}
-\centering
-\begin{tabular}{l c c c c c c c c c c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{$\textbf{Exp/log-Normal}^1$} & & \multicolumn{2}{c}{\textbf{Weibull/log-Normal}} & & \multicolumn{2}{c}{\textbf{Gompertz/log-Normal}} & & \multicolumn{2}{c}{\textbf{Log-logistic/log-Normal}} & & \multicolumn{2}{c}{\textbf{log-Normal/log-Normal}}\\
-\cmidrule{2-3}\cmidrule{5-6}\cmidrule{8-9}\cmidrule{11-12}\cmidrule{14-15}
-\textbf{Parameter} & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI} & & \textbf{Mean} & \textbf{95\% CrI}\\
-\midrule
-$\beta^{os}_0$ & -3.046 & (-3.183, -2.909) &  & 2.996 & (2.886, 3.113) &  & -3.039 & (-3.186, -2.891) &  & 2.714 & (2.572, 2.868) &  & 2.478 & (2.41, 2.543) & \\
-$\beta^{os}_1$ & -0.012 & (-0.02, -0.003) &  & 0.009 & (0.001, 0.017) &  & -0.012 & (-0.02, -0.002) &  & 0.007 & (-0.002, 0.016) &  & 0.000 & (-0.004, 0.005) & \\
-$\beta^{pfs}_0$ & 1.247 & (1.198, 1.294) &  & 1.248 & (1.197, 1.29) &  & 1.249 & (1.202, 1.295) &  & 1.248 & (1.204, 1.293) &  & 1.247 & (1.204, 1.294) & \\
-$\beta^{pfs}_1$ & 0.000 & (-0.004, 0.003) &  & 0.000 & (-0.003, 0.003) &  & 0.000 & (-0.003, 0.003) &  & 0.000 & (-0.003, 0.003) &  & 0.000 & (-0.003, 0.003) & \\
-$\beta^{\pi}_{os, 1}$ & -1.082 & (-1.378, -0.824) &  & -1.002 & (-1.346, -0.756) &  & -1.073 & (-1.383, -0.775) &  & -1.292 & (-1.71, -0.936) &  & -0.808 & (-1.052, -0.61) & \\
-$\beta^{\pi}_{os, 2}$ & -0.244 & (-0.487, 0.022) &  & -0.176 & (-0.423, 0.086) &  & -0.224 & (-0.462, 0.011) &  & -0.398 & (-0.7, -0.097) &  & -0.061 & (-0.305, 0.158) & \\
-$\beta^{\pi}_{os, 3}$ & 0.056 & (-0.178, 0.28) &  & 0.110 & (-0.107, 0.362) &  & 0.062 & (-0.192, 0.33) &  & -0.073 & (-0.324, 0.193) &  & 0.212 & (-0.006, 0.443) & \\
-$\beta^{\pi}_{pfs, 1}$ & -1.575 & (-1.904, -1.281) &  & -1.558 & (-1.861, -1.298) &  & -1.565 & (-1.889, -1.249) &  & -1.553 & (-1.839, -1.268) &  & -1.565 & (-1.891, -1.272) & \\
-$\beta^{\pi}_{pfs, 2}$ & -0.307 & (-0.515, -0.048) &  & -0.305 & (-0.553, -0.066) &  & -0.307 & (-0.519, -0.098) &  & -0.301 & (-0.54, -0.056) &  & -0.307 & (-0.538, -0.088) & \\
-$\beta^{\pi}_{pfs, 3}$ & -0.067 & (-0.321, 0.215) &  & -0.071 & (-0.303, 0.189) &  & -0.060 & (-0.309, 0.176) &  & -0.056 & (-0.273, 0.164) &  & -0.056 & (-0.322, 0.182) & \\
-$\pi^{os}_1$ & 0.254 & (0.201, 0.305) &  & 0.270 & (0.207, 0.32) &  & 0.256 & (0.201, 0.315) &  & 0.217 & (0.153, 0.282) &  & 0.309 & (0.259, 0.352) & \\
-$\pi^{os}_2$ & 0.440 & (0.381, 0.506) &  & 0.456 & (0.396, 0.521) &  & 0.444 & (0.387, 0.503) &  & 0.402 & (0.332, 0.476) &  & 0.485 & (0.424, 0.54) & \\
-$\pi^{os}_3$ & 0.514 & (0.456, 0.57) &  & 0.527 & (0.473, 0.59) &  & 0.515 & (0.452, 0.582) &  & 0.482 & (0.42, 0.548) &  & 0.553 & (0.498, 0.609) & \\
-$\pi^{pfs}_1$ & 0.173 & (0.13, 0.217) &  & 0.175 & (0.135, 0.215) &  & 0.174 & (0.131, 0.223) &  & 0.176 & (0.137, 0.22) &  & 0.174 & (0.131, 0.219) & \\
-$\pi^{pfs}_2$ & 0.424 & (0.374, 0.488) &  & 0.425 & (0.365, 0.484) &  & 0.424 & (0.373, 0.476) &  & 0.426 & (0.368, 0.486) &  & 0.424 & (0.369, 0.478) & \\
-$\pi^{pfs}_3$ & 0.483 & (0.42, 0.554) &  & 0.482 & (0.425, 0.547) &  & 0.485 & (0.423, 0.544) &  & 0.486 & (0.432, 0.541) &  & 0.486 & (0.42, 0.545) & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\item[1] OS distribution/PFS distribution.
-\end{tablenotes}
-\end{table*}
-\end{center}
-% \end{sidewaystable}
-\end{landscape}
-
-\begin{table*}[H]
-\caption{WAIC statistics for all distributions and hierarchical mixture cure model. \label{tab:waic_hier}}
-\centering
-\begin{tabular}{l l c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{2}{c}{\textbf{ELPD\textsuperscript{$\dagger$}}} & \multicolumn{2}{c}{\textbf{$p_D^{\ddagger}$}} & \multicolumn{2}{c}{\textbf{WAIC}} \\
-\cmidrule{3-4}\cmidrule{5-6}\cmidrule{7-8}
-\textbf{OS} & \textbf{PFS} & \textbf{Estimate} & \textbf{SE} & \textbf{Estimate} & \textbf{SE} & \textbf{Estimate} & \textbf{SE}\\
-\midrule
-exp & exp & -5064.70 & 80.37 & 11.13 & 0.46 & 10129.40 & 160.74\\
- & gompertz & -5065.64 & 80.44 & 11.80 & 0.49 & 10131.29 & 160.88\\
- & loglogistic & -4970.34 & 80.72 & 11.78 & 0.33 & 9940.68 & 161.45\\
- & lognormal & -4730.47 & 92.79 & 18.04 & 0.91 & 9460.94 & 185.59\\
- & weibull & -5062.99 & 81.69 & 14.63 & 0.80 & 10125.97 & 163.38\\
-gompertz & exp & -5064.99 & 80.41 & 11.45 & 0.45 & 10129.99 & 160.82\\
- & gompertz & -5065.61 & 80.44 & 11.66 & 0.48 & 10131.22 & 160.88\\
- & loglogistic & -4970.42 & 80.79 & 11.68 & 0.34 & 9940.84 & 161.59\\
- & lognormal & -4730.92 & 92.64 & 18.31 & 0.95 & 9461.84 & 185.29\\
- & weibull & -5063.81 & 81.74 & 15.45 & 0.85 & 10127.61 & 163.48\\
-loglogistic & exp & -5059.86 & 80.47 & 11.29 & 0.42 & 10119.73 & 160.93\\
- & gompertz & -5060.37 & 80.40 & 11.64 & 0.45 & 10120.74 & 160.80\\
- & loglogistic & -4966.22 & 80.75 & 12.77 & 0.35 & 9932.44 & 161.50\\
- & lognormal & -4726.57 & 93.17 & 19.43 & 0.91 & 9453.13 & 186.34\\
- & weibull & -5058.17 & 81.84 & 14.80 & 0.74 & 10116.33 & 163.67\\
-lognormal & exp & -4972.55 & 84.58 & 16.35 & 0.61 & 9945.09 & 169.15\\
- & gompertz & -4973.16 & 84.69 & 16.50 & 0.56 & 9946.32 & 169.38\\
- & loglogistic & -4877.87 & 85.79 & 16.53 & 0.50 & 9755.74 & 171.59\\
- & lognormal & -4638.85 & 100.27 & 23.58 & 1.00 & 9277.71 & 200.55\\
- & weibull & -4970.22 & 86.17 & 19.01 & 0.89 & 9940.44 & 172.34\\
-weibull & exp & -5063.26 & 80.70 & 11.93 & 0.46 & 10126.53 & 161.40\\
- & gompertz & -5064.37 & 80.64 & 12.67 & 0.52 & 10128.73 & 161.28\\
- & loglogistic & -4968.74 & 81.03 & 12.30 & 0.37 & 9937.49 & 162.07\\
- & lognormal & -4729.78 & 93.18 & 19.54 & 0.97 & 9459.56 & 186.36\\
- & weibull & -5061.91 & 82.05 & 15.77 & 0.85 & 10123.81 & 164.11\\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\textsuperscript{$\dagger$}ELPD: Expected log pointwise predictive density;
-\textsuperscript{$\ddagger$}$p_D$: Effective number of parameters
-\end{tablenotes}
-\end{table*}
-
-\begin{table*}[H]
-\caption{WAIC statistics for all distributions and separate mixture cure models. \label{tab:waic_separate}}
-\centering
-\begin{tabular}{l l c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{2}{c}{\textbf{ELPD\textsuperscript{$\dagger$}}} & \multicolumn{2}{c}{\textbf{$p_D^{\ddagger}$}} & \multicolumn{2}{c}{\textbf{WAIC}} \\
-\cmidrule{3-4}\cmidrule{5-6}\cmidrule{7-8}
-\textbf{OS} & \textbf{PFS} & \textbf{Estimate} & \textbf{SE} & \textbf{Estimate} & \textbf{SE} & \textbf{Estimate} & \textbf{SE}\\
-\midrule
-exp & exp & -5066.38 & 81.40 & 10.46 & 0.43 & 10132.76 & 162.81\\
- & gompertz & -5066.68 & 81.46 & 10.38 & 0.46 & 10133.37 & 162.92\\
- & loglogistic & -4971.73 & 81.67 & 10.36 & 0.28 & 9943.46 & 163.34\\
- & lognormal & -4732.41 & 93.18 & 18.56 & 0.99 & 9464.83 & 186.36\\
- & weibull & -5064.87 & 82.86 & 14.39 & 0.86 & 10129.74 & 165.72\\
-gompertz & exp & -5066.72 & 81.44 & 10.51 & 0.45 & 10133.43 & 162.89\\
- & gompertz & -5066.76 & 81.49 & 10.19 & 0.44 & 10133.53 & 162.97\\
- & loglogistic & -4972.24 & 81.70 & 10.70 & 0.28 & 9944.47 & 163.40\\
- & lognormal & -4732.23 & 93.30 & 18.01 & 0.95 & 9464.46 & 186.61\\
- & weibull & -5064.46 & 82.92 & 13.50 & 0.78 & 10128.91 & 165.83\\
-loglogistic & exp & -5062.51 & 81.89 & 10.79 & 0.40 & 10125.02 & 163.78\\
- & gompertz & -5062.64 & 82.01 & 10.26 & 0.41 & 10125.27 & 164.02\\
- & loglogistic & -4968.45 & 82.36 & 11.63 & 0.28 & 9936.89 & 164.72\\
- & lognormal & -4728.25 & 94.20 & 18.18 & 0.92 & 9456.51 & 188.40\\
- & weibull & -5060.18 & 83.31 & 13.79 & 0.69 & 10120.37 & 166.62\\
-lognormal & exp & -4973.43 & 85.26 & 14.63 & 0.55 & 9946.86 & 170.53\\
- & gompertz & -4973.48 & 85.22 & 14.31 & 0.51 & 9946.96 & 170.44\\
- & loglogistic & -4879.07 & 86.55 & 15.07 & 0.44 & 9758.14 & 173.09\\
- & lognormal & -4638.43 & 100.40 & 21.30 & 0.96 & 9276.85 & 200.80\\
- & weibull & -4972.48 & 87.07 & 19.54 & 0.91 & 9944.95 & 174.13\\
-weibull & exp & -5064.74 & 81.52 & 11.11 & 0.45 & 10129.48 & 163.04\\
- & gompertz & -5065.16 & 81.59 & 11.16 & 0.44 & 10130.32 & 163.18\\
- & loglogistic & -4970.64 & 81.87 & 11.68 & 0.35 & 9941.27 & 163.73\\
- & lognormal & -4730.93 & 93.78 & 19.04 & 0.96 & 9461.85 & 187.56\\
- & weibull & -5063.20 & 83.09 & 14.87 & 0.83 & 10126.41 & 166.17\\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\textsuperscript{$\dagger$}ELPD: Expected log pointwise predictive density;
-\textsuperscript{$\ddagger$}$p_D$: Effective number of parameters
-\end{tablenotes}
-\end{table*}
-
-\begin{table*}[H]
-\caption{PSIS-LOO statistics for all distributions and hierarchical mixture cure model. \label{tab:loo_hier}}
-\centering
-\begin{tabular}{l l c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{2}{c}{\textbf{ELPD\textsuperscript{$\dagger$}}} & \multicolumn{2}{c}{\textbf{$p_D^{\ddagger}$}} & \multicolumn{2}{c}{\textbf{LOO AIC}} \\
-\cmidrule{3-4}\cmidrule{5-6}\cmidrule{7-8}
-\textbf{OS} & \textbf{PFS} & \textbf{Estimate} & \textbf{SE} & \textbf{Estimate} & \textbf{SE} & \textbf{Estimate} & \textbf{SE}\\
-\midrule
-exp & exp & -5064.80 & 80.37 & 11.22 & 0.46 & 10129.59 & 160.75\\
- & gompertz & -5065.74 & 80.44 & 11.90 & 0.49 & 10131.48 & 160.88\\
- & loglogistic & -4970.43 & 80.73 & 11.87 & 0.33 & 9940.86 & 161.45\\
- & lognormal & -4730.60 & 92.80 & 18.18 & 0.92 & 9461.20 & 185.59\\
- & weibull & -5063.08 & 81.69 & 14.72 & 0.80 & 10126.17 & 163.38\\
-gompertz & exp & -5065.09 & 80.41 & 11.55 & 0.45 & 10130.18 & 160.82\\
- & gompertz & -5065.70 & 80.44 & 11.75 & 0.48 & 10131.40 & 160.88\\
- & loglogistic & -4970.50 & 80.79 & 11.76 & 0.34 & 9940.99 & 161.59\\
- & lognormal & -4731.06 & 92.65 & 18.45 & 0.96 & 9462.12 & 185.30\\
- & weibull & -5063.92 & 81.74 & 15.57 & 0.86 & 10127.84 & 163.49\\
-loglogistic & exp & -5059.95 & 80.47 & 11.38 & 0.42 & 10119.90 & 160.94\\
- & gompertz & -5060.45 & 80.40 & 11.73 & 0.45 & 10120.90 & 160.80\\
- & loglogistic & -4966.31 & 80.75 & 12.87 & 0.35 & 9932.63 & 161.50\\
- & lognormal & -4726.71 & 93.18 & 19.58 & 0.92 & 9453.42 & 186.35\\
- & weibull & -5058.26 & 81.84 & 14.90 & 0.74 & 10116.53 & 163.67\\
-lognormal & exp & -4972.68 & 84.58 & 16.49 & 0.61 & 9945.37 & 169.16\\
- & gompertz & -4973.28 & 84.69 & 16.62 & 0.57 & 9946.56 & 169.39\\
- & loglogistic & -4878.00 & 85.79 & 16.67 & 0.50 & 9756.01 & 171.59\\
- & lognormal & -4639.02 & 100.27 & 23.75 & 1.00 & 9278.04 & 200.55\\
- & weibull & -4970.34 & 86.17 & 19.13 & 0.89 & 9940.68 & 172.34\\
-weibull & exp & -5063.35 & 80.70 & 12.02 & 0.47 & 10126.69 & 161.40\\
- & gompertz & -5064.46 & 80.64 & 12.76 & 0.53 & 10128.92 & 161.28\\
- & loglogistic & -4968.83 & 81.03 & 12.39 & 0.37 & 9937.67 & 162.07\\
- & lognormal & -4729.90 & 93.18 & 19.66 & 0.98 & 9459.80 & 186.36\\
- & weibull & -5062.01 & 82.05 & 15.88 & 0.85 & 10124.03 & 164.11\\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\textsuperscript{$\dagger$}ELPD: Expected log pointwise predictive density;
-\textsuperscript{$\ddagger$}$p_D$: Effective number of parameters
-\end{tablenotes}
-\end{table*}
-
-\begin{table*}[H]
-\caption{PSIS-LOO statistics for all distributions and separate mixture cure models. \label{tab:loo_separate}}
-\centering
-\begin{tabular}{l l c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{2}{c}{\textbf{ELPD\textsuperscript{$\dagger$}}} & \multicolumn{2}{c}{\textbf{$p_D^{\ddagger}$}} & \multicolumn{2}{c}{\textbf{LOO AIC}} \\
-\cmidrule{3-4}\cmidrule{5-6}\cmidrule{7-8}
-\textbf{OS} & \textbf{PFS} & \textbf{Estimate} & \textbf{SE} & \textbf{Estimate} & \textbf{SE} & \textbf{Estimate} & \textbf{SE}\\
-\midrule
-exp & exp & -5066.47 & 81.40 & 10.55 & 0.43 & 10132.93 & 162.81\\
- & gompertz & -5066.76 & 81.46 & 10.46 & 0.46 & 10133.52 & 162.92\\
- & loglogistic & -4971.81 & 81.67 & 10.44 & 0.28 & 9943.61 & 163.34\\
- & lognormal & -4732.55 & 93.18 & 18.69 & 0.99 & 9465.09 & 186.37\\
- & weibull & -5064.95 & 82.86 & 14.48 & 0.86 & 10129.91 & 165.72\\
-gompertz & exp & -5066.80 & 81.44 & 10.59 & 0.46 & 10133.60 & 162.89\\
- & gompertz & -5066.84 & 81.49 & 10.27 & 0.44 & 10133.69 & 162.97\\
- & loglogistic & -4972.33 & 81.70 & 10.79 & 0.29 & 9944.66 & 163.40\\
- & lognormal & -4732.34 & 93.31 & 18.13 & 0.95 & 9464.68 & 186.61\\
- & weibull & -5064.54 & 82.92 & 13.58 & 0.79 & 10129.08 & 165.84\\
-loglogistic & exp & -5062.60 & 81.89 & 10.88 & 0.40 & 10125.20 & 163.78\\
- & gompertz & -5062.72 & 82.01 & 10.34 & 0.41 & 10125.43 & 164.03\\
- & loglogistic & -4968.53 & 82.36 & 11.72 & 0.29 & 9937.06 & 164.72\\
- & lognormal & -4728.37 & 94.20 & 18.30 & 0.93 & 9456.75 & 188.40\\
- & weibull & -5060.29 & 83.31 & 13.90 & 0.69 & 10120.59 & 166.62\\
-lognormal & exp & -4973.54 & 85.26 & 14.74 & 0.56 & 9947.08 & 170.53\\
- & gompertz & -4973.58 & 85.22 & 14.40 & 0.52 & 9947.15 & 170.44\\
- & loglogistic & -4879.18 & 86.55 & 15.17 & 0.45 & 9758.35 & 173.10\\
- & lognormal & -4638.57 & 100.40 & 21.44 & 0.96 & 9277.15 & 200.80\\
- & weibull & -4972.61 & 87.07 & 19.67 & 0.92 & 9945.22 & 174.14\\
-weibull & exp & -5064.82 & 81.52 & 11.18 & 0.45 & 10129.63 & 163.04\\
- & gompertz & -5065.24 & 81.59 & 11.24 & 0.44 & 10130.48 & 163.18\\
- & loglogistic & -4970.70 & 81.87 & 11.74 & 0.35 & 9941.40 & 163.73\\
- & lognormal & -4731.06 & 93.78 & 19.18 & 0.97 & 9462.12 & 187.57\\
- & weibull & -5063.28 & 83.09 & 14.95 & 0.82 & 10126.56 & 166.18\\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}%%[341pt]
-\textsuperscript{$\dagger$}ELPD: Expected log pointwise predictive density;
-\textsuperscript{$\ddagger$}$p_D$: Effective number of parameters
-\end{tablenotes}
-\end{table*}
-
-\section{Posterior predictive checks}
-
-\begin{figure}[H]
-    \centering
-    \subfloat[\centering OS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_exp_exp_os.png} }}%
-    \qquad
-    \subfloat[\centering PFS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_exp_exp_pfs.png} }}%
-    \caption{Posterior predictive values Kaplan-Meier curves for exponential OS and exponential PFS distributions with the hierarchical mixture cure model. Black lines represent end-points for 20 predicted cohorts and the red line is for the observed data.}%
-%     \label{fig:ppv_km_exp}%
-% \end{figure}
-
-% \begin{figure}[H]
-    \centering
-    \subfloat[\centering OS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_weibull_weibull_os.png} }}%
-    \qquad
-    \subfloat[\centering PFS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_weibull_weibull_pfs.png} }}%
-    \caption{Posterior predictive values Kaplan-Meier curves for weibull OS and weibull PFS distributions with the hierarchical mixture cure model. Black lines represent end-points for 20 predicted cohorts and the red line is for the observed data.}%
-%     \label{fig:ppc_km_wei}%
-% \end{figure}
-
-% \begin{figure}[H]
-    \centering
-    \subfloat[\centering OS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_gompertz_gompertz_os.png} }}%
-    \qquad
-    \subfloat[\centering PFS data]{{\includegraphics[width=0.4\linewidth, height=5cm]{post_pred_KM_gompertz_gompertz_pfs.png} }}%
-    \caption{Posterior predictive values Kaplan-Meier curves for gompertz OS and gompertz PFS distributions with the hierarchical mixture cure model. Black lines represent end-points for 20 predicted cohorts and the red line is for the observed data.}%
-    % \label{fig:ppv_km_gomp}%
-\end{figure}
-
-\section{DAGs}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.6\linewidth]{DAG_complete_pool.png}
-\caption{\label{fig:dag_complete} A complete cure fraction pooling mixture cure model DAG for a trial with two end-points. The trial indexes correspond to the motivating example end-points of PFS (1) and OS (2).
-Solid lines represent stochastic and dashed lines deterministic relationships, respectively.
-Cured patients have fixed hazards e.g. taken from life tables.
-The distribution of times for uncured patient regresses on covariates for the rate parameter and $\phi$ is the set of ancillary parameters.}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.6\linewidth]{DAG_no_pooling.png}
-\caption{\label{fig:dag_nopool} A no cure fraction pooling mixture cure model DAG for a trial with two end-points. The trial indexes correspond to the motivating example end-points of PFS (1) and OS (2).
-Solid lines represent stochastic and dashed lines deterministic relationships, respectively.
-Cured patients have fixed hazards e.g. taken from life tables.
-The distribution of times for uncured patient regresses on covariates for the rate parameter and $\phi$ is the set of ancillary parameters.}
-\end{figure}
 
 \newpage
 
