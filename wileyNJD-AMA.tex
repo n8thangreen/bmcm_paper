@@ -120,8 +120,8 @@ This can enable consistency between plateau estimates and maximise the utility o
 
 % review of related work
 Within a frequentist paradigm, an example of related work is a multi-level modelling approach in mixture cure modelling using random effects to model multilevel clustering structure in the linear predictors in both hazard function and cured probability parts \cite{Lai2009}.
-Correlation between random effects in the uncured survival and cure fraction has also been investigated using a bivariate Normal distribution \cite{Lai2008} \cite{Tan2018}.
-Instead we will impose dependency with hyperparameters.
+Correlation between random effects in the uncured survival and cure fraction has been investigated using a bivariate Normal distribution \cite{Lai2008} \cite{Tan2018}.
+Instead, we will impose dependency with hyperparameters.
 % Tan2018 model log HR rather than cure fraction
 To our knowledge there has been no Bayesian fully-parametric mixture cure model with a multi-level modelling structure for end-points.
 
@@ -378,7 +378,7 @@ This corresponds to a prior mean cure fraction of just under 0.5, and approximat
 Prior predictive plots and further discussion are provided in the supplementary material.
 
 The random effect variance on the global cure fraction is a noninformative (folded) half-Normal \cite{Gelman2006} with 
-${\sigma^2 \sim \text{N}(0, 2.5)\mathbb{I}(0,)}$, where $\text{N}(0, 2.5)\mathbb{I}(0,)$ denotes a normal distribution truncated at mean 0.
+${\sigma^2 \sim \text{N}(0, 2.5)\mathbb{I}(0,)}$, where $\mathbb{I}(0,)$ denotes a distribution truncated at mean 0.
 Alternatively, a noninformative uniform prior density on standard deviation parameters $\sigma$ is expected to generally work well when $J > 5$.
 For small hierarchical variance a $\text{Gamma}(2, 0.1)$ may be preferred \cite{Chung2013}.
 
@@ -481,51 +481,135 @@ Comparing the hierarchical and separate models there is not a noticeable differe
 As mentioned above, there is limited information with only two end-points and a fairly weak prior.
 There is a small amount of shrinkage such that the posterior distributions for OS and PFS are pulled toward the global mean, so that the PFS cure fractions are larger and the OS cure fractions are smaller in the hierarchical model than the separate model.
 
-% \begin{landscape}
-% \begin{sidewaystable}[H]
-\begin{center}
+
 \begin{table*}[!ht]
-\caption{WAIC statistics for hierarchical and separate models, and all distributions. \label{tab:waic}}
-\begin{tabular}{llrrrrrrrrrrrr}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{6}{c}{\textbf{Hierarchical}} & \multicolumn{6}{c}{\textbf{Separate}}\\
-\cmidrule{3-8}\cmidrule{5-6}\cmidrule{9-14}
-\textbf{OS distn} & \textbf{PFS distn} & \textbf{ELPD\textsuperscript{$\dagger$}} & \textbf{SE} & \textbf{$p_D^{\ddagger}$} & \textbf{SE} & \textbf{WAIC} & \textbf{SE} & \textbf{ELPD} & \textbf{SE} & $p_D$ & \textbf{SE} & \textbf{WAIC} & \textbf{SE}\\
-\midrule
-exp & exp & -5064.70 & 80.37 & 11.13 & 0.46 & 10129.40 & 160.74 & -5066.38 & 81.40 & 10.46 & 0.43 & 10132.76 & 162.81\\
- & gompertz & -5065.64 & 80.44 & 11.80 & 0.49 & 10131.29 & 160.88 & -5066.68 & 81.46 & 10.38 & 0.46 & 10133.37 & 162.92\\
- & loglogistic & -4970.34 & 80.72 & 11.78 & 0.33 & 9940.68 & 161.45 & -4971.73 & 81.67 & 10.36 & 0.28 & 9943.46 & 163.34\\
- & lognormal & -4730.47 & 92.79 & 18.04 & 0.91 & 9460.94 & 185.59 & -4732.41 & 93.18 & 18.56 & 0.99 & 9464.83 & 186.36\\
- & weibull & -5062.99 & 81.69 & 14.63 & 0.80 & 10125.97 & 163.38 & -5064.87 & 82.86 & 14.39 & 0.86 & 10129.74 & 165.72\\
-gompertz & exp & -5064.99 & 80.41 & 11.45 & 0.45 & 10129.99 & 160.82 & -5066.72 & 81.44 & 10.51 & 0.45 & 10133.43 & 162.89\\
- & gompertz & -5065.61 & 80.44 & 11.66 & 0.48 & 10131.22 & 160.88 & -5066.76 & 81.49 & 10.19 & 0.44 & 10133.53 & 162.97\\
- & loglogistic & -4970.42 & 80.79 & 11.68 & 0.34 & 9940.84 & 161.59 & -4972.24 & 81.70 & 10.70 & 0.28 & 9944.47 & 163.40\\
- & lognormal & -4730.92 & 92.64 & 18.31 & 0.95 & 9461.84 & 185.29 & -4732.23 & 93.30 & 18.01 & 0.95 & 9464.46 & 186.61\\
- & weibull & -5063.81 & 81.74 & 15.45 & 0.85 & 10127.61 & 163.48 & -5064.46 & 82.92 & 13.50 & 0.78 & 10128.91 & 165.83\\
-loglogistic & exp & -5059.86 & 80.47 & 11.29 & 0.42 & 10119.73 & 160.93 & -5062.51 & 81.89 & 10.79 & 0.40 & 10125.02 & 163.78\\
- & gompertz & -5060.37 & 80.40 & 11.64 & 0.45 & 10120.74 & 160.80 & -5062.64 & 82.01 & 10.26 & 0.41 & 10125.27 & 164.02\\
- & loglogistic & -4966.22 & 80.75 & 12.77 & 0.35 & 9932.44 & 161.50 & -4968.45 & 82.36 & 11.63 & 0.28 & 9936.89 & 164.72\\
- & lognormal & -4726.57 & 93.17 & 19.43 & 0.91 & 9453.13 & 186.34 & -4728.25 & 94.20 & 18.18 & 0.92 & 9456.51 & 188.40\\
- & weibull & -5058.17 & 81.84 & 14.80 & 0.74 & 10116.33 & 163.67 & -5060.18 & 83.31 & 13.79 & 0.69 & 10120.37 & 166.62\\
-lognormal & exp & -4972.55 & 84.58 & 16.35 & 0.61 & 9945.09 & 169.15 & -4973.43 & 85.26 & 14.63 & 0.55 & 9946.86 & 170.53\\
- & gompertz & -4973.16 & 84.69 & 16.50 & 0.56 & 9946.32 & 169.38 & -4973.48 & 85.22 & 14.31 & 0.51 & 9946.96 & 170.44\\
- & loglogistic & -4877.87 & 85.79 & 16.53 & 0.50 & 9755.74 & 171.59 & -4879.07 & 86.55 & 15.07 & 0.44 & 9758.14 & 173.09\\
- & lognormal & -4638.85 & 100.27 & 23.58 & 1.00 & 9277.71 & 200.55 & -4638.43 & 100.40 & 21.30 & 0.96 & 9276.85 & 200.80\\
- & weibull & -4970.22 & 86.17 & 19.01 & 0.89 & 9940.44 & 172.34 & -4972.48 & 87.07 & 19.54 & 0.91 & 9944.95 & 174.13\\
-weibull & exp & -5063.26 & 80.70 & 11.93 & 0.46 & 10126.53 & 161.40 & -5064.74 & 81.52 & 11.11 & 0.45 & 10129.48 & 163.04\\
- & gompertz & -5064.37 & 80.64 & 12.67 & 0.52 & 10128.73 & 161.28 & -5065.16 & 81.59 & 11.16 & 0.44 & 10130.32 & 163.18\\
- & lognormal & -4729.78 & 93.18 & 19.54 & 0.97 & 9459.56 & 186.36 & -4730.93 & 93.78 & 19.04 & 0.96 & 9461.85 & 187.56\\
- & weibull & -5061.91 & 82.05 & 15.77 & 0.85 & 10123.81 & 164.11 & -5063.20 & 83.09 & 14.87 & 0.83 & 10126.41 & 166.17\\
-\bottomrule
+\centering
+\caption{WAIC statistics for hierarchical model and all distributions. \label{tab:waic_hier}}
+\begin{tabular}{l|l|l|l|l}
+\hline
+\textbf{OS distn} & \textbf{PFS distn} & \textbf{ELPD\textsuperscript{$\dagger$}} & \textbf{$p_D^{\ddagger}$} & \textbf{WAIC} \\
+\hline
+exp & exp & -5064.82 (80.38) & 11.16 (0.46) & 10129.63 (160.77)\\
+\hline
+ & gompertz & -5065.64 (80.44) & 11.8 (0.49) & 10131.29 (160.88)\\
+\hline
+ & loglogistic & -4970.34 (80.72) & 11.78 (0.33) & 9940.68 (161.45)\\
+\hline
+ & lognormal & -4730.47 (92.79) & 18.04 (0.91) & 9460.94 (185.59)\\
+\hline
+ & weibull & -5062.99 (81.69) & 14.63 (0.8) & 10125.97 (163.38)\\
+\hline
+gompertz & exp & -5064.99 (80.41) & 11.45 (0.45) & 10129.99 (160.82)\\
+\hline
+ & gompertz & -5065.61 (80.44) & 11.66 (0.48) & 10131.22 (160.88)\\
+\hline
+ & loglogistic & -4970.42 (80.79) & 11.68 (0.34) & 9940.84 (161.59)\\
+\hline
+ & lognormal & -4730.92 (92.64) & 18.31 (0.95) & 9461.84 (185.29)\\
+\hline
+ & weibull & -5063.81 (81.74) & 15.45 (0.85) & 10127.61 (163.48)\\
+\hline
+loglogistic & exp & -5059.86 (80.47) & 11.29 (0.42) & 10119.73 (160.93)\\
+\hline
+ & gompertz & -5060.37 (80.4) & 11.64 (0.45) & 10120.74 (160.8)\\
+\hline
+ & loglogistic & -4966.22 (80.75) & 12.77 (0.35) & 9932.44 (161.5)\\
+\hline
+ & lognormal & -4726.57 (93.17) & 19.43 (0.91) & 9453.13 (186.34)\\
+\hline
+ & weibull & -5058.17 (81.84) & 14.8 (0.74) & 10116.33 (163.67)\\
+\hline
+lognormal & exp & -4972.55 (84.58) & 16.35 (0.61) & 9945.09 (169.15)\\
+\hline
+ & gompertz & -4973.16 (84.69) & 16.5 (0.56) & 9946.32 (169.38)\\
+\hline
+ & loglogistic & -4877.87 (85.79) & 16.53 (0.5) & 9755.74 (171.59)\\
+\hline
+ & lognormal & -4638.85 (100.27) & 23.58 (1) & 9277.71 (200.55)\\
+\hline
+ & weibull & -4970.22 (86.17) & 19.01 (0.89) & 9940.44 (172.34)\\
+\hline
+weibull & exp & -5063.26 (80.7) & 11.93 (0.46) & 10126.53 (161.4)\\
+\hline
+ & gompertz & -5064.37 (80.64) & 12.67 (0.52) & 10128.73 (161.28)\\
+\hline
+ & loglogistic & -4968.74 (81.03) & 12.3 (0.37) & 9937.49 (162.07)\\
+\hline
+ & lognormal & -4729.78 (93.18) & 19.54 (0.97) & 9459.56 (186.36)\\
+\hline
+ & weibull & -5061.91 (82.05) & 15.77 (0.85) & 10123.81 (164.11)\\
+\hline
 \end{tabular}
 \begin{tablenotes}%%[341pt]
 \textsuperscript{$\dagger$}ELPD: Expected log pointwise predictive density;
 \textsuperscript{$\ddagger$}$p_D$: Effective number of parameters
 \end{tablenotes}
 \end{table*}
-\end{center}
-% \end{sidewaystable}
-% \end{landscape}
+
+
+\begin{table*}[!ht]
+\centering
+\caption{WAIC statistics for separate models and all distributions. \label{tab:waic_sep}}
+\begin{tabular}{l|l|l|l|l}
+\hline
+\textbf{OS distn} & \textbf{PFS distn} & \textbf{ELPD\textsuperscript{$\dagger$}} & \textbf{$p_D^{\ddagger}$} & \textbf{WAIC} \\
+\hline
+exp & exp & -5066.38 (81.4) & 10.46 (0.43) & 10132.76 (162.81)\\
+\hline
+ & gompertz & -5066.68 (81.46) & 10.38 (0.46) & 10133.37 (162.92)\\
+\hline
+ & loglogistic & -4971.73 (81.67) & 10.36 (0.28) & 9943.46 (163.34)\\
+\hline
+ & lognormal & -4732.41 (93.18) & 18.56 (0.99) & 9464.83 (186.36)\\
+\hline
+ & weibull & -5064.87 (82.86) & 14.39 (0.86) & 10129.74 (165.72)\\
+\hline
+gompertz & exp & -5066.72 (81.44) & 10.51 (0.45) & 10133.43 (162.89)\\
+\hline
+ & gompertz & -5066.76 (81.49) & 10.19 (0.44) & 10133.53 (162.97)\\
+\hline
+ & loglogistic & -4972.24 (81.7) & 10.7 (0.28) & 9944.47 (163.4)\\
+\hline
+ & lognormal & -4732.23 (93.3) & 18.01 (0.95) & 9464.46 (186.61)\\
+\hline
+ & weibull & -5064.46 (82.92) & 13.5 (0.78) & 10128.91 (165.83)\\
+\hline
+loglogistic & exp & -5062.51 (81.89) & 10.79 (0.4) & 10125.02 (163.78)\\
+\hline
+ & gompertz & -5062.64 (82.01) & 10.26 (0.41) & 10125.27 (164.02)\\
+\hline
+ & loglogistic & -4968.45 (82.36) & 11.63 (0.28) & 9936.89 (164.72)\\
+\hline
+ & lognormal & -4728.25 (94.2) & 18.18 (0.92) & 9456.51 (188.4)\\
+\hline
+ & weibull & -5060.18 (83.31) & 13.79 (0.69) & 10120.37 (166.62)\\
+\hline
+lognormal & exp & -4973.43 (85.26) & 14.63 (0.55) & 9946.86 (170.53)\\
+\hline
+ & gompertz & -4973.48 (85.22) & 14.31 (0.51) & 9946.96 (170.44)\\
+\hline
+ & loglogistic & -4879.07 (86.55) & 15.07 (0.44) & 9758.14 (173.09)\\
+\hline
+ & lognormal & -4638.43 (100.4) & 21.3 (0.96) & 9276.85 (200.8)\\
+\hline
+ & weibull & -4972.48 (87.07) & 19.54 (0.91) & 9944.95 (174.13)\\
+\hline
+weibull & exp & -5064.74 (81.52) & 11.11 (0.45) & 10129.48 (163.04)\\
+\hline
+ & gompertz & -5065.16 (81.59) & 11.16 (0.44) & 10130.32 (163.18)\\
+\hline
+ & loglogistic & -4970.64 (81.87) & 11.68 (0.35) & 9941.27 (163.73)\\
+\hline
+ & lognormal & -4730.93 (93.78) & 19.04 (0.96) & 9461.85 (187.56)\\
+\hline
+ & weibull & -5063.2 (83.09) & 14.87 (0.83) & 10126.41 (166.17)\\
+\hline
+\end{tabular}
+\begin{tablenotes}%%[341pt]
+\textsuperscript{$\dagger$}ELPD: Expected log pointwise predictive density;
+\textsuperscript{$\ddagger$}$p_D$: Effective number of parameters
+\end{tablenotes}
+\end{table*}
 
 % \begin{landscape}
 % \begin{sidewaysfigure}[H]
@@ -612,7 +696,7 @@ Finally, the separate model gives 6.59 (6.18, 7.07) months for OS and 3.98 (3.85
 %
 \section{Discussion}\label{sec:discussion}
 We have presented a Bayesian hierarchical mixture cure model to obtain complete survival curves which exhibit plateau behaviour. These curves can then be used in HTA to inform functions of patient lifetime.
-We have demonstrated the novel method using the CheckMate 067 trial data set at different artificial data-cuts.
+We have demonstrated the novel method using the CheckMate 067 trial data set for two end-points and at different artificial data-cuts.
 The hierarchical model was compared with the separate model analogue and has been shown to be superior as well as both principled and applicable to situations where trials include multiple treatment arms and end-points.
 
 One of the benefit of adopting a hierarchical Bayesian approach is robustness to smaller sample sizes due to providing prior information and borrowing of strength between data for different end-points.
@@ -631,7 +715,7 @@ In practice there may be additional information from clinical experience or prev
 The priors can be specified on the natural scale to aid elicitation and interpretation.
 For example, we may have clinical knowledge that a drug treatment could generate a cure fraction greater than, say, 30\%.
 If a (cancer) patient enters the study at 60 years old then there is a high degree of certainty that they will not live for, say, over 40 years.
-In the case of sparse data e.g. when there is a large amount of missing data perhaps due to right censoring, then 'regularising' the inference based on available prior information could make a significant and important difference.
+In the case of sparse data e.g. when there is a large amount of missing data perhaps due to right censoring, then 'regularising' the inference based on available prior information could make a significant and important difference. In particular, the method of blending curves is a recent, straightforward option for how to constrain survival \citep{Che2022}. 
 How to elicit this prior information in practice may not be simple and a formal protocol should be adopted \cite{OHagan2019}.
 
 Health care regulators, such as the European Medicines Agency (EMA) and U.S. Food and Drug Administration (FDA), may value the fact that a hierarchical model can embed some form of prior knowledge to account for scepticism.
@@ -642,8 +726,10 @@ The hierarchical model is more aligned, which means possibly you have more relia
 
 % data
 Future work should test the proposed hierarchical MCM on a variety of data sets and at data-cuts reflecting their actual trial protocols.
-The modelling framework is generalisable to any number of end-points and treatments. Further work could investigate the benefit to including additional end-point data even if it does not clearly demonstrate plateauing behaviour.
-The survival curve used in the model for the general population background 'cured' survival can be refined to be appropriate to specific cohort characteristics. For instance, long term survival of clinically identified complete responders (CR) could be used to somehow bridge the gap between statistical cure and clinical cure/functional cure. The shorter-term CR individual-level survival data can be combined with longer-term external data such as from WHO life table as in the current analysis (see \citep{Jackson2017} for potential approaches).
+The modelling framework is generalisable from two end-points in our example to any number in principle.
+For example, previous related frequentist analyses considered clusters of hospitals and recurrent events per individual \citep{Lai2008, Lai2009}.
+Further work could investigate the benefit to including additional end-point data even if it does not clearly demonstrate plateauing behaviour.
+The survival curve used in the model for the general population background statistically 'cured' survival can be refined to be appropriate to specific cohort characteristics. For instance, long term survival of clinically identified complete responders (CR) could be used to bridge the gap between statistical cure and clinical cure/functional cure. The shorter-term CR individual-level survival data can be combined with longer-term external data such as from WHO life tables as in the current analysis (see \citep{Jackson2017} for potential approaches).
 
 % optimal stopping
 Another way to think about the cut-point data is to think about what is the minimum follow-up time should we choose to halt the trial and end the data collection which would maximise some expected overall utility.
@@ -661,7 +747,7 @@ For example, in the case given above, what is the additional value of obtaining 
 In practice, deriving a set of heuristics may be better than formalising a general rule.
 A discrete set of cut-point may be used, similar to our artificial selection of rounded times 12 and 30 months, rather than considering the whole real line.
 
-As well as during a study, the model can be used in advance of a study to inform on optimal follow-up time to support the choice of data-cuts used in practice.
+As well as during a study, the hierarchical MCM could be used in advance of a study to inform trial design and optimal follow-up time to support the choice of data-cuts used in practice. Smaller sample sizes and shorter duration may provide equivalent power given the exploitation of additional model structure.
 
 % implications for HTA
 There are several implications for HTA by using the hierarchical mixture cure model presented here.
