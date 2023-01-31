@@ -185,6 +185,10 @@ Both sets of curves for PFS and OS appear to tend toward positive asymptotes, th
 \caption{\label{fig:S_raw_data} Kaplan-Meier curves of PFS and OS times with 95\% CI for the complete CheckMate 067 phase 3 trial data and ipilimumab, nivolumab and combination treatments.}
 \end{figure}
 
+A standard frequentist analysis has been carried-out on this data already with separate mixture cure models for each treatment and OS or PFS \cite{Mohr2020}.
+It was estimated that for OS, ranges of estimated proportions of LTSs were 16\%–26\% for ipilimumab, 38\%–46\% for nivolumab, and 49\%–54\% for combined treatment across all modelled distributions.
+Similarly, for PFS, ranges of the proportions of LTSs were 9\%–13\% for ipilimumab, 29\%–33\% for nivolumab, and 38\%–40\% for combined treatment.
+
 %
 \section{Modelling framework}\label{sec:methods}
 \note[GBaio]{I wonder whether you could simplify the notation in this section and remove the index j throughout?}
@@ -257,8 +261,9 @@ The treatment index for an individual is included in the covariate vector $\bm{x
 % We will assume without loss of generalisability that all individuals have all treatments.
 Note that although we are including all treatments arms in the same model we are not assuming any relationship between them. In particular, we do not suppose proportional hazards. This allows greater flexibility for the cases when proportional hazards is violated.
 
-\subsubsection{Issues modelling multiple end-points in an HTA context} \label{section:issues}
-There are several potential issues with existing approaches to cure modelling applied to an HTA context in particular.
+%% move this to earlier?
+\subsubsection{Issues modelling multiple end-points} \label{section:issues}
+There are several potential issues with existing approaches to cure modelling, when applied to an HTA context in particular.
 
 % correlated events
 Firstly, when the end-points are correlated, such as with the common events of interest overall survival (OS) and progression-free survival (PFS), this ought to be accounted for in the modelling.
@@ -459,8 +464,8 @@ The survival plots for the complete set of distributions are given in the supple
 \begin{figure}[!ht]
 \centering
 % produced using paper_output_plots.R
-\includegraphics[width=0.7\linewidth]{plot_S_exp_lognormal_grid_cf_hier.png}
-\caption{\label{fig:S_exp_lnorm_cf_hier} Hierarchical mixture cure model posterior survival curves for uncured fraction assumed (I) exponential; and (II) log-Normal for both OS and PFS, and ipilimumab, nivolumab and combination treatments. The black lines show the Kaplan-Meier curves using the complete CheckMate 067 trial data.}
+\includegraphics[width=0.7\linewidth]{bmcm_stan_exp_exp_S_plot.png}
+\caption{\label{fig:S_exp_cf_hier} Bayesian hierarchical mixture cure model posterior survival curves for uncured fraction assumed exponential for both OS and PFS, and ipilimumab, nivolumab and combination treatments. The black lines show the Kaplan-Meier curves using the complete CheckMate 067 trial data.}
 \end{figure}
 
 % cure fractions
