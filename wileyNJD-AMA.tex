@@ -10,6 +10,9 @@
 % \usepackage{endfloat}
 \usepackage{bm,amssymb,amsmath}
 \usepackage{trackchanges}  %http://trackchanges.sourceforge.net/help_stylefile.html
+	
+\usepackage{lineno}
+\linenumbers
 
 \addeditor{NGreen}
 \addeditor{GBaio}
@@ -151,33 +154,32 @@ The data source for the analysis consists of patient-level data of times to PFS 
 In our data set the minimum study follow-up from randomisation was 60 months so this was used as the final data-cut time.
 We also considered two earlier artificial data-cuts by truncating the 60-month data at 12 and 30 months.
 These particular times were chosen for this analysis because the actual study had a planned data-cut at approximately 30 months (28 months) and the largest observed median time for OS was just over 30 months. Thus, this time is relevant to the trial and at this time it may be possible to make comparable inferences to the complete 60-months data set but at a significantly earlier time.
-Further, the latest median time between all treatment regimens for PFS was approximately 12 months. Therefore, at 12 months it may be possible to characterise the PFS survival curves but not the less mature OS and so borrowing information between PFS and OS may be advantageous. Taking a data-cut at an even earlier time would probably not provide sufficient information to enable any useful extrapolation. Primarily, the data-cut points were selected to demonstrate the theoretical justification of our method and not to strictly follow the study data-cut protocol.
+Further, the latest median time between all treatment regimens for PFS was approximately 12 months. Therefore, at 12 months it may be possible to characterise the PFS survival curves but not the less mature OS and so borrowing information between PFS and OS may be advantageous. Taking a data-cut at an even earlier time would probably not provide sufficient information to enable any useful extrapolation.
+Patients who were still being followed-up but who had not experienced the event of interest at the time of an artificial data-cut were censored at this time. In practice, a more realistic censoring time may have been at the date of last visit but this would have made no differences for the purposes of this analysis. Primarily, the data-cut points were selected to demonstrate the theoretical justification of our method and not to strictly follow the study data-cut protocol.
 
+The reader is encouraged to refer to previously published analyses for the CM067 trial results, including 5 year database lock (DBL) was published in \cite{Larkin2019}. In summary, for PFS the median (95\% CI) times to event for each treatment arm were 2.86 (2.79-3.29) for ipilimumab, 6.93 (5.32-10.41) for nivolumab, and 11.50 (9.26-20.80) for the combination treatment. For OS the median (95\% CI) times to event for each treatment arm were 20.0 (17.22-25.6) for ipilimumab, 36.9 (31.24-60.9) for nivolumab, and not observed for the combination treatment.
 Figure~\ref{fig:S_raw_data} shows the Kaplan-Meier estimates of the PFS and OS survival curves for the complete CheckMate 067 phase 3 trial data.
-Summary statistics are presented in Table~\ref{tab:checkmate_summary}.
 Both sets of curves for PFS and OS appear to tend toward positive asymptotes, the PFS curves more clearly.
+% Summary statistics are presented in Table~\ref{tab:checkmate_summary}.
 
-%%TODO: should we remove table?
-% There is a lot of information about CM067 trial results. It is helpful for the reader to get all info in one place. However, 5y DBL was published in Larkin et al. 2019 NEJM. We would have to compare every data point as it was presented in the clinical manuscript. An easier approach is to describe high level and point to the clinical manuscript.
-
-\begin{center}
-\begin{table*}[!ht]
-\caption{Summary statistics of the CheckMate 067 phase 3 trial, for progression-free survival (PFS) and overall survival (OS). \label{tab:checkmate_summary}}
-\centering
-\begin{tabular}{r c c c c c c}
-\toprule
-\multicolumn{1}{l}{} & \multicolumn{2}{c}{PFS} & \multicolumn{1}{l}{} &\multicolumn{2}{c}{OS}\\
-\cmidrule{2-3}\cmidrule{5-6}
- Treatment arm & Median time (months) & Events & & Median time (months) & Events & N\\
-               & (95\% CI)            &        & & (95\% CI)            &        & \\
- \midrule
- Ipilimumab  & 2.86 (2.79-3.29)   & 261 & & 20.0 (17.22-25.6) & 228 & 311\\
- Nivolumab   & 6.93 (5.32-10.41)  & 203 & & 36.9 (31.24-60.9) & 175 & 313\\
- Combination & 11.50 (9.26-20.80) & 182 & & - & 151 & 313\\ 
-\bottomrule
-\end{tabular}
-\end{table*}
-\end{center}
+% \begin{center}
+% \begin{table*}[!ht]
+% \caption{Summary statistics of the CheckMate 067 phase 3 trial, for progression-free survival (PFS) and overall survival (OS). \label{tab:checkmate_summary}}
+% \centering
+% \begin{tabular}{r c c c c c c}
+% \toprule
+% \multicolumn{1}{l}{} & \multicolumn{2}{c}{PFS} & \multicolumn{1}{l}{} &\multicolumn{2}{c}{OS}\\
+% \cmidrule{2-3}\cmidrule{5-6}
+%  Treatment arm & Median time (months) & Events & & Median time (months) & Events & N\\
+%               & (95\% CI)            &        & & (95\% CI)            &        & \\
+%  \midrule
+%  Ipilimumab  & 2.86 (2.79-3.29)   & 261 & & 20.0 (17.22-25.6) & 228 & 311\\
+%  Nivolumab   & 6.93 (5.32-10.41)  & 203 & & 36.9 (31.24-60.9) & 175 & 313\\
+%  Combination & 11.50 (9.26-20.80) & 182 & & - & 151 & 313\\ 
+% \bottomrule
+% \end{tabular}
+% \end{table*}
+% \end{center}
 
 \begin{figure}[!ht]
 \centering
@@ -398,8 +400,7 @@ In reality, a subset of these parametric models will be more plausible for the d
 
 %
 \subsection{Model assessment}
-We evaluated the goodness of fit of the overall models using out-of-sample predictions estimated with the widely applicable information criterion (WAIC) and leave-one-out cross-validation (LOO) \cite{Vehtari2017}.
-These have various advantages to more common AIC and DIC and are easily obtained using the posterior sample of the Stan output.\\
+We evaluated the goodness of fit of the overall models using out-of-sample predictions estimated with the widely applicable information criterion (WAIC) (and leave-one-out cross-validation (LOO) given in the Appendix) \cite{Vehtari2017}. These have various advantages to more common AIC and DIC. WAIC is the difference between the computed log pointwise predictive density and the estimated effective number of parameters. Smaller values are better. It is fully Bayesian and invariant to parameterisation. They are easily obtained using the posterior sample of the Stan output.\\
 % The effective number of parameters is not uniquely defined because it depends on the level of the hierarchy that is in {it focus} \cite{spiegelhalter}.
 The set of parameters in the hierarchical model (and their dimensions) are
 $\mathbf{\beta^{\pi}}$ (3), $\mathbf{\sigma}$ (3), $\mathbf{\beta^{\lambda}_{PFS}}$ (2), $\mathbf{\beta^{\lambda}_{OS}}$ (2), $\mathbf{\phi_{OS}}$ (1), $\mathbf{\phi_{PFS}}$ (1), $\mathbf{\pi_{OS}}$ (3), $\mathbf{\pi_{PFS}}$ (3).
@@ -426,37 +427,30 @@ Of course, we also extend the basic mixture cure model so it is not yet clear ho
 %
 \subsection{Complete data only results} \label{sec:results}
 In this section, we will explore the mixture cure model fits using the complete 60-months CheckMate 067 trial data.
-A selection of the hierarchical model posterior survival curves using the complete data are shown in Figure~\ref{fig:S_exp_lnorm_cf_hier}.
-The equivalent plots for the separate models are given in the Appendix.
+An example of the Bayesian hierarchical model posterior survival curves using the complete data is shown in Figure~\ref{fig:S_exp_cf_hier}.
+The equivalent plots for all other models are given in the Appendix.
 
-These figures show output for two models, with uncured fraction of either exponential or log-Normal for both OS and PFS.
-The background survival is linearly decreasing with time and the same between plots, as expected using point estimates from WHO life tables.
-Visual inspection of the fits demonstrate that both models perform reasonably well.
+The background survival is linearly decreasing with time and the same between plots, as expected because were are using point estimates from WHO life tables.
+Visual inspection demonstrate reasonably good model fits.
 The PFS Kaplan-Meier curves show an initial steep decrease before levelling off.
-The log-Normal distribution captures this early behaviour better but the exponential performs better at later times.
-The OS Kaplan-Meier curves show a shallower curve and so are more closely fit by the exponential.
-The survival curves for the uncured patients decrease more sharply for the log-Normal model.
-% medians
-For the exponential model, the PFS median times are 5, 9 and 12 months,
-and for log-Normal model the PFS median times are 4, 6, 8 months, for ipilimumab, nivolumab and combined, respectively
-Similarly, for the exponential model, the OS median times are 22, 38 and 56 months,
-and for the log-Normal model the OS median times are 17, 29 and over 60 months, for ipilimumab, nivolumab and combined, respectively.
-The uncured median survival times for the exponential model are 5 and 15 months, and for the log-Normal model 4 and 12 months, for PFS and OS, respectively.
+The exponential fits particularly well to the tail which is of particular importance.
 
-%% restricted mean survival times
-The restricted mean survival times at 60 months (RMST) are greater for the exponential models.
-The RMST for the cured population is exactly value corresponding to the general population of 58.2 months.
-For the exponential model the RMST (95\% credible interval, CrI) for the uncured group is 20.6 (18.4, 23.1) and 6.66 (6.09, 7.39) months, for OS and PFS, respectively. 
+% medians
+All model fits are fairly similar. For example, for the exponential model, the PFS median times are 5, 9 and 12 months, for ipilimumab, nivolumab and combined treatments, respectively.
+In comparison with the Kaplan-Meier median times in Table~\ref{tab:checkmate_summary}, the fitted times are 75\%, 30\% and 5\% larger. That is, the median times converge for large times.
+Similarly, for the exponential model, the OS median times are 22, 38 and 56 months, for ipilimumab, nivolumab and combined, respectively.
+The uncured median survival times for the exponential model are 5 and 15 months, for PFS and OS, respectively.
+
+% restricted mean survival times
+The restricted mean survival time (RMST) is the average time-to-event over a fixed follow-up period and has been proposed as an intuitive alternative summary.
+For a follow-up time of 60 months and For the exponential model, the RMST (95\% credible interval, CrI) for the uncured group is 20.6 (18.4, 23.1) and 6.66 (6.09, 7.39) months, for OS and PFS, respectively. 
 For the OS end-point the RMST is 28.7 (26.3, 31.1), 36.5 (34.1, 38.9) and 39.6 (37.1, 42.1) months, for ipilimumab, nivolumab and combined, respectively.
 For the PFS end-point the RMST is 11.9 (9.96, 14.1), 24.3 (21.1, 27.4) and 27.7 (24.7, 30.8) months, for ipilimumab, nivolumab and combined, respectively.
-For the the log-Normal model the RMST for the uncured group is 14.8 (13.6, 16.0) and 4.38 (4.16, 4.63) months, for OS and PFS, respectively. 
-For the OS end-point the RMST is 27.3 (24.7, 29.9), 35.6 (32.9, 38.4) and 38.8 (36.4, 41.2) months, for ipilimumab, nivolumab and combined, respectively.
-For the PFS end-point the RMST is 12.2 (9.85, 14.8), 27.2 (24.0, 30.2) and 30.5 (27.2, 33.7) months, for ipilimumab, nivolumab and combined, respectively.
+The RMST for the cured population is the same exact value corresponding to the general population of 58.2 months.
 
 % time to reach 0
-The latest time PFS has survival probability greater than 0 is over 30 months for exponential and is below 15 months for log-Normal.
-Similarly, the OS survival probability is greater than 0 at the end of follow-up at 60 months but reaches 0 for the log-Normal model at approximately 60 months.
-The survival plots for the complete set of distributions are given in the supplementary Appendix.
+The latest time PFS has survival probability greater than 0 is over 30 months for the exponential distribution.
+Similarly, the OS survival probability is greater than 0 at the end of follow-up at 60 months.
 
 %%TODO: include a table of survival statistics?
 %%      compare curves formally? e.g. ANOVA, t-test RMST or HR?
@@ -465,7 +459,14 @@ The survival plots for the complete set of distributions are given in the supple
 \centering
 % produced using paper_output_plots.R
 \includegraphics[width=0.7\linewidth]{bmcm_stan_exp_exp_S_plot.png}
-\caption{\label{fig:S_exp_cf_hier} Bayesian hierarchical mixture cure model posterior survival curves for uncured fraction assumed exponential for both OS and PFS, and ipilimumab, nivolumab and combination treatments. The black lines show the Kaplan-Meier curves using the complete CheckMate 067 trial data.}
+\caption{\label{fig:S_exp_cf_hier} Bayesian hierarchical mixture cure model posterior mean survival curves for uncured fraction assumed exponential for both OS and PFS, and ipilimumab, nivolumab and combination treatments. The black lines show the Kaplan-Meier curves using the complete CheckMate 067 trial data.}
+\end{figure}
+
+%%TODO: should we include this plot in the main text?
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\linewidth]{plot_S_overlay.png}
+\caption{\label{fig:S_overlay} Bayesian hierarchical mixture cure model posterior survival curves using complete CheckMate 067 trial data.}
 \end{figure}
 
 % cure fractions
@@ -489,7 +490,7 @@ There is a small amount of shrinkage such that the posterior distributions for O
 
 \begin{table*}[!ht]
 \centering
-\caption{WAIC statistics for hierarchical model and all distributions. \label{tab:waic_hier}}
+\caption{WAIC point estimates (and standard errors) for hierarchical model and all distributions. \label{tab:waic_hier}}
 \begin{tabular}{l|l|l|l|l}
 \hline
 \textbf{OS distn} & \textbf{PFS distn} & \textbf{ELPD\textsuperscript{$\dagger$}} & \textbf{$p_D^{\ddagger}$} & \textbf{WAIC} \\
@@ -547,14 +548,15 @@ weibull & exp & -5063.26 (80.7) & 11.93 (0.46) & 10126.53 (161.4)\\
 \end{tabular}
 \begin{tablenotes}%%[341pt]
 \textsuperscript{$\dagger$}ELPD: Expected log pointwise predictive density;
-\textsuperscript{$\ddagger$}$p_D$: Effective number of parameters
+\textsuperscript{$\ddagger$}$p_D$: Effective number of parameters;
+WAIC: widely applicable information criterion.
 \end{tablenotes}
 \end{table*}
 
 
 \begin{table*}[!ht]
 \centering
-\caption{WAIC statistics for separate models and all distributions. \label{tab:waic_sep}}
+\caption{WAIC point estimates (and standard errors) for separate models and all distributions. \label{tab:waic_sep}}
 \begin{tabular}{l|l|l|l|l}
 \hline
 \textbf{OS distn} & \textbf{PFS distn} & \textbf{ELPD\textsuperscript{$\dagger$}} & \textbf{$p_D^{\ddagger}$} & \textbf{WAIC} \\
@@ -612,7 +614,8 @@ weibull & exp & -5064.74 (81.52) & 11.11 (0.45) & 10129.48 (163.04)\\
 \end{tabular}
 \begin{tablenotes}%%[341pt]
 \textsuperscript{$\dagger$}ELPD: Expected log pointwise predictive density;
-\textsuperscript{$\ddagger$}$p_D$: Effective number of parameters
+\textsuperscript{$\ddagger$}$p_D$: Effective number of parameters;
+WAIC: widely applicable information criterion.
 \end{tablenotes}
 \end{table*}
 
@@ -620,7 +623,8 @@ weibull & exp & -5064.74 (81.52) & 11.11 (0.45) & 10129.48 (163.04)\\
 % \begin{sidewaysfigure}[H]
 \begin{figure}[hbt!]
 \centering
-\includegraphics[height=10cm, width=0.9\linewidth]{forest_plot_joint_cf_hier.png}
+% \includegraphics[height=10cm, width=0.9\linewidth]{forest_plot_joint_cf_hier.png}
+\includegraphics[height=10cm, width=0.9\linewidth]{forest_plot_multimcm.png}
 \caption{\label{fig:cf_forest_all_tx} Hierarchical mixture cure model posterior cure fraction forest plots with 95\% credible intervals for (i) ipilimumab only (ii) nivolumab only and (iii) combination treatment.}
 % \end{sidewaysfigure}
 \end{figure}
@@ -630,7 +634,8 @@ weibull & exp & -5064.74 (81.52) & 11.11 (0.45) & 10129.48 (163.04)\\
 % \begin{sidewaysfigure}[H]
 \begin{figure}[hbt!]
 \centering
-\includegraphics[height=10cm, width=0.9\linewidth]{forest_plot_joint_all_tx_separate.png}
+% \includegraphics[height=10cm, width=0.9\linewidth]{forest_plot_joint_all_tx_separate.png}
+\includegraphics[height=10cm, width=0.9\linewidth]{forest_plot_sep_multimcm.png}
 \caption{\label{fig:cf_forest_all_tx_sep} Separate mixture cure models posterior cure fraction forest plots with 95\% credible intervals for (i) ipilimumab only (ii) nivolumab only and (iii) combination treatment.}
 % \end{sidewaysfigure}
 \end{figure}
@@ -695,8 +700,52 @@ Finally, the separate model gives 6.59 (6.18, 7.07) months for OS and 3.98 (3.85
 % The ratio of the CrIs of the separate and hierarchical cure fractions didn't show any significant difference for the complete data set.
 % For the cut-point samples...
 
-% table?
+% cf table?
 
+Table~\ref{tab:cutpoint_pred} shows the survival estimates at 60 months extrapolated using 12 and 30 months data cut point.
+
+\begin{table*}[!ht]
+\centering
+\caption{Survival estimates at 60 months using 12 and 30 months data cut point. \label{tab:cutpoint_pred}}
+\begin{tabular}{l|l|l|l|l|l|l}
+\hline
+End-point & Model & Distribution & Cut point & Ipilimumab & Nivolumab & Combined\\
+ & & & (months) & & & \\
+\hline
+OS & hier & exp & 12 & 0.19 [0.11, 0.34] & 0.33 [0.27, 0.39] & 0.33 [0.2, 0.46]\\
+\hline
+OS & hier & exp & 30 & 0.2 [0.11, 0.28] & 0.33 [0.28, 0.38] & 0.47 [0.4, 0.55]\\
+\hline
+OS & hier & lognormal & 12 & 0.32 [0.22, 0.42] & 0.38 [0.33, 0.43] & 0.44 [0.33, 0.53]\\
+\hline
+OS & hier & lognormal & 30 & 0.23 [0.17, 0.3] & 0.33 [0.28, 0.38] & 0.49 [0.43, 0.56]\\
+\hline
+OS & separate & exp & 12 & 0.26 [0.18, 0.34] & 0.34 [0.28, 0.4] & 0.34 [0.23, 0.44]\\
+\hline
+OS & separate & exp & 30 & 0.22 [0.17, 0.28] & 0.32 [0.27, 0.38] & 0.47 [0.4, 0.52]\\
+\hline
+OS & separate & lognormal & 12 & 0.34 [0.26, 0.42] & 0.38 [0.32, 0.43] & 0.41 [0.33, 0.51]\\
+\hline
+OS & separate & lognormal & 30 & 0.27 [0.22, 0.32] & 0.33 [0.27, 0.37] & 0.48 [0.42, 0.54]\\
+\hline
+PFS & hier & exp & 12 & 0.07 [0.02, 0.13] & 0.36 [0.21, 0.47] & 0.4 [0.33, 0.46]\\
+\hline
+PFS & hier & exp & 30 & 0.1 [0.07, 0.14] & 0.41 [0.34, 0.49] & 0.39 [0.33, 0.45]\\
+\hline
+PFS & hier & lognormal & 12 & 0.14 [0.09, 0.19] & 0.45 [0.36, 0.54] & 0.45 [0.39, 0.51]\\
+\hline
+PFS & hier & lognormal & 30 & 0.1 [0.07, 0.14] & 0.43 [0.38, 0.49] & 0.4 [0.34, 0.45]\\
+\hline
+PFS & separate & exp & 12 & 0.1 [0.06, 0.15] & 0.35 [0.25, 0.45] & 0.4 [0.33, 0.46]\\
+\hline
+PFS & separate & exp & 30 & 0.11 [0.08, 0.15] & 0.41 [0.34, 0.48] & 0.38 [0.32, 0.43]\\
+\hline
+PFS & separate & lognormal & 12 & 0.15 [0.11, 0.19] & 0.43 [0.35, 0.52] & 0.44 [0.39, 0.49]\\
+\hline
+PFS & separate & lognormal & 30 & 0.12 [0.08, 0.15] & 0.43 [0.36, 0.5] & 0.39 [0.34, 0.45]\\
+\hline
+\end{tabular}
+\end{table*}
 
 %
 \section{Discussion}\label{sec:discussion}
@@ -780,20 +829,21 @@ The key conclusion of this paper is that data are available for better more effi
 
 %\backmatter
 
-\section*{Acknowledgements}
-This is acknowledgement text.
+%%TODO:
+% \section*{Acknowledgements}
+% This is acknowledgement text.
 
-\subsection*{Author contributions}
+% \subsection*{Author contributions}
 
-This is an author contribution text.
+% This is an author contribution text.
 
-\subsection*{Financial disclosure}
+% \subsection*{Financial disclosure}
 
-None reported.
+% None reported.
 
-\subsection*{Conflict of interest}
+% \subsection*{Conflict of interest}
 
-The authors declare no potential conflict of interests.
+% The authors declare no potential conflict of interests.
 
 
 % \section*{Supporting information}
