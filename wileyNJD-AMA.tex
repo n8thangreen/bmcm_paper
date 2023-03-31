@@ -193,7 +193,6 @@ Similarly, for PFS, ranges of the proportions of LTSs were 9\%–13\% for ipilim
 
 %
 \section{Modelling framework}\label{sec:methods}
-\note[GBaio]{I wonder whether you could simplify the notation in this section and remove the index j throughout?}
 Consider a study in which $n$ individuals are observed and the (non-negative) time to either progression ($T^{prog}_{i}$) or death ($T^{death}_{i}$) are recorded for each individual $i=1,\ldots,n$.
 Denote the event time for individual $i$ by $T_{i}$.
 In our motivating example, we would have a separate set of $T_{i}$ for either end-point, PFS or OS.
@@ -234,9 +233,6 @@ In the standard cure model, cured individuals are usually assumed to have no cha
 There are several types of cure models and a rich and growing body of research in this area.
 (see \citep{Yu2013} for a comparison and guidance with application to oncology.)
 
-\note[GBaio]{I can understand \_b for "background", but why do we use \_u? Can we find a more straightforward notation?}
-\note[NGreen]{this just seems to be what everyone else uses. "u"ncured perhaps?}
-
 For an individual $i$ in a population with a cure fraction, the mixture cure model has the following survival model
 
 \begin{equation}
@@ -263,7 +259,7 @@ The treatment index for an individual is included in the covariate vector $\bm{x
 % We will assume without loss of generalisability that all individuals have all treatments.
 Note that although we are including all treatments arms in the same model we are not assuming any relationship between them. In particular, we do not suppose proportional hazards. This allows greater flexibility for the cases when proportional hazards is violated.
 
-%% move this to earlier?
+%% 
 \subsubsection{Issues modelling multiple end-points} \label{section:issues}
 There are several potential issues with existing approaches to cure modelling, when applied to an HTA context in particular.
 
@@ -282,6 +278,10 @@ The censoring times may be too early in order to adequately characterise a survi
 In particular, OS times are bounded below by PFS times by definition so will be subject to more censoring at the same cut-point.
 By taking advantage of the set of end-points together the data paucity may be alleviated to give better fits and extrapolation to the full lifetimes of patients.
 This is particularly important for health economics modelling in order to gauge the full cost and effect of an intervention.
+
+% complexity penalising
+Furthermore, if there is heavy censoring for all endpoints, such as early data cuts, and the number of endpoints is small then the data alone may not represent the true underlying survival curves, including the plateau for the cure fractions.
+At this point, additional sources of information should be principally incorporated into the model. A Bayesian paradigm naturally allows for the inclusion of external evidence from sources such as historical data and expert opinion. It is reasonable to assume, in the absence of additional information, that the cure fractions for all end points are drawn from the same or very similar distribution. In order to do this we can increase the amount of strength to borrow between end point data which strikes a balance between the information (or lack of) in the data and other knowledge \cite{Nikolaidis2021}. Practically, this corresponds to a reduction in the global cure fraction variance hyper parameter which in the limit is a base model with $\sigma_k=0$, equivalent to complete pooling of the data. 
 
 % our innovative proposal
 We will now present a Bayesian hierarchical mixture cure model for multiple end-points.
@@ -384,10 +384,29 @@ The hierarchical cure fraction is modelled as a fixed effect linear regression w
 This corresponds to a prior mean cure fraction of just under 0.5, and approximately 10\% and 1\% chance of exceeding 0.6 and 0.7 respectively.
 Prior predictive plots and further discussion are provided in the supplementary material.
 
-The random effect variance on the global cure fraction is a noninformative (folded) half-Normal \cite{Gelman2006} with 
-${\sigma^2 \sim \text{N}(0, 2.5)\mathbb{I}(0,)}$, where $\mathbb{I}(0,)$ denotes a distribution truncated at mean 0.
+\subsubsection{Cure fraction between-endpoint variance}
+% complete data
+For the complete data analysis, the random effect variance on the global cure fraction was a noninformative (folded) half-Normal \cite{Gelman2006} with 
+${\sigma_k \sim \text{N}(0, 2.5^2)\mathbb{I}(0,)}$, where $\mathbb{I}(0,)$ denotes a distribution truncated at mean 0.
 Alternatively, a noninformative uniform prior density on standard deviation parameters $\sigma$ is expected to generally work well when $J > 5$.
 For small hierarchical variance a $\text{Gamma}(2, 0.1)$ may be preferred \cite{Chung2013}.
+
+% cut-point data
+As discussed, the early phase of a trial is not very informative of the cure fraction if no plateauing is yet to occur. In this situation we can take advantage of the Bayesian hierarchical structure. In the absence of other evidence it is reasonable to assume that the cure fractions for each end-point are from the same distribution which corresponds to a narrow prior on the between-group standard deviation at the global cure fraction level. 
+Firstly, adopting the same family of prior distributions as in the main analysis with complete data, then suppose a confidence interval of approximately 99\% of the density so significance level $\alpha = 0.01$ which is for a two-tail distribution.
+This gives $\sigma_k \sim \mbox{N}(0, 0.06^2)\mathbb{I}(0,)$ for $p(\pi_k > 0.55) = 0.005$ and $\sigma_k \sim \mbox{N}(0, 0.03^2)\mathbb{I}(0,)$ for $p(\pi_k > 0.525) = 0.005$.
+Alternatively, we can use a {\it Penalised Complexity (PC)} prior which preferences a base model of greatest simplicity \cite{Simpson2017}.
+In our case, first define the parameters $\sigma_0$ and $\alpha$ for the equation $p(\sigma > \sigma_0) = \alpha$, and then using $\lambda = - \log(\alpha)/\sigma_0$ an exponential distribution prior with rate $\lambda$ can be obtained.
+So, for $\sigma_0 = 0.18$ leads to $\lambda = - \log(0.01)/0.18 = 25$ or $\sigma \sim \mbox{Exp}(25)$.
+Similarly, for $\sigma_0 = 0.08$ leads to $\lambda = - \log(0.01)/0.08 = 55$ or $\sigma \sim \mbox{Exp}(55)$.
+We can see how this corresponds to the prior uncertainty on the cure fraction scale in Figure~\ref{fig:complexityprior}. The two type of distributions are similar but the penalised complexity prior is more peaked around the central value.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[height=10cm, width=0.6\linewidth]{complexity-prior-plot.png}
+\caption{\label{fig:complexityprior} Bayesian hierarchical model prior distributions on the cure fraction scale corresponding to different between-group variances at the global cure fraction level, $\sigma_k^2$. Histograms are shown for penalised complexity priors (top) and truncated normal priors (bottom).}
+\end{figure}
+
 
 %
 \subsection{Choice of survival distributions}
@@ -422,7 +441,6 @@ For the basic mixture cure model assessment may focus on the model as a whole or
 The fit of the latency submodel can be examined using a revised Schoenfeld residual \cite{Wileyto2013} and the performance of the incidence submodel can be checked with concordance measures such as AUC \cite{Peng2021}.
 However, these incidence model approaches are best used directly with known cure status and are designed for models which consider individual cure fractions, unlike our model which assumed a single population cure fraction.
 Of course, we also extend the basic mixture cure model so it is not yet clear how to best use these methods in this situation. 
-\note[NGreen]{are we interested in PH between treatments? [Tori] PH has been shown to be violated for these treatments for both endpoints (BMS should be able to provide references for that)}
 
 %
 \subsection{Complete data only results} \label{sec:results}
@@ -466,7 +484,7 @@ Similarly, the OS survival probability is greater than 0 at the end of follow-up
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.7\linewidth]{plot_S_overlay.png}
-\caption{\label{fig:S_overlay} Bayesian hierarchical mixture cure model posterior survival curves using complete CheckMate 067 trial data.}
+\caption{\label{fig:S_overlay} Bayesian hierarchical mixture cure model posterior survival curves for a range of distributions using complete CheckMate 067 trial data. The same distribution pairs are used for OS and PFS.}
 \end{figure}
 
 % cure fractions
@@ -643,7 +661,11 @@ WAIC: widely applicable information criterion.
 
 %
 \subsection{All data-cuts results}\label{sec:results-data-cut}
-We now turn our attention to fitting the mixture cure models to earlier data-cuts in the CheckMate 067 trial data set. 
+We now turn our attention to fitting the mixture cure models to earlier data-cuts in the CheckMate 067 trial data set.
+For the complete data set up to 60 months we have seen that the separate and hierarchical models produce similar parameter inferences. This is to be expected when the data are relatively mature, there are in effect only two data points at the global level and a weak prior is used for the global variance hyper parameter.
+
+For demonstration purposes, we show results using the the penalised complexity prior with exponential distribution rate parameter $\lambda = 55$ for the 12 months data cut scenario and retain all other prevous priors including the weak priors for the mean $\pi_k$. As more data are made available at later times then the emphasis on this prior is be relaxed reflecting the relative influence of the data increases. This approach is in the spirit of information-sharing methods such as power priors which are "adaptively robust", where a power parameter controls the degree of borrowing. For example, for the simple case of normal historical data under a flat prior, the power prior is another normal distribution with a scaled variance according to the sample size and magnitude of the power parameter, determined by the investigator.
+
 Figures~\ref{fig:forest_plot_cf_cutpoint_sep} and Figure~\ref{fig:forest_plot_cf_cutpoint_hier} show forest plots of the cure fraction estimates for 12, 30 and 60 months and for the separate and hierarchical models, respectively.
 Results are shown for the OS exponential with PFS exponential model and the OS log-Normal with PFS log-Normal model.
 
@@ -659,7 +681,7 @@ For OS in the hierarchical model the cure fraction estimates appear to be accura
 The posterior is more stable about the complete data cure fraction for all considered data-cuts.
 
 
-Figures~\ref{fig:S_cutpoint_12mo_sep} and \ref{fig:S_cutpoint_12mo_hier} show the survival curves for the data-cut with 12 months of follow-up data for the the exponential and log-Normal models and for the separate and hierarchical models respectively.
+Figures~\ref{fig:S_cutpoint_12mo_exp} shows the survival curves for the data-cut with 12 months of follow-up data for the exponential and for the separate and hierarchical models respectively.
 Equivalent Figures for 30 months data-cut are given in the Appendix.
 
 %% restricted mean survival times
@@ -682,18 +704,10 @@ Finally, the separate model gives 6.59 (6.18, 7.07) months for OS and 3.98 (3.85
 \caption{\label{fig:forest_plot_cf_cutpoint_hier} Posterior cure fraction forest plot with 95\% credible intervals for study data with cutpoint censoring at 12 months, 30 months and the complete data set using the hierarchical mixture cure model.}
 \end{figure}
 
-\note[NGreen]{show complete data with dotted line?}
-
 \begin{figure}[!ht]
 \centering
-\includegraphics[height=10cm, width=0.6\linewidth]{plot_S_grid_cf_sep_cpt_12m.png}
-\caption{\label{fig:S_cutpoint_12mo_sep} Separate mixture cure models posterior survival curves with 95\% credible intervals for (I) PFS and OS exponential uncured survival curves and (II) PFS and OS log-Normal uncured survival curves and censored times at a 12 month cutpoint. The black lines show the observed data Kaplan-Meier curves.}
-\end{figure}
-
-\begin{figure}[!ht]
-\centering
-\includegraphics[height=10cm, width=0.6\linewidth]{plot_S_grid_cf_hier_cpt_12m.png}
-\caption{\label{fig:S_cutpoint_12mo_hier} Hierarchical mixture cure model posterior survival curves with 95\% credible intervals for (I) PFS and OS exponential uncured survival curves and (II) PFS and OS log-Normal uncured survival curves and censored times at a 12 month cutpoint. The black lines show the observed data Kaplan-Meier curves.}
+\includegraphics[height=10cm, width=0.6\linewidth]{plot_S_grid_cf_exponential_cpt_12.png}
+\caption{\label{fig:S_cutpoint_12mo_exp} Mixture cure models posterior survival curves with 95\% credible intervals using cut-point data for 12 month follow-up and for separate (top) and hierarchical (bottom) models. Both PFS and OS use exponential uncured survival curves. The black lines show the observed data Kaplan-Meier curves.}
 \end{figure}
 
 % % CrI ratios
@@ -702,47 +716,63 @@ Finally, the separate model gives 6.59 (6.18, 7.07) months for OS and 3.98 (3.85
 
 % cf table?
 
-Table~\ref{tab:cutpoint_pred} shows the survival estimates at 60 months extrapolated using 12 and 30 months data cut point.
+Table~\ref{tab:cutpoint_pred} shows the survival estimates at 60 months extrapolated using 12 and 30 months data cut point. Clearly, when the survival curve has converged to the long-term plateau this is equivalent to the cure fraction.
 
 \begin{table*}[!ht]
 \centering
-\caption{Survival estimates at 60 months using 12 and 30 months data cut point. \label{tab:cutpoint_pred}}
+\caption{Survival probability estimates for separate and hierarchical models at 60 months using 12, 30 and 60 months data cut points. Models with exponential or log-normal distributions for both OS and PFS are given. \label{tab:cutpoint_pred}}
 \begin{tabular}{l|l|l|l|l|l|l}
 \hline
-End-point & Model & Distribution & Cut point & Ipilimumab & Nivolumab & Combined\\
- & & & (months) & & & \\
+Endpoint & Model & Distribution & Cut-point & Ipilimumab & Nivolumab & Combined\\
+ &  &  & (month) & & & \\
 \hline
-OS & hier & exp & 12 & 0.19 [0.11, 0.34] & 0.33 [0.27, 0.39] & 0.33 [0.2, 0.46]\\
+OS & hier & exp & 12 & 0.19 [0.14, 0.28] & 0.34 [0.28, 0.39] & 0.42 [0.33, 0.48]\\
 \hline
 OS & hier & exp & 30 & 0.2 [0.11, 0.28] & 0.33 [0.28, 0.38] & 0.47 [0.4, 0.55]\\
 \hline
-OS & hier & lognormal & 12 & 0.32 [0.22, 0.42] & 0.38 [0.33, 0.43] & 0.44 [0.33, 0.53]\\
+OS & hier & exp & 60 & 0.25 [0.2, 0.29] & 0.31 [0.26, 0.36] & 0.51 [0.46, 0.56]\\
+\hline
+OS & hier & lognormal & 12 & 0.28 [0.23, 0.33] & 0.38 [0.33, 0.43] & 0.49 [0.43, 0.54]\\
 \hline
 OS & hier & lognormal & 30 & 0.23 [0.17, 0.3] & 0.33 [0.28, 0.38] & 0.49 [0.43, 0.56]\\
+\hline
+OS & hier & lognormal & 60 & 0.25 [0.21, 0.3] & 0.31 [0.26, 0.35] & 0.51 [0.46, 0.56]\\
 \hline
 OS & separate & exp & 12 & 0.26 [0.18, 0.34] & 0.34 [0.28, 0.4] & 0.34 [0.23, 0.44]\\
 \hline
 OS & separate & exp & 30 & 0.22 [0.17, 0.28] & 0.32 [0.27, 0.38] & 0.47 [0.4, 0.52]\\
 \hline
+OS & separate & exp & 60 & 0.25 [0.21, 0.3] & 0.3 [0.25, 0.35] & 0.5 [0.45, 0.55]\\
+\hline
 OS & separate & lognormal & 12 & 0.34 [0.26, 0.42] & 0.38 [0.32, 0.43] & 0.41 [0.33, 0.51]\\
 \hline
 OS & separate & lognormal & 30 & 0.27 [0.22, 0.32] & 0.33 [0.27, 0.37] & 0.48 [0.42, 0.54]\\
 \hline
-PFS & hier & exp & 12 & 0.07 [0.02, 0.13] & 0.36 [0.21, 0.47] & 0.4 [0.33, 0.46]\\
+OS & separate & lognormal & 60 & 0.27 [0.22, 0.32] & 0.3 [0.25, 0.35] & 0.51 [0.45, 0.56]\\
+\hline
+PFS & hier & exp & 12 & 0.1 [0.05, 0.15] & 0.39 [0.34, 0.44] & 0.38 [0.32, 0.44]\\
 \hline
 PFS & hier & exp & 30 & 0.1 [0.07, 0.14] & 0.41 [0.34, 0.49] & 0.39 [0.33, 0.45]\\
 \hline
-PFS & hier & lognormal & 12 & 0.14 [0.09, 0.19] & 0.45 [0.36, 0.54] & 0.45 [0.39, 0.51]\\
+PFS & hier & exp & 60 & 0.08 [0.05, 0.12] & 0.42 [0.37, 0.48] & 0.38 [0.32, 0.44]\\
+\hline
+PFS & hier & lognormal & 12 & 0.16 [0.11, 0.2] & 0.47 [0.41, 0.51] & 0.43 [0.38, 0.48]\\
 \hline
 PFS & hier & lognormal & 30 & 0.1 [0.07, 0.14] & 0.43 [0.38, 0.49] & 0.4 [0.34, 0.45]\\
+\hline
+PFS & hier & lognormal & 60 & 0.08 [0.05, 0.12] & 0.43 [0.38, 0.48] & 0.38 [0.32, 0.43]\\
 \hline
 PFS & separate & exp & 12 & 0.1 [0.06, 0.15] & 0.35 [0.25, 0.45] & 0.4 [0.33, 0.46]\\
 \hline
 PFS & separate & exp & 30 & 0.11 [0.08, 0.15] & 0.41 [0.34, 0.48] & 0.38 [0.32, 0.43]\\
 \hline
+PFS & separate & exp & 60 & 0.1 [0.07, 0.14] & 0.42 [0.37, 0.48] & 0.37 [0.31, 0.42]\\
+\hline
 PFS & separate & lognormal & 12 & 0.15 [0.11, 0.19] & 0.43 [0.35, 0.52] & 0.44 [0.39, 0.49]\\
 \hline
 PFS & separate & lognormal & 30 & 0.12 [0.08, 0.15] & 0.43 [0.36, 0.5] & 0.39 [0.34, 0.45]\\
+\hline
+PFS & separate & lognormal & 60 & 0.1 [0.07, 0.13] & 0.43 [0.38, 0.48] & 0.37 [0.31, 0.42]\\
 \hline
 \end{tabular}
 \end{table*}
@@ -754,6 +784,7 @@ We have demonstrated the novel method using the CheckMate 067 trial data set for
 The hierarchical model was compared with the separate model analogue and has been shown to be superior as well as both principled and applicable to situations where trials include multiple treatment arms and end-points.
 
 One of the benefit of adopting a hierarchical Bayesian approach is robustness to smaller sample sizes due to providing prior information and borrowing of strength between data for different end-points.
+Principled prior distribution specification about the cure fractions was shown to be especially useful early on in the trial when observable data about long-term survivors was weak. 
 This results in the stabilisation of the cure fraction estimates.
 It may be that there is excessive borrowing of information between cure fractions when the end-points are distinctly different.
 In our example, this was not necessary since there are only two end-points but for a larger number this may be appropriate.
@@ -816,9 +847,26 @@ smaller trials,
 
 The key conclusion of this paper is that data are available for better more efficient estimation of the outcomes of trials. Standard models are generally not up to the task but we have demonstrated a novel model which can achieve this.
 
-\note[NGreen]{how should the complete responders be included in the main model? If they enter via the background adjustment why double-count them?}
-\note[NGreen]{model averaging using all distributions and weights from LOO/WAIC?}
-\note[NGreen]{extensions of the implementation could be to generalise to have different distributions for each treatment in a single model fit, rather than at the moment where they are assumed to be the same for all treatments.}
+
+% this doesnt go here
+% may move to supplimentary material
+% TODO: prior derivation details
+% This first thing to do is work out the maximum standard deviation for the global cure fraction values we would be {\it likely} to see.
+% That is, if we expect the global cure fraction (which contribute the mean cure fraction for each end point) to not be very varied (and so OS and PFS means are similar) then the standard deviation would be small.
+% Define the centred global cure fraction on the logit scale $x \sim \mbox{N}(0, \sigma^2)$.
+% \begin{eqnarray*}
+% p(\pi > \pi_{\mu} + \delta) &=& p(\mbox{logit}(\pi) > \mbox{logit}(\pi_{\mu} + \delta))\\
+% &=& p(\mu + x > \mbox{logit}(\pi_{\mu} + \delta))\\
+% &=& p(x > \mbox{logit}(\pi_{\mu} + \delta) - \mbox{logit}(\pi_{\mu}))\\
+% \end{eqnarray*}
+
+% We can simplify the notation as follows.
+% $$
+% p(x > \mbox{logOR}(\delta)) = p(z > \mbox{logOR}(\delta)/\sigma) = 1 - \Phi(\mbox{logOR}(\delta)/\sigma) < \alpha
+% $$
+% So, plugging-in some numbers: Assume that $\pi_{\mu} = 0.5$ then for $\alpha = 0.01$, a $\delta = 0.05$ difference is $1 - \Phi(0.2/\sigma) < 0.01$ which gives $\sigma = 0.1$
+% or for $\delta = 0.02$ difference then $1 - \Phi(0.08/\sigma) < 0.01$ gives $\sigma = 0.035$.
+% Next, we can use this maximum standard deviation on the global cure fraction to define the distribution for the between-group variance.
 
 % % previous methodology work
 % In previous work, a multilevel frailty cure fraction model for the latent variable formulation was considered by \cite{Tawiah2020}.
