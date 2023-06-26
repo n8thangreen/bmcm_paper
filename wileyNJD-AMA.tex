@@ -31,23 +31,21 @@
 
 \author[1]{Nathan Green*}
 
-\author[4]{Murat Kurt}
+\author[2]{Murat Kurt}
 
-\author[4]{Andriy Moshyk}
+\author[2]{Andriy Moshyk}
 
-\author[2]{Victoria Federico Paly}
+\author[3]{James Larkin}
 
-\author[1,3]{Gianluca Baio}
+\author[1]{Gianluca Baio}
 
 \authormark{N Green \textsc{et al}}
 
 \address[1]{\orgdiv{Department of Statistical Science}, \orgname{UCL}, \orgaddress{\state{London}, \country{UK}}}
 
-\address[2]{\orgdiv{Org Division}, \orgname{Org Name}, \orgaddress{\state{State name}, \country{Country name}}}
+\address[2]{\orgdiv{Worldwide Health Economics & Outcomes Research}, \orgname{Bristol Myers Squibb}, \orgaddress{\state{NJ}, \country{USA}}}
 
-\address[3]{\orgdiv{Org Division}, \orgname{Org Name}, \orgaddress{\state{State name}, \country{Country name}}}
-
-\address[4]{\orgdiv{Org Division}, \orgname{Bristol Myers Squibb}, \orgaddress{\state{State name}, \country{Country name}}}
+\address[3]{\orgname{The Royal Marsden Hospital}, \orgaddress{\state{London}, \country{UK}}} %james.larkin@rmh.nhs.uk
 
 \corres{*Nathan Green \email{n.green@ucl.ac.uk}}
 
@@ -59,7 +57,7 @@ Time to an event of interest over a lifetime is a central measure of the clinica
 Within the same trial multiple end-points may also be considered.
 For example, overall and progression-free survival time for different drugs in oncology studies.
 A common situation is when an intervention is only effective for some proportion of the population who are not clinically identifiable.
-So we need to estimate latent group membership as well as separate survival models for each.
+Therefore, latent group membership as well as separate survival models for groups identified need to be estimated.
 However, follow-up in trials may be relatively short leading to substantial censoring.
 We present a general Bayesian hierarchical framework that can handle this complexity by exploiting the similarity of cure fractions between end-points;
 accounting for the correlation between them and improving the extrapolation beyond the observed data.
@@ -81,32 +79,32 @@ We show the benefits of using our approach with a motivating example, the CheckM
 \section{Introduction}\label{sec:intro}
 %%% HTA perspective %%%
 % survival data
-Interventions that impact upon the time to an event of interest, such as disease progression or death in a cancer trial, form a high proportion of appraisals by Health Technology Assessment (HTA) agencies, such as the National Institute for Health and Care Excellence (NICE), in England \citep{Latimer2011}.
+Interventions that impact the time to an event of interest, such as disease progression or death in a cancer trial, form a high proportion of appraisals by Health Technology Assessment (HTA) agencies, such as the National Institute for Health and Care Excellence (NICE), in England \citep{Latimer2011}.
 For instance, a new intervention may be expected to increase the amount of time until a patient experiences disease progression or death from any cause. For this reason, ``survival data'' are instrumental to modelling in HTA \cite{Demiris2006, Jackson2010}.
 
 % what is a data-cut?
 A feature of survival data from a trial is that they are often reported on during as well as at the end of the trial period.
 This enables on-going assessments and can inform decisions such as an early end to the trial due to harm or futility.
-However, in reality it is normally not possible to make use of the collected data in real time because there is a period in which they need to be cleaned due to issues, such as missingness and other data quality errors.
-So, snapshots of the trial data are made at pre-specified points defined in the study protocol.
+However, in reality, it is normally not possible to make use of the collected data in real time because there is a period in which they need to be cleaned due to issues, such as missingness and other data quality errors.
+Therefore, snapshots of the trial data are made at pre-specified points defined in the study protocol.
 This can be at a particular date, follow-up time, or a particular number of patients.
 These subsets of survival data made at discrete times are called \textit{data-cuts}.
 
 % extrapolation
-In order to quantify accurately the health and economic benefits of a new intervention using such survival data it is necessary to estimate the {\it mean survival time}, i.e.~the \textit{long term} effects of a given intervention.
+In order to quantify accurately the health and economic benefits of a new intervention using such survival data, it is necessary to estimate the {\it mean survival time}, ie,~the \textit{long-term} effects of a given intervention.
 This is in contrast to general survival curve summaries, such as the median time, which are typically used in standard ``biostatistical'' analyses.
-This idiosyncrasy has important implications because, in order to calculate the mean survival time we require the full survival curve, i.e. over a patient's lifetime, but available data (e.g.~data-cuts from a randomised trial) almost inevitably only cover a limited time frame and are subject to a high degree of censoring.
+This idiosyncrasy has important implications because, in order to calculate the mean survival time we require the full survival curve, ie, over a patient's lifetime, but available data (e.g.~data-cuts from a randomised trial) almost inevitably only cover a limited time frame and are subject to a high degree of censoring.
 Thus, it is necessary to \textit{extrapolate} the observed survival curve to a time horizon that is typically much longer than the one considered in the experimental study.
 Consequently, unlike ``standard'' time-to-event analyses that are often based on semi-parametric models (e.g.~Cox regression), HTA modelling is based on a fully parametric approach to the survival analysis, as recommended by a highly influential NICE Decision Support Unit (DSU) Technical Support Document (TSD) \citep{Latimer2011}.
 
 % plateaus
 Another important feature of survival data in the field of cancer research has arisen in the past decade due to the development of potentially highly successful immuno-oncology treatments.
 These aim to stimulate the body’s immune system to recognise and kill cancer cells \cite{Ouwens2019}. Several types of immunotherapy can be used to treat melanoma including immune checkpoint inhibitors, interleukin-2 (IL-2) and oncolytic virus therapy.
-In particular, inhibitory immune checkpoint blockade combination therapies have shown significant success in promoting immune responses against cancer and can result in tumor regression in many patients \cite{Khair2019}.
-These advances have lead to cancer patients with improved survival end-points and more long-term survival (LTS) patients comparable to the general population.
-In previous immuno-oncologic studies for melanoma therapies, such as ipilimumab and nivolumab,
-results have indicated that survival curves ``plateau'' for a considerable proportion of LTS patients in the limited range of the available survival curve \citep{Wolchok2017, Larkin2019}.
-That is, the survival curve converges to a probability (substantially) greater than zero and does not appear to decrease further.
+In particular, inhibitory immune checkpoint blockade combination therapies have shown significant success in promoting immune responses against cancer and can result in tumour regression in many patients \cite{Khair2019}.
+These advances have lead to cancer patients with improved survival end-points and more long-term survival (LTS) (although complete responders, CR, still have worse outcomes than the general population).
+In previous immuno-oncologic studies for melanoma therapies, such as those evaluating ipilimumab and nivolumab, results have indicated that survival curves ``plateau'' for a considerable proportion of LTS patients in the time period covered by survival curve \citep{Wolchok2017, Larkin2019}.
+That is, the underlying survival curve converges to a probability (substantially) greater than zero and does not appear to decrease further.
+Note that in practice, in the tail of the Kaplan-Meier plateauing may also be due to sampling issues, such as small sample size or missing data, and so there will be uncertainty about the true proportion of LTS.
 % mixture cure models
 When a survival curve exhibits this plateau behaviour, it is common to adopt a \textit{mixture cure model} (MCM) approach to describe the generation of the underlying data.
 A MCM considers a population as a mixture of two groups: the cured and not cured.
@@ -138,28 +136,28 @@ Finally, in Section~\ref{sec:discussion} we discuss the results and future work.
 
 %
 \section{Motivating example}\label{sec:example}
-Our motivating example concerns a long term study of melanoma therapies.
-The study has been described in detail elsewhere so we give a brief overview of the data here (see \citep{Wolchok2017, Larkin2019, Hodi2018} for more details).
+Our motivating example concerns a long-term study of melanoma therapies.
+The study has been described in detail elsewhere, so we give a brief overview of the data here (see \citep{Wolchok2017, Larkin2019, Hodi2018} for more details).
 The \textit{CheckMate 067} trial is a phase 3 randomised, double-blind study conducted on eligible patients aged 18 years or older with previously untreated, unresectable stage III or IV melanoma.
-They were randomly assigned in a 1:1:1 ratio and stratified by anti–programmed death-1 ligand 1 (PD-L1) antibodies status, whether there is a change in the BRAF gene that makes it work incorrectly (BRAF mutation), and metastasis stage.
-The purpose of the trial was to test the effectiveness of ipilimumab, an anti–cytotoxic T-lymphocyte–associated antigen 4 monoclonal antibody, and nivolumab, an anti–programmed death 1 agent.
-The total baseline sample consists of $n = 945$ subjects divided across three treatment arms
-i) Ipilimumab monotherapy with regimen of 3 mg/kg IV once every 3 weeks (Q3W) for a total of 4 doses;
-ii) Nivolumab monotherapy with regimen of 3 mg/kg intravenous (IV) once every 2 weeks (Q2W);
-iii) Combined nivolumab with ipilimumab with regimen of 1 mg/kg IV and 3 mg/kg IV Q3W for 4 doses followed by nivolumab 3 mg/kg IV Q2W.
 Nivolumab alone or nivolumab plus ipilimumab was compared with ipilimumab alone in patients with metastatic melanoma.
-The co-primary end-points were \textit{progression-free survival} (PFS; i.e.~the time from randomisation until the first of disease progression or death) and \textit{overall survival} (OS; i.e.~the time from randomisation to time of death).
-The data source for the analysis consists of patient-level data of times to PFS and OS with covariates sex, age at start of trial and nationality.
+They were randomly assigned in a 1:1:1 ratio and stratified by anti–programmed death-1 ligand 1 (PD-L1) expression status, whether there is a change in the BRAF gene that makes it work incorrectly (BRAF mutation), and metastasis stage.
+% The purpose of the trial was to test the effectiveness of ipilimumab, an anti–cytotoxic T-lymphocyte–associated antigen 4 monoclonal antibody, and nivolumab, an anti–programmed death 1 agent.
+The total baseline sample consists of $n = 945$ subjects divided across three treatment arms
+i) ipilimumab monotherapy with regimen of 3 mg/kg IV once every 3 weeks (Q3W) for a total of 4 doses;
+ii) nivolumab monotherapy with regimen of 3 mg/kg intravenous (IV) once every 2 weeks (Q2W);
+iii) combined nivolumab with ipilimumab with regimen of 1 mg/kg IV and 3 mg/kg IV Q3W for 4 doses followed by nivolumab 3 mg/kg IV Q2W.
+The co-primary end-points were \textit{progression-free survival} (PFS; ie,~the time from randomisation until the first of disease progression or death) and \textit{overall survival} (OS; ie,~the time from randomisation to time of death).
+The data source for the analysis consists of patient-level data of times to PFS and OS with covariates sex, age at start of trial, and country of centre.
 
-In our data set the minimum study follow-up from randomisation was 60 months so this was used as the final data-cut time.
+In our data set the minimum study follow-up from randomisation of 60 months was used as the final data-cut time.
 We also considered two earlier artificial data-cuts by truncating the 60-month data at 12 and 30 months.
-These particular times were chosen for this analysis because the actual study had a planned data-cut at approximately 30 months (28 months) and the largest observed median time for OS was just over 30 months. Thus, this time is relevant to the trial and at this time it may be possible to make comparable inferences to the complete 60-months data set but at a significantly earlier time.
-Further, the latest median time between all treatment regimens for PFS was approximately 12 months. Therefore, at 12 months it may be possible to characterise the PFS survival curves but not the less mature OS and so borrowing information between PFS and OS may be advantageous. Taking a data-cut at an even earlier time would probably not provide sufficient information to enable any useful extrapolation.
-Patients who were still being followed-up but who had not experienced the event of interest at the time of an artificial data-cut were censored at this time. In practice, a more realistic censoring time may have been at the date of last visit but this would have made no differences for the purposes of this analysis. Primarily, the data-cut points were selected to demonstrate the theoretical justification of our method and not to strictly follow the study data-cut protocol.
+These particular times were chosen for this analysis because the actual study had a planned data-cut at 28 months, and the largest observed median time for OS was just over 30 months. Thus, this time is reasonable and relevant to the trial, and at this time it may be possible to make comparable inferences to the complete 60-months data set but at a significantly earlier time.
+Moreover, the latest median time between all treatment regimens for PFS was approximately 12 months. Therefore, at 12 months it may be possible to characterise the PFS survival curves but not the less mature OS and so borrowing information between PFS and OS may be advantageous. Taking a data-cut at an even earlier time would probably not provide sufficient information to enable any useful extrapolation.
+Patients who were still being followed-up but had not experienced the event of interest at the time of an artificial data-cut were censored at this time.
 
-The reader is encouraged to refer to previously published analyses for the CM067 trial results, including 5 year database lock (DBL) was published in \cite{Larkin2019}. In summary, for PFS the median (95\% CI) times to event for each treatment arm were 2.86 (2.79-3.29) for ipilimumab, 6.93 (5.32-10.41) for nivolumab, and 11.50 (9.26-20.80) for the combination treatment. For OS the median (95\% CI) times to event for each treatment arm were 20.0 (17.22-25.6) for ipilimumab, 36.9 (31.24-60.9) for nivolumab, and not observed for the combination treatment.
+The reader is encouraged to refer to previously published analyses for the CheckMate 067 trial results, including the 5-year database lock (DBL) publication in \cite{Larkin2019}. In summary, for PFS the median (95\% CI) times to event for each treatment arm were 2.86 (2.79-3.29) for ipilimumab, 6.93 (5.32-10.41) for nivolumab, and 11.50 (9.26-20.80) for the combination treatment of nivolumab and ipilimumab. For OS the median (95\% CI) times to event for each treatment arm were 20.0 (17.22-25.6) for ipilimumab, 36.9 (31.24-60.9) for nivolumab, and not observed for the combination treatment.
 Figure~\ref{fig:S_raw_data} shows the Kaplan-Meier estimates of the PFS and OS survival curves for the complete CheckMate 067 phase 3 trial data.
-Both sets of curves for PFS and OS appear to tend toward positive asymptotes, the PFS curves more clearly.
+Both sets of curves, for PFS and OS, appear to approach a positive limiting probability; the PFS curves more clearly so.
 % Summary statistics are presented in Table~\ref{tab:checkmate_summary}.
 
 % \begin{center}
@@ -187,27 +185,27 @@ Both sets of curves for PFS and OS appear to tend toward positive asymptotes, th
 \caption{\label{fig:S_raw_data} Kaplan-Meier curves of PFS and OS times with 95\% CI for the complete CheckMate 067 phase 3 trial data and ipilimumab, nivolumab and combination treatments.}
 \end{figure}
 
-A standard frequentist analysis has been carried-out on this data already with separate mixture cure models for each treatment and OS or PFS \cite{Mohr2020}.
+A standard frequentist analysis has been carried-out on these data already with separate mixture cure models for each treatment and OS or PFS \cite{Mohr2020}.
 It was estimated that for OS, ranges of estimated proportions of LTSs were 16\%–26\% for ipilimumab, 38\%–46\% for nivolumab, and 49\%–54\% for combined treatment across all modelled distributions.
 Similarly, for PFS, ranges of the proportions of LTSs were 9\%–13\% for ipilimumab, 29\%–33\% for nivolumab, and 38\%–40\% for combined treatment.
 
 %
 \section{Modelling framework}\label{sec:methods}
-Consider a study in which $n$ individuals are observed and the (non-negative) time to either progression ($T^{prog}_{i}$) or death ($T^{death}_{i}$) are recorded for each individual $i=1,\ldots,n$.
+Consider a study in which $n$ individuals are observed, and the (non-negative) time to either progression ($T^{prog}_{i}$) or death ($T^{death}_{i}$) are recorded for each individual $i=1,\ldots,n$.
 Denote the event time for individual $i$ by $T_{i}$.
 In our motivating example, we would have a separate set of $T_{i}$ for either end-point, PFS or OS.
-Thus, PFS times are $T_{i} = \min(T^{prog}_{i}, T^{death}_{i})$ and OS times are $T_{i} = T^{death}_{i}$.
-Event times may be censored and therefore we consider a censoring time $C_{i}$ and an event indicator $\delta_{i} = \mathbb{I}(T_{i} < C_{i})$
+Thus, PFS times are $T_{i} = \min(T^{prog}_{i}, T^{death}_{i})$, and OS times are $T_{i} = T^{death}_{i}$.
+Event times may be censored, and therefore we consider a censoring time $C_{i}$ and an event indicator $\delta_{i} = \mathbb{I}(T_{i} < C_{i})$
 --- so that $\delta_{i} = 1$ if the end-point is fully observed for individual $i$ and 0 if it is censored.
 The observed survival time is then indicated as $t_{i} = \min(T_{i}, C_{i})$.
 
 Typically, a study will also measure some individual-level covariates, which we assume are collected in a vector $\bm{x}_{i} = (x_{1i}, \ldots, x_{Pi})^\top$.
-These may include the individual's age, sex, comorbidities and, usually, a treatment arm indicator.
+These may include the individual's age, sex, comorbidities, and usually, a treatment arm indicator.
 The full data can then be represented as
 $\mathcal{D}_i = (t_i, \delta_i, \bm{x}_i)$.
 % $\mathcal{D}_i = (\bm{t}_i, \bm{\delta}_i, \bm{x}_i)$.
 % where $\bm{t}_i = (\bm{t}_{1i}, \bm{t}_{2i})$, $\bm{x}_i = (\bm{x}_{1i}, \bm{x}_{2i})$ and $\bm{\delta}_i = (\bm{\delta}_{1i}, \bm\delta_{2i})$.
-In our example, the covariates are the same between PFS ans OS.
+In our example, the covariates are the same between PFS and OS.
 
 We model the observed times using a parametric sampling distribution $t_{i} \sim p(t_{i} \mid \bm\theta)$ as a function of a set of model parameters $\bm\theta = (\bm\alpha(\bm x), \mu(\bm x))$. 
 In this notation, the location parameter $\mu(x)$ indicates the mean or the scale of the probability distribution; and a (set of) ancillary parameters $\bm \alpha(x)$ describe the shape or variance of the distribution.
@@ -275,12 +273,12 @@ This is a clinically unintuitive dichotomy between the resulting proportions of 
 % censoring
 Secondly, time to event data are typically right-censored due to administrative censoring or loss to follow up.
 The censoring times may be too early in order to adequately characterise a survival model for HTA for a single end-point.
-In particular, OS times are bounded below by PFS times by definition so will be subject to more censoring at the same cut-point.
-By taking advantage of the set of end-points together the data paucity may be alleviated to give better fits and extrapolation to the full lifetimes of patients.
+In particular, OS times are bounded below by PFS times by definition, so will be subject to more censoring at the same cut-point.
+By taking advantage of the set of end-points together, the data paucity may be alleviated to give better fits and extrapolation to the full lifetimes of patients.
 This is particularly important for health economics modelling in order to gauge the full cost and effect of an intervention.
 
 % complexity penalising
-Furthermore, if there is heavy censoring for all endpoints, such as early data cuts, and the number of endpoints is small then the data alone may not represent the true underlying survival curves, including the plateau for the cure fractions.
+Furthermore, if there is heavy censoring for all endpoints, such as early data cuts, and the number of endpoints is small, then the data alone may not represent the true underlying survival curves, including the plateau for the cure fractions.
 At this point, additional sources of information should be principally incorporated into the model. A Bayesian paradigm naturally allows for the inclusion of external evidence from sources such as historical data and expert opinion. It is reasonable to assume, in the absence of additional information, that the cure fractions for all end points are drawn from the same or very similar distribution. In order to do this we can increase the amount of strength to borrow between end point data which strikes a balance between the information (or lack of) in the data and other knowledge \cite{Nikolaidis2021}. Practically, this corresponds to a reduction in the global cure fraction variance hyper parameter which in the limit is a base model with $\sigma_k=0$, equivalent to complete pooling of the data. 
 
 % our innovative proposal
@@ -291,7 +289,7 @@ This has the double advantage of borrowing information between end-points
 %
 \subsection{The hierarchical mixture cure model} \label{section:hier_model}
 In this section, we show how to construct the extended mixture cure model in order to model multiple end-points together and alleviate the issues posed in the Section \ref{section:issues}.
-In order to do this we must first introduce an additional index to denote an end-point $j = 1, \ldots, J$ --- typically, $J=2$ for PFS and OS.
+In order to do this, we must first introduce an additional index to denote an end-point $j = 1, \ldots, J$ --- typically, $J=2$ for PFS and OS.
 We can now define a separate mixture cure model, as described in equation~(\ref{eqn:mcm}), for each of the end-points $j$.
 With this in mind, let us consider three alternative multiple end-point incidence models for the estimation of the cure fraction for treatment $k$ and end-point $j$, denoted $\pi_{kj}$.
 
@@ -321,8 +319,8 @@ where $\sigma_k^2$ is the between-group (end-points) variance.
 The end-point specific cure fractions in our example are denoted $\pi_{PFS}, \pi_{OS}$.
 Figure~\ref{fig:hier_dag} shows a directed acyclic graphical (DAG) representation of the Bayesian hierarchical mixture cure modelling framework for two end-points.
 The equivalent DAGs for the complete and no pooling models are given in the Appendix.
-Note that pooling refers to the cure fractions. The survival times are not pooled; the parameters for the uncured survival models ($\phi$, $\beta^{\lambda}$ in the latency model) are estimated using the separate sets of survival times for each end-point.
-E.g. in the complete pooling case we're not assuming that PFS and OS have the same survival time distributions.
+Note that pooling refers to the cure fractions. The survival times are not pooled; the parameters for the uncured survival models ($\phi$, $\beta^{\lambda}$ in the latency model) are estimated using the separate sets of survival times for each end-point
+eg, in the complete pooling case we do not assume that PFS and OS have the same survival time distributions.
 However, in the complete and partial pooling case there is an indirect pooling effect for the latency models via the incidence model, so the fact that the cure fractions are similar/the same will influence the shapes of the survival curves.
 
 \begin{figure}[!ht]
@@ -347,25 +345,25 @@ The packaged code is in a generalisable framework and can be downloaded from her
 
 %
 \subsection{Background survival}
-In many cure fraction models it is common to have $S_b(t, x) = 1$ for all $t$ under consideration, which is reasonable in the short-term.
+In many cure fraction models, it is common to have $S_b(t, x) = 1$ for all $t$ under consideration, which is reasonable in the short-term.
 However, we are focused on the full life-course of an individual in an HTA context and so include a general population all-cause mortality competing risk.
 Thus, the uncured population is subject to a background mortality risk in addition to the risk from the event of interest.
 
 We used the World Health Organisation (WHO) life tables by country for the latest year available of 2016 \cite{wholifetables} to inform the background mortality in the mixture cure model.
 The baseline hazards are the expected mortality rate for each patient at the age at which they experience the event.
-The mortality data are country, age and gender adjusted, thus providing a granular account of the different patient profiles in the trial.
+The mortality data are adjusted for country, age and gender; thus providing a granular account of the different patient profiles in the trial.
 The WHO reports conditional probabilities of death in 5-year intervals until age 85.
 A constant annual mortality rate is reported for individuals over 85. They assumed that no-one lives beyond 100 years.
 Further details are provided in the supplementary material.
 
-In a Bayesian analysis there are alternative ways in which we could model the background mortality.
+In a Bayesian analysis, there are alternative ways in which we could model the background mortality.
 For this work we used WHO hazard point estimates as fixed and known.
-We could consider the WHO estimates to provide sufficiently accurate estimates given the sample size and so incorporating uncertainty is not necessary. This also forces consistency across fits.
+We could consider the WHO estimates to provide sufficiently accurate estimates given the sample size, and so incorporating uncertainty is not necessary. This also forces consistency across fits.
 Denote the fixed WHO estimates for individual $i$ used for the background survival in (\ref{eqn:mcm}) as
 $S_b(t_i \mid \bm\theta_b, \bm{x}_i) = \hat{S}_i$.
 
 % background adjustment
-It may be that the patients in the trial have a worse background survival than the average equivalent individual in the general population and so naively using the WHO life tables will over-estimate their survival times.
+It may be that the patients in the trial have a worse background survival than the average equivalent individual in the general population, and so naively using the WHO life tables will over-estimate their survival times.
 There are several possible ways that this could be addressed.
 For example, using only the complete responders in the sample, who are clinically confirmed as cured, it is possible to obtain a posterior distribution for a hazard ratio between these and a WHO estimate baseline.
 This can serve as a prior in the main model in a two-step approach. Alternatively, prior belief could be defined explicitly using expert knowledge.
@@ -373,11 +371,11 @@ This could be elicited directly for the hazard ratio or on a natural scale, such
 
 %
 \subsection{Prior specification}
-Where possible the choice of priors should be informed by expert opinion and prior results.
+Where possible, the choice of priors should be informed by expert opinion and prior results.
 We specify vague priors on log-scale for the coefficients of the OS and PFS rates $\log(\lambda_{OS}),  \log(\lambda_{PFS})$.
 Centering the ages, the baseline is a vague prior ${\beta_0^{PFS} \sim \text{N}(0, 100),}\; {\beta_0^{OS} \sim \text{N}(0, 100)}$
 and for age $\beta_{age}^{PFS} \sim \text{N}(0, 100),\; \beta_{age}^{OS} \sim \text{N}(0, 100)$.
-Alternatively, we could specify the cure fraction directly using a a Beta prior distribution $\pi \sim \text{Beta}(a, b)$.
+Alternatively, we could specify the cure fraction directly using a Beta prior distribution $\pi \sim \text{Beta}(a, b)$.
 The parameters can be obtained via transformation of the mean and standard deviation to allow a more natural scale for elicitation.
 
 The hierarchical cure fraction is modelled as a fixed effect linear regression with logistic link. Each treatment coefficient prior is independent $\beta^{\pi}_k \sim \text{N}(-0.1, 0.2)$.
@@ -392,14 +390,14 @@ Alternatively, a noninformative uniform prior density on standard deviation para
 For small hierarchical variance a $\text{Gamma}(2, 0.1)$ may be preferred \cite{Chung2013}.
 
 % cut-point data
-As discussed, the early phase of a trial is not very informative of the cure fraction if no plateauing is yet to occur. In this situation we can take advantage of the Bayesian hierarchical structure. In the absence of other evidence it is reasonable to assume that the cure fractions for each end-point are from the same distribution which corresponds to a narrow prior on the between-group standard deviation at the global cure fraction level. 
-Firstly, adopting the same family of prior distributions as in the main analysis with complete data, then suppose a confidence interval of approximately 99\% of the density so significance level $\alpha = 0.01$ which is for a two-tail distribution.
-This gives $\sigma_k \sim \mbox{N}(0, 0.06^2)\mathbb{I}(0,)$ for $p(\pi_k > 0.55) = 0.005$ and $\sigma_k \sim \mbox{N}(0, 0.03^2)\mathbb{I}(0,)$ for $p(\pi_k > 0.525) = 0.005$.
+As discussed, the early phase of a trial is not very informative of the cure fraction if no plateauing is yet to occur. In this situation, we can take advantage of the Bayesian hierarchical structure. In the absence of other evidence, it is reasonable to assume that the cure fractions for each end-point are from the same distribution which corresponds to a narrow prior on the between-group standard deviation at the global cure fraction level. 
+Firstly, adopting the same family of prior distributions as in the main analysis when using complete data, then suppose a two-tailed confidence interval of approximately 99\% of the density so significance level $\alpha = 0.01$.
+This gives $\sigma_k \sim \mbox{N}(0, 0.06^2)\mathbb{I}(0,)$ for $p(\pi_k > 0.55) = 0.005$, ie, 99\% interval [0.45, 0.55], and $\sigma_k \sim \mbox{N}(0, 0.03^2)\mathbb{I}(0,)$ for $p(\pi_k > 0.525) = 0.005$.
 Alternatively, we can use a {\it Penalised Complexity (PC)} prior which preferences a base model of greatest simplicity \cite{Simpson2017}.
 In our case, first define the parameters $\sigma_0$ and $\alpha$ for the equation $p(\sigma > \sigma_0) = \alpha$, and then using $\lambda = - \log(\alpha)/\sigma_0$ an exponential distribution prior with rate $\lambda$ can be obtained.
 So, for $\sigma_0 = 0.18$ leads to $\lambda = - \log(0.01)/0.18 = 25$ or $\sigma \sim \mbox{Exp}(25)$.
 Similarly, for $\sigma_0 = 0.08$ leads to $\lambda = - \log(0.01)/0.08 = 55$ or $\sigma \sim \mbox{Exp}(55)$.
-We can see how this corresponds to the prior uncertainty on the cure fraction scale in Figure~\ref{fig:complexityprior}. The two type of distributions are similar but the penalised complexity prior is more peaked around the central value.
+We can see how this corresponds to the prior uncertainty on the cure fraction scale in Figure~\ref{fig:complexityprior}. The two type of distributions are similar, but the penalised complexity prior is more peaked around the central value.
 
 \begin{figure}[!ht]
 \centering
@@ -419,7 +417,7 @@ In reality, a subset of these parametric models will be more plausible for the d
 
 %
 \subsection{Model assessment}
-We evaluated the goodness of fit of the overall models using out-of-sample predictions estimated with the widely applicable information criterion (WAIC) (and leave-one-out cross-validation (LOO) given in the Appendix) \cite{Vehtari2017}. These have various advantages to more common AIC and DIC. WAIC is the difference between the computed log pointwise predictive density and the estimated effective number of parameters. Smaller values are better. It is fully Bayesian and invariant to parameterisation. They are easily obtained using the posterior sample of the Stan output.\\
+We evaluated the goodness of fit of the overall models using out-of-sample predictions estimated with the widely applicable information criterion (WAIC) (and leave-one-out cross-validation, LOO, given in the Appendix) \cite{Vehtari2017}. These have various advantages to more common AIC and DIC. WAIC is the difference between the computed log pointwise predictive density and the estimated effective number of parameters. Smaller values are better. It is fully Bayesian and invariant to parameterisation. They are easily obtained using the posterior sample of the Stan output.\\
 % The effective number of parameters is not uniquely defined because it depends on the level of the hierarchy that is in {it focus} \cite{spiegelhalter}.
 The set of parameters in the hierarchical model (and their dimensions) are
 $\mathbf{\beta^{\pi}}$ (3), $\mathbf{\sigma}$ (3), $\mathbf{\beta^{\lambda}_{PFS}}$ (2), $\mathbf{\beta^{\lambda}_{OS}}$ (2), $\mathbf{\phi_{OS}}$ (1), $\mathbf{\phi_{PFS}}$ (1), $\mathbf{\pi_{OS}}$ (3), $\mathbf{\pi_{PFS}}$ (3).
@@ -437,13 +435,13 @@ Depending on the number of ancillary parameters the total is 16, 17 or 18.
 % Define as the ratio of the widths of the CrIs of $\pi_{os}$ and $\pi_{pfs}$ from the hierarchical model to the width of the CrIs of the separate model.
 
 There has not been much work carried-out to date on model assessment methods specific to mixture cure models.
-For the basic mixture cure model assessment may focus on the model as a whole or on the incidence and latency submodels separately.
-The fit of the latency submodel can be examined using a revised Schoenfeld residual \cite{Wileyto2013} and the performance of the incidence submodel can be checked with concordance measures such as AUC \cite{Peng2021}.
+For the basic mixture cure model, assessment may focus on the model as a whole or on the incidence and latency submodels separately.
+The fit of the latency submodel can be examined using a revised Schoenfeld residual \cite{Wileyto2013}, and the performance of the incidence submodel can be checked with concordance measures such as AUC \cite{Peng2021}.
 However, these incidence model approaches are best used directly with known cure status and are designed for models which consider individual cure fractions, unlike our model which assumed a single population cure fraction.
 Of course, we also extend the basic mixture cure model so it is not yet clear how to best use these methods in this situation. 
 
 %
-\subsection{Complete data only results} \label{sec:results}
+\subsection{60 months data only results} \label{sec:results}
 In this section, we will explore the mixture cure model fits using the complete 60-months CheckMate 067 trial data.
 An example of the Bayesian hierarchical model posterior survival curves using the complete data is shown in Figure~\ref{fig:S_exp_cf_hier}.
 The equivalent plots for all other models are given in the Appendix.
@@ -455,20 +453,20 @@ The exponential fits particularly well to the tail which is of particular import
 
 % medians
 All model fits are fairly similar. For example, for the exponential model, the PFS median times are 5, 9 and 12 months, for ipilimumab, nivolumab and combined treatments, respectively.
-In comparison with the Kaplan-Meier median times in Table~\ref{tab:checkmate_summary}, the fitted times are 75\%, 30\% and 5\% larger. That is, the median times converge for large times.
+In comparison with the Kaplan-Meier median times, the fitted times are 75\%, 30\% and 5\% larger. That is, the median times converge for large times.
 Similarly, for the exponential model, the OS median times are 22, 38 and 56 months, for ipilimumab, nivolumab and combined, respectively.
 The uncured median survival times for the exponential model are 5 and 15 months, for PFS and OS, respectively.
 
 % restricted mean survival times
 The restricted mean survival time (RMST) is the average time-to-event over a fixed follow-up period and has been proposed as an intuitive alternative summary.
-For a follow-up time of 60 months and For the exponential model, the RMST (95\% credible interval, CrI) for the uncured group is 20.6 (18.4, 23.1) and 6.66 (6.09, 7.39) months, for OS and PFS, respectively. 
-For the OS end-point the RMST is 28.7 (26.3, 31.1), 36.5 (34.1, 38.9) and 39.6 (37.1, 42.1) months, for ipilimumab, nivolumab and combined, respectively.
-For the PFS end-point the RMST is 11.9 (9.96, 14.1), 24.3 (21.1, 27.4) and 27.7 (24.7, 30.8) months, for ipilimumab, nivolumab and combined, respectively.
-The RMST for the cured population is the same exact value corresponding to the general population of 58.2 months.
+For a follow-up time of 60 months and for the exponential model, the RMSTs (95\% credible interval, CrI) for the uncured group are 20.6 (18.4, 23.1) and 6.66 (6.09, 7.39) months, for OS and PFS, respectively. 
+For the OS end-point, the RMSTs are 28.7 (26.3, 31.1), 36.5 (34.1, 38.9) and 39.6 (37.1, 42.1) months, for ipilimumab, nivolumab and combined, respectively.
+For the PFS end-point, the RMSTs are 11.9 (10.0, 14.1), 24.3 (21.1, 27.4) and 27.7 (24.7, 30.8) months, for ipilimumab, nivolumab and combined, respectively.
+The RMST for the cured population is the same value corresponding to the general population of 58.2 months.
 
-% time to reach 0
-The latest time PFS has survival probability greater than 0 is over 30 months for the exponential distribution.
-Similarly, the OS survival probability is greater than 0 at the end of follow-up at 60 months.
+% % time to reach 0
+% The latest time PFS has survival probability greater than 0 is over 30 months for the exponential distribution.
+% Similarly, the OS survival probability is greater than 0 at the end of follow-up at 60 months.
 
 %%TODO: include a table of survival statistics?
 %%      compare curves formally? e.g. ANOVA, t-test RMST or HR?
@@ -490,10 +488,10 @@ Similarly, the OS survival probability is greater than 0 at the end of follow-up
 % cure fractions
 Figure~\ref{fig:cf_forest_all_tx} and Figure~\ref{fig:cf_forest_all_tx_sep} show cure fraction posterior distribution forest plots for the hierarchical and separate mixture cure models, respectively. 
 % global cf
-We can see that the global cure fraction posterior is relatively wide which is understandable since there are only two exchangeable points providing limited information (OS and PFS).
+We can see that the global cure fraction posterior is relatively wide, which is understandable since there are only two exchangeable points providing limited information (OS and PFS).
 They approximately range 0.1-0.55, 0.2-0.6, 0.2-0.65 for ipilimumab, nivolumab and combined treatments respectively. 
 However, despite this, the data influence the end-point cure fractions by pulling the central location away from the prior, downwards for ipilimumab and upwards for the combined treatment.
-For ipilimumab the PFS curve fraction posterior is close to containing zero within the credible interval.
+For ipilimumab, the PFS curve fraction posterior is close to containing zero within the credible interval.
 Whereas for nivolumab and the combined treatment arms the mean global cure fraction lies somewhere between the PFS and OS means, the ipilimumab global mean is closer to the OS cure fraction mean. This is because we have explicitly codified in the prior distribution that the global cure fraction is unlikely to be near zero and the PFS cure fraction posterior is close to zero.
 We would observe the equivalent behaviour if the OS distributions were near to 1.
 % plateau time
@@ -664,31 +662,31 @@ WAIC: widely applicable information criterion.
 We now turn our attention to fitting the mixture cure models to earlier data-cuts in the CheckMate 067 trial data set.
 For the complete data set up to 60 months we have seen that the separate and hierarchical models produce similar parameter inferences. This is to be expected when the data are relatively mature, there are in effect only two data points at the global level and a weak prior is used for the global variance hyper parameter.
 
-For demonstration purposes, we show results using the the penalised complexity prior with exponential distribution rate parameter $\lambda = 55$ for the 12 months data cut scenario and retain all other prevous priors including the weak priors for the mean $\pi_k$. As more data are made available at later times then the emphasis on this prior is be relaxed reflecting the relative influence of the data increases. This approach is in the spirit of information-sharing methods such as power priors which are "adaptively robust", where a power parameter controls the degree of borrowing. For example, for the simple case of normal historical data under a flat prior, the power prior is another normal distribution with a scaled variance according to the sample size and magnitude of the power parameter, determined by the investigator.
+For demonstration purposes, we show results using the penalised complexity prior with exponential distribution rate parameter $\lambda = 55$ for the 12 months data cut scenario and retain all other previous priors, including the weak priors for the mean $\pi_k$. More data are available at later times and so the emphasis on this prior was relaxed. This approach is in the spirit of information-sharing methods such as power priors, which are "adaptively robust", where a power parameter controls the degree of borrowing. For example, for the simple case of normal historical data under a flat prior, the power prior is another normal distribution with a scaled variance according to the sample size and magnitude of the power parameter, determined by the investigator.
 
-Figures~\ref{fig:forest_plot_cf_cutpoint_sep} and Figure~\ref{fig:forest_plot_cf_cutpoint_hier} show forest plots of the cure fraction estimates for 12, 30 and 60 months and for the separate and hierarchical models, respectively.
+Figures~\ref{fig:forest_plot_cf_cutpoint_sep} and Figure~\ref{fig:forest_plot_cf_cutpoint_hier} show forest plots of the cure fraction estimates for 12, 30 and 60 months, and for the separate and hierarchical models, respectively.
 Results are shown for the OS exponential with PFS exponential model and the OS log-Normal with PFS log-Normal model.
 
 We can see that in Figure~\ref{fig:forest_plot_cf_cutpoint_sep} for the exponential model in the OS survival curves for the separate model there is more uncertainty than in the equivalent plot for the hierarchical model in Figure~\ref{fig:forest_plot_cf_cutpoint_hier}.
 The log-Normal model OS survival curves for separate and hierarchical models over-estimate the cure fraction at earlier data-cuts and all treatment arms.
-For later data-cuts the cure fractions appear to converge from above to the complete data estimates.
+For later data-cuts, the cure fractions appear to converge from above to the complete data estimates.
 % It appears to revert to the background survival at the time of the last observed data point.
 
 Conversely, for the separate models and all treatment arms, at 12 months follow-up the exponential model underestimates the OS cure fraction and approaches the complete data value from below.
 This is less clear than for the log-Normal model probably because of the larger estimate uncertainty for the exponential model.
 Crucially, these are two clearly different behaviours but we would be ignorant to which is correct (if any) until later on in the trial.
-For OS in the hierarchical model the cure fraction estimates appear to be accurate and more certain even at 12 months for all treatment arms.
+For OS in the hierarchical model, the cure fraction estimates appear to be accurate and more certain even at 12 months for all treatment arms.
 The posterior is more stable about the complete data cure fraction for all considered data-cuts.
 
 
-Figures~\ref{fig:S_cutpoint_12mo_exp} shows the survival curves for the data-cut with 12 months of follow-up data for the exponential and for the separate and hierarchical models respectively.
+Figures~\ref{fig:S_cutpoint_12mo_exp} shows the survival curves for the data-cut with 12 months of follow-up data for the exponential and for the separate and hierarchical models, respectively.
 Equivalent Figures for 30 months data-cut are given in the Appendix.
 
 %% restricted mean survival times
 Comparing the uncured RMSTs for various models,
 the hierarchical exponential model gives for OS 20.6 (18.4, 23.1) and PFS 6.72 (6.15, 7.34) months.
 For the separate model, OS is 22.3 (18.5, 26.9) and PFS is 5.68 (4.9, 6.45) months.
-For the log-Normal hierarchical model the RMST for OS end-point is 6.6 (6.17, 7.13) and PFS is 3.98 (3.84, 4.12) months.
+For the log-Normal hierarchical model, the RMST for OS end-point is 6.6 (6.17, 7.13) and PFS is 3.98 (3.84, 4.12) months.
 Finally, the separate model gives 6.59 (6.18, 7.07) months for OS and 3.98 (3.85, 4.1) months for PFS.
 
 
@@ -721,7 +719,7 @@ Table~\ref{tab:cutpoint_pred} shows the survival estimates at 60 months extrapol
 \begin{table*}[!ht]
 \centering
 \caption{Survival probability estimates for separate and hierarchical models at 60 months using 12, 30 and 60 months data cut points. Models with exponential or log-normal distributions for both OS and PFS are given. \label{tab:cutpoint_pred}}
-\begin{tabular}{l|l|l|l|l|l|l}
+\begin{tabular}{l|l|l|l|l|l|l}i
 \hline
 Endpoint & Model & Distribution & Cut-point & Ipilimumab & Nivolumab & Combined\\
  &  &  & (month) & & & \\
@@ -780,41 +778,45 @@ PFS & separate & lognormal & 60 & 0.1 [0.07, 0.13] & 0.43 [0.38, 0.48] & 0.37 [0
 %
 \section{Discussion}\label{sec:discussion}
 We have presented a Bayesian hierarchical mixture cure model to obtain complete survival curves which exhibit plateau behaviour. These curves can then be used in HTA to inform functions of patient lifetime.
-We have demonstrated the novel method using the CheckMate 067 trial data set for two end-points and at different artificial data-cuts.
+We have demonstrated the novel method using the CheckMate 067 trial data set for end-points OS and PFS and at different artificial data-cuts.
 The hierarchical model was compared with the separate model analogue and has been shown to be superior as well as both principled and applicable to situations where trials include multiple treatment arms and end-points.
 
-One of the benefit of adopting a hierarchical Bayesian approach is robustness to smaller sample sizes due to providing prior information and borrowing of strength between data for different end-points.
+A benefit to adopting a Bayesian paradigm over a frequentist approach is the flexibility to modelling complex structure, in our particular case multilevel or nested data. In contrast, a frequentist model would need to impose assumptions about the structure of a covariance matrix.
+Another advantage of adopting a hierarchical Bayesian approach is robustness to smaller sample sizes due to the provision of prior information and borrowing of strength between data for different end-points.
 Principled prior distribution specification about the cure fractions was shown to be especially useful early on in the trial when observable data about long-term survivors was weak. 
 This results in the stabilisation of the cure fraction estimates.
 It may be that there is excessive borrowing of information between cure fractions when the end-points are distinctly different.
-In our example, this was not necessary since there are only two end-points but for a larger number this may be appropriate.
+In our example, this was not necessary, since there are only two end-points but for a larger number this may be appropriate.
 Partial-exchangeability can be used instead in this case \cite{Neuenschwander2016}.
 
 % choice of priors
 In comparison to some previous frequentist approaches, our framework is able to include contextual information about the parameters of the model via the prior distributions.
-Incorporating sensible information, both in the form of external data sources or elicited from experts can
-stabilise the inference on the cure fraction and restrict/constrain its values via the prior distributions.
-For the analysis presented in this paper we chose uninformative priors.
-This allows the data to dominate the posterior even if the dataset is relatively small.
-In practice there may be additional information from clinical experience or previous data that can better inform the prior selection.
+Incorporating sensible information, both in the form of external data sources or elicited from experts can stabilise the inference on the cure fraction and restrict/constrain its values via the prior distributions.
+For the analysis presented in this paper, we exploited different priors.
+Uninformative priors allow the data to dominate the posterior even if the dataset is relatively small.
+In practice, there may be additional information from clinical experience or previous data that can better inform the prior selection.
 The priors can be specified on the natural scale to aid elicitation and interpretation.
 For example, we may have clinical knowledge that a drug treatment could generate a cure fraction greater than, say, 30\%.
 If a (cancer) patient enters the study at 60 years old then there is a high degree of certainty that they will not live for, say, over 40 years.
 In the case of sparse data e.g. when there is a large amount of missing data perhaps due to right censoring, then 'regularising' the inference based on available prior information could make a significant and important difference. In particular, the method of blending curves is a recent, straightforward option for how to constrain survival \citep{Che2022}. 
 How to elicit this prior information in practice may not be simple and a formal protocol should be adopted \cite{OHagan2019}.
 
-Health care regulators, such as the European Medicines Agency (EMA) and U.S. Food and Drug Administration (FDA), may value the fact that a hierarchical model can embed some form of prior knowledge to account for scepticism.
+Healthcare regulators, such as the European Medicines Agency (EMA) and U.S. Food and Drug Administration (FDA), may value the fact that a hierarchical model can embed some form of prior knowledge to account for scepticism.
 This will prevent the cure rates to be taken at face value, particularly with limited data.
-The hierarchical model seems to give a more precise estimate of the cure rate, even with earlier data-cuts (especially for the Exponential model).
-The hierarchical model is more aligned, which means possibly you have more reliable estimates early on, which is a good argument to complement modelling based on earlier cuts.
+The hierarchical model seems to give a more precise estimate of the cure rate, even with earlier data-cuts (especially for the exponential model).
+The hierarchical model is more aligned, which means the possibility of more reliable estimates early on, which is a good argument to complement modelling based on earlier cuts.
 % Earlier cuts can lead to quicker introduction in the market and reimbursement decisions.
+
+% limitations
+In our analysis, we simulated censoring due to data-cuts by simply censoring all patients in the complete data set at the same time point.
+In practice, a more realistic censoring time may have been at the date of last visit for each patient, but this would have made no differences for the purposes of this analysis. Primarily, the data-cut points were selected to demonstrate the theoretical justification of our method and not to strictly follow the study data-cut protocol.
 
 % data
 Future work should test the proposed hierarchical MCM on a variety of data sets and at data-cuts reflecting their actual trial protocols.
 The modelling framework is generalisable from two end-points in our example to any number in principle.
 For example, previous related frequentist analyses considered clusters of hospitals and recurrent events per individual \citep{Lai2008, Lai2009}.
 Further work could investigate the benefit to including additional end-point data even if it does not clearly demonstrate plateauing behaviour.
-The survival curve used in the model for the general population background statistically 'cured' survival can be refined to be appropriate to specific cohort characteristics. For instance, long term survival of clinically identified complete responders (CR) could be used to bridge the gap between statistical cure and clinical cure/functional cure. The shorter-term CR individual-level survival data can be combined with longer-term external data such as from WHO life tables as in the current analysis (see \citep{Jackson2017} for potential approaches).
+The background survival curve used in the model representing the statistically `cured' survival in general population can be refined to be appropriate to specific cohort characteristics. For instance, long-term survival of clinically identified complete responders (CR) could be used to bridge the gap between statistical cure and clinical cure/functional cure. The shorter-term CR individual-level survival data can be combined with longer-term external data, such as from WHO life tables as in the current analysis (see \citep{Jackson2017} for potential approaches).
 
 % optimal stopping
 Another way to think about the cut-point data is to think about what is the minimum follow-up time should we choose to halt the trial and end the data collection which would maximise some expected overall utility.
@@ -823,29 +825,25 @@ That is, put another way, what is the optimal stopping time $\tau^*$ for the tot
 $$
 \mathbb{E} V_{\tau^*} = \sup_{\tau} \mathbb{E} V_{\tau}
 $$
-The stopping utility should incorporate a measure of the survival extrapolation robustness and may include benefits such as smaller costs, freed-up time from the trial for patients and those running the study, quicker time to market for a drug, avoidance of side-effects etc.
-The utility would also depend on estimating 'correct' parameters values from the available data i.e. that they are within some acceptable threshold of the true values.
-This could be applied directly on the parameters of interest or an order statistics for which drug is deemed the preferable.
+The stopping utility should incorporate a measure of the survival extrapolation robustness and may include benefits, such as smaller costs, freed-up time from the trial for patients and those running the study, quicker time to market for a drug, and avoidance of side-effects etc.
+The utility would also depend on estimating `correct' parameters values from the available data ie, that they are within some acceptable threshold of the true values.
+This could be applied directly on the parameters of interest or an order statistics for which drug is deemed preferable.
 
 This may be framed in terms of value of information (VoI) \citep{Heath2017}.
 For example, in the case given above, what is the additional value of obtaining further data after 12 and 30 months.
 In practice, deriving a set of heuristics may be better than formalising a general rule.
-A discrete set of cut-point may be used, similar to our artificial selection of rounded times 12 and 30 months, rather than considering the whole real line.
+A discrete set of cut-points may be used, similar to our artificial selection of rounded times 12 and 30 months, rather than considering the whole real line.
 
 As well as during a study, the hierarchical MCM could be used in advance of a study to inform trial design and optimal follow-up time to support the choice of data-cuts used in practice. Smaller sample sizes and shorter duration may provide equivalent power given the exploitation of additional model structure.
 
 % implications for HTA
 There are several implications for HTA by using the hierarchical mixture cure model presented here.
-In a cost-effectiveness analysis unstable estimates over time would give different estimates of benefit and thus cost-effectiveness statistics and potentially differing optimal decisions.
+In a cost-effectiveness analysis, unstable estimates over time would give different estimates of benefit and thus cost-effectiveness statistics and potentially differing optimal decisions.
 Lee~(2019)\cite{Lee2019} performed a cost-effectiveness analysis of using nivolumab with ipilimumab vs ipilimumab using the CheckMate 067 trial data, and a partitioned survival model and Markov state-transition model. Lifetime costs and benefits were estimated.
 Results were obtained using 18-month (when OS data were unavailable) and 36-month (OS available) CheckMate 067 data-cuts. They showed that the model using OS data generated more than 1 additional quality-adjusted life-year (QALY) across both treatment arms compared to the model without OS data.
-Using our approach, we have shown that reliable estimates of complete survival curves can be obtained even for early data-cuts. These can be used to estimate lifetime horizon benefits in instances where perhaps previously estimates were not available.
+Using our approach, we have shown that reliable estimates of complete survival curves for OS can be obtained even for early data-cuts. These can be used to estimate lifetime horizon benefits in instances where perhaps previously estimates were not available.
 In our example, the OS cure fraction is accurate and stable at 12 months for the hierarchical mixture cure model with exponential distributions for the OS and PFS uncured survival models.
-
-Additional benefits are potential early stopping (cheaper, improved health, quicker drugs to market for producers and patients benefit),
-smaller trials,
-
-The key conclusion of this paper is that data are available for better more efficient estimation of the outcomes of trials. Standard models are generally not up to the task but we have demonstrated a novel model which can achieve this.
+Additional benefits are potential early stopping (cheaper, improved health, quicker drugs to market for producers and patients benefit), smaller trials,
 
 
 % this doesnt go here
@@ -879,7 +877,7 @@ The key conclusion of this paper is that data are available for better more effi
 
 %%TODO:
 % \section*{Acknowledgements}
-% This is acknowledgement text.
+% We thank Victoria Federico Paly ...
 
 % \subsection*{Author contributions}
 
