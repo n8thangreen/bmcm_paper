@@ -10,7 +10,10 @@
 % \usepackage{endfloat}
 \usepackage{bm,amssymb,amsmath}
 \usepackage{trackchanges}  %http://trackchanges.sourceforge.net/help_stylefile.html
-	
+
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows, positioning}
+
 \usepackage{lineno}
 \linenumbers
 
@@ -129,7 +132,7 @@ To our knowledge there has been no Bayesian fully-parametric mixture cure model 
 % plan of the paper
 The paper is structured as follows.
 In the next section, the motivating example and data used throughout is outlined.
-We introduce the basic mixture cure model in Section~\ref{section:basic_model}, before extending this to our Bayesian hierarchical model in Section~\ref{section:hier_model}.
+We introduce the basic mixture cure model in Section~\ref{sec:basic_model}, before extending this to our Bayesian hierarchical model in Section~\ref{sec:hier_model}.
 In Section~\ref{sec:application} our novel modelling approach is applied to the motivating example dataset.
 Comparisons are made between our approach and an independent model analogue.
 Finally, in Section~\ref{sec:discussion} we discuss the results and future work.
@@ -201,7 +204,7 @@ and $\beta^{\mu}_{p}$ are the coefficients for an individual's measurements.
 The $[+ \ldots]$ term indicates additional components for the linear predictor (e.g.~structured random effects).
 The function $g(\cdot)$ is typically the logarithm.
 
-\subsection{The standard mixture cure model} \label{section:basic_model}
+\subsection{The standard mixture cure model} \label{sec:basic_model}
 Suppose that we observe a sustained plateau in the survival time data or have some other reason to believe that there is a long-term survivor group in our sample. We will now present the standard mixture cure model (sometimes called a long-term survival model) as the basis of our proposed extension.
 Denote the probability of being cured by the {\it cure fraction}, $\pi$.
 The term "cure" here refers to the type of statistical model and does not literally mean that they are cured of disease. In our case, cured means that a patient has responded to treatment and is a LTS.
@@ -238,7 +241,7 @@ The treatment index for an individual is included in the covariate vector $\bm{x
 Note that although we are including all treatments arms in the same model we are not assuming any relationship between them. In particular, we do not suppose proportional hazards. This allows greater flexibility for the cases when proportional hazards is violated.
 
 %% 
-\subsubsection{Issues modelling multiple end-points} \label{section:issues}
+\subsubsection{Issues modelling multiple end-points} \label{sec:issues}
 There are several potential issues with existing approaches to cure modelling, when applied to an HTA context in particular.
 
 % correlated events
@@ -259,7 +262,7 @@ This is particularly important for health economics modelling in order to gauge 
 
 % complexity penalising
 Furthermore, if there is heavy censoring for all endpoints, such as early data cuts, and the number of endpoints is small, then the data alone may not represent the true underlying survival curves, including the plateau for the cure fractions.
-At this point, additional sources of information should be principally incorporated into the model. A Bayesian paradigm naturally allows for the inclusion of external evidence from sources such as historical data and expert opinion. It is reasonable to assume, in the absence of additional information, that the cure fractions for all end points are drawn from the same or very similar distribution. In order to do this we can increase the amount of strength to borrow between end point data which strikes a balance between the information (or lack of) in the data and other knowledge \cite{Nikolaidis2021}. Practically, this corresponds to a reduction in the global cure fraction variance hyper parameter which in the limit is a base model with $\sigma_k=0$, equivalent to complete pooling of the data. 
+At this point, additional sources of information should be principally incorporated into the model. A Bayesian paradigm naturally allows for the inclusion of external evidence from sources such as historical data and expert opinion. It is reasonable to assume, in the absence of additional information, that the cure fractions for all end-points are drawn from the same or very similar distribution. In order to do this we can increase the amount of strength to borrow between end-point data which strikes a balance between the information (or lack of) in the data and other knowledge \cite{Nikolaidis2021}. Practically, this corresponds to a reduction in the global cure fraction variance hyper parameter which in the limit is a base model with $\sigma_k=0$, equivalent to complete pooling of the data. 
 
 % our innovative proposal
 We will now present a Bayesian hierarchical mixture cure model for multiple end-points.
@@ -267,13 +270,13 @@ This has the double advantage of borrowing information between end-points
 (e.g. in the case of OS and PFS, the likely more mature PFS data can inform the often highly censored OS analysis) and obtaining a single cure fraction estimate.
 
 %
-\subsection{The hierarchical mixture cure model} \label{section:hier_model}
-In this section, we show how to construct the extended mixture cure model in order to model multiple end-points together and alleviate the issues posed in the Section \ref{section:issues}.
+\subsection{The hierarchical mixture cure model} \label{sec:hier_model}
+In this section, we show how to construct the extended mixture cure model in order to model multiple end-points together and alleviate the issues posed in the Section \ref{sec:issues}.
 In order to do this, we must first introduce an additional index to denote an end-point $j = 1, \ldots, J$ --- typically, $J=2$ for PFS and OS.
 We can now define a separate mixture cure model, as described in equation~(\ref{eqn:mcm}), for each of the end-points $j$.
 With this in mind, let us consider three alternative multiple end-point incidence models for the estimation of the cure fraction for treatment $k$ and end-point $j$, denoted $\pi_{kj}$.
 
-Firstly, the approach taken so far, and presented in Section \ref{section:basic_model}, is to model the cure fraction corresponding to each end-point completely separately (no pooling), assuming that they are independent.
+Firstly, the approach taken so far, and presented in Section \ref{sec:basic_model}, is to model the cure fraction corresponding to each end-point completely separately (no pooling), assuming that they are independent.
 $$
 \pi_{kj} \perp\!\!\!\perp \pi_{kj'}, \; j,j' = 1, \ldots, J.
 %\text{logit}(\pi_k) \sim \text{N}(\mu_k, \sigma_k^2), \; k = 1, \ldots, K.
@@ -303,9 +306,59 @@ Note that pooling refers to the cure fractions. The survival times are not poole
 eg, in the complete pooling case we do not assume that PFS and OS have the same survival time distributions.
 However, in the complete and partial pooling case there is an indirect pooling effect for the latency models via the incidence model, so the fact that the cure fractions are similar/the same will influence the shapes of the survival curves.
 
+% BUGS diagram
+\tikzset{
+    events/.style={ellipse, draw, align=center},
+    data/.style={rectangle, draw, align=center},
+}
+
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=0.6\linewidth]{DAG_with_Tx.png}
+\begin{tikzpicture}[node distance=1cm, >=stealth']
+\node [events] (beta_pi) {$\beta^{\pi}$};
+\node [events, below = of beta_pi] (pi_sigma) {$\pi, \sigma^2$};
+\node [events, below left = of pi_sigma] (pi1) {$\pi_1$};
+\node [events, below right = of pi_sigma] (pi2) {$\pi_2$};
+\node [events, below = of pi1] (t1) {$t_1$};
+\node [events, left = of t1] (lambda1) {$\lambda_1$};
+\node [data, below = of lambda1] (X1) {$X_1$};
+\node [events, left = of lambda1] (beta1) {$\beta_1^{\lambda}$};
+\node [events, above = of beta1] (phi1) {$\phi_1$};
+\node [events, right = of X1] (h1) {$h_1$};
+\node [events, below = of pi2] (t2) {$t_2$};
+\node [events, right = of t2] (lambda2) {$\lambda_2$};
+\node [data, below = of lambda2] (X2) {$X_2$};
+\node [events, right = of lambda2] (beta2) {$\beta_2^{\lambda}$};
+\node [events, above = of beta2] (phi2) {$\phi_2$};
+\node [events, left = of X2] (h2) {$h_2$};
+\node [data, below right = of h1] (who) {$h$};
+
+\draw [->] (beta_pi) -- (pi_sigma);
+\draw [->] (pi_sigma) -- (pi1);
+\draw [->] (pi_sigma) -- (pi2);
+\draw [->] (pi1) -- (t1);
+\draw [->] (h1) -- (t1);
+\draw [->] (lambda1) -- (t1);
+\draw [->] (X1) -- (lambda1);
+\draw [->] (beta1) -- (lambda1);
+\draw [->] (phi1) -- (t1);
+\draw [->, dashed] (X1) -- (h1);
+\draw [->] (pi2) -- (t2);
+\draw [->] (h2) -- (t2);
+\draw [->] (lambda2) -- (t2);
+\draw [->] (X2) -- (lambda2);
+\draw [->] (beta2) -- (lambda2);
+\draw [->] (phi2) -- (t2);
+\draw [->, dashed] (X2) -- (h2);
+\draw [->, dashed] (who) -- (h1);
+\draw [->, dashed] (who) -- (h2);
+
+\draw (-4.2,-1) -- (4.2,-1) -- (4.2,-7.2) -- (-4.2,-7.2) -- (-4.2,-1);
+\draw (-3.9,-3.5) -- (3.9,-3.5) -- (3.9,-7) -- (-3.9,-7) -- (-3.9,-3.5);
+
+\node[align=left] at (-3,-1.3) {$k$ in $1, \ldots, N_k$};
+\node[align=left] at (-2.7,-3.7) {$i$ in $1, \ldots, N_i$};
+\end{tikzpicture}
 \caption{\label{fig:hier_dag} A hierarchical mixture cure model DAG for a trial with two end-points. The trial indices correspond to the motivating example end-points of PFS (1) and OS (2).
 Solid lines represent stochastic and dashed lines deterministic relationships, respectively.
 Cured patients have fixed hazards e.g. taken from life tables.
@@ -314,7 +367,7 @@ The distribution of times for uncured patient regresses on covariates for the ra
 
 %
 \section{Application}\label{sec:application}
-In this section we apply the models from Section~\ref{section:hier_model} to the CheckMate 067 dataset.
+In this section we apply the models from Section~\ref{sec:hier_model} to the CheckMate 067 dataset.
 We first detail the modelling aspects specific to this analysis before presenting the results.
 
 % software
@@ -827,7 +880,7 @@ Additional benefits are potential early stopping (cheaper, improved health, quic
 % may move to supplimentary material
 % TODO: prior derivation details
 % This first thing to do is work out the maximum standard deviation for the global cure fraction values we would be {\it likely} to see.
-% That is, if we expect the global cure fraction (which contribute the mean cure fraction for each end point) to not be very varied (and so OS and PFS means are similar) then the standard deviation would be small.
+% That is, if we expect the global cure fraction (which contribute the mean cure fraction for each end-point) to not be very varied (and so OS and PFS means are similar) then the standard deviation would be small.
 % Define the centred global cure fraction on the logit scale $x \sim \mbox{N}(0, \sigma^2)$.
 % \begin{eqnarray*}
 % p(\pi > \pi_{\mu} + \delta) &=& p(\mbox{logit}(\pi) > \mbox{logit}(\pi_{\mu} + \delta))\\
