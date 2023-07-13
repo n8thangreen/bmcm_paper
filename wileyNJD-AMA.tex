@@ -222,7 +222,7 @@ The $[+ \ldots]$ term indicates additional components for the linear predictor (
 The function $g(\cdot)$ is typically the logarithm.
 
 \subsection{The standard mixture cure model} \label{section:basic_model}
-Suppose that we observe a sustained plateau in the survival time data or have some other reason to believe that there is a long-term survivor group in our sample. We will now present the standard mixture cure model (sometimes called a long-term survival model) as the basis of the proposed model.
+Suppose that we observe a sustained plateau in the survival time data or have some other reason to believe that there is a long-term survivor group in our sample. We will now present the standard mixture cure model (sometimes called a long-term survival model) as the basis of our proposed extension.
 Denote the probability of being cured by the {\it cure fraction}, $\pi$.
 The term "cure" here refers to the type of statistical model and does not literally mean that they are cured of disease. In our case, cured means that a patient has responded to treatment and is a LTS.
 Because the cure models explicitly split patients in to two groups (cured or not) then the full set of model parameters consists of two separate groups.
@@ -231,7 +231,7 @@ In the standard cure model, cured individuals are usually assumed to have no cha
 There are several types of cure models and a rich and growing body of research in this area.
 (see \citep{Yu2013} for a comparison and guidance with application to oncology.)
 
-For an individual $i$ in a population with a cure fraction, the mixture cure model has the following survival model
+For an individual $i$ in a population with a cure fraction, the mixture cure model is associated with the following survival function
 
 \begin{equation}
 \label{eqn:mcm}
@@ -243,7 +243,7 @@ where $S(t) = 1 \!-\! \int_0^t p(s \mid \theta)\, \text{d}s$ denotes survival at
 $S_b(t \mid \bm\theta^b, \bm{x})$ is a function of the background mortality at time $t$ conditional on covariates $\bm{x}$,
 % some papers denote \pi as _uncured_ fraction
 and $S_u(t \mid \bm\theta^u, \bm{x})$ is a function of the (excess) mortality due to cancer at time $t$, conditional on covariates $\bm{x}$.
-The formulation in equation~(\ref{eqn:mcm}) can be thought of as comprising of two submodels: i) an \textit{incidence} model for the cure fraction $\pi$. The general term from epidemiology is the rate or probability of a disease; ii) a \textit{latency} model for the survival function of the uncured population $S_u$. This is 'hidden' since it cannot be directly observed from the data.
+The formulation in equation~(\ref{eqn:mcm}) can be thought of as comprising of two submodels: i) an \textit{incidence} model for the cure fraction $\pi$ (the general term from epidemiology is the rate or probability of a disease); and ii) a \textit{latency} model for the survival function of the uncured population $S_u$. This is 'hidden' since it cannot be directly observed from the data.
 
 The model above can be extended to account for multiple treatments, $K$; for instance, in our running example, $K=3$ and we could specify the cure fraction for treatment $k=1,\ldots,K$ using the following ``fixed'' effect model
 \begin{equation}
@@ -263,7 +263,7 @@ There are several potential issues with existing approaches to cure modelling, w
 
 % correlated events
 Firstly, when the end-points are correlated, such as with the common events of interest overall survival (OS) and progression-free survival (PFS), this ought to be accounted for in the modelling.
-There may be information in one sample of event times which we can use to improve the inference from another.
+There may be information in one sample of event times that we can use to improve the inference from another.
 Performing separate, independent analyses may even give counter-intuitive results.
 In the case of multiple types of end-points in the same trial, since the clinical interpretation of a cure fraction is the proportion of patients that are LTS,
 it may make intuitive sense that there is a single underlying cure fraction.
@@ -311,9 +311,9 @@ Lastly, and the approach proposed in this paper, is a compromise between the fir
 We propose a hierarchical structure on the cure fraction assuming exchangeability between all end-points $j$ for each treatment $k$.
 We assume that there is a single, shared "common" cure fraction from which the separate end-point specific cure fractions are obtained, corresponding to equation~(\ref{eqn:pi_regn})
 but where $\pi_{k}, \beta^{\pi}_{k}$ are no longer for particular end-points as before but now represent "global" values.
-Using the global cure fraction we can define the second-level end-point specific cure fractions to be normally distributed as
+Using the global cure fraction we can define the second-level end-point specific cure fractions as
 $$
-\text{logit}(\pi_{kj}) \sim \text{N}(\text{logit}(\pi_k), \sigma_k^2), \; j = 1, \ldots, J.  
+\text{logit}(\pi_{kj}) \sim \text{Normal}(\text{logit}(\pi_k), \sigma_k^2), \; j = 1, \ldots, J.  
 $$
 where $\sigma_k^2$ is the between-group (end-points) variance.
 The end-point specific cure fractions in our example are denoted $\pi_{PFS}, \pi_{OS}$.
@@ -351,29 +351,28 @@ Thus, the uncured population is subject to a background mortality risk in additi
 
 We used the World Health Organisation (WHO) life tables by country for the latest year available of 2016 \cite{wholifetables} to inform the background mortality in the mixture cure model.
 The baseline hazards are the expected mortality rate for each patient at the age at which they experience the event.
-The mortality data are adjusted for country, age and gender; thus providing a granular account of the different patient profiles in the trial.
+The mortality data are adjusted for country, age and gender. Thus, this structure provides a granular account of the different patient profiles in the trial.
 The WHO reports conditional probabilities of death in 5-year intervals until age 85.
 A constant annual mortality rate is reported for individuals over 85. They assumed that no-one lives beyond 100 years.
 Further details are provided in the supplementary material.
 
 In a Bayesian analysis, there are alternative ways in which we could model the background mortality.
 For this work we used WHO hazard point estimates as fixed and known.
-We could consider the WHO estimates to provide sufficiently accurate estimates given the sample size, and so incorporating uncertainty is not necessary. This also forces consistency across fits.
+We could consider the WHO estimates to provide sufficiently accurate estimates given the sample size, and so incorporating uncertainty is less crucial than in other cases. This also forces consistency across fits.
 Denote the fixed WHO estimates for individual $i$ used for the background survival in (\ref{eqn:mcm}) as
 $S_b(t_i \mid \bm\theta_b, \bm{x}_i) = \hat{S}_i$.
 
 % background adjustment
 It may be that the patients in the trial have a worse background survival than the average equivalent individual in the general population, and so naively using the WHO life tables will over-estimate their survival times.
-There are several possible ways that this could be addressed.
+There are several possible ways in which this could be addressed.
 For example, using only the complete responders in the sample, who are clinically confirmed as cured, it is possible to obtain a posterior distribution for a hazard ratio between these and a WHO estimate baseline.
 This can serve as a prior in the main model in a two-step approach. Alternatively, prior belief could be defined explicitly using expert knowledge.
 This could be elicited directly for the hazard ratio or on a natural scale, such as mean lifetime, and transformed.
 
 %
 \subsection{Prior specification}
-Where possible, the choice of priors should be informed by expert opinion and prior results.
 We specify vague priors on log-scale for the coefficients of the OS and PFS rates $\log(\lambda_{OS}),  \log(\lambda_{PFS})$.
-Centering the ages, the baseline is a vague prior ${\beta_0^{PFS} \sim \text{N}(0, 100),}\; {\beta_0^{OS} \sim \text{N}(0, 100)}$
+Centering the ages, the baseline is also associated with a vague prior: ${\beta_0^{PFS} \sim \text{N}(0, 100),}\; {\beta_0^{OS} \sim \text{N}(0, 100)}$
 and for age $\beta_{age}^{PFS} \sim \text{N}(0, 100),\; \beta_{age}^{OS} \sim \text{N}(0, 100)$.
 Alternatively, we could specify the cure fraction directly using a Beta prior distribution $\pi \sim \text{Beta}(a, b)$.
 The parameters can be obtained via transformation of the mean and standard deviation to allow a more natural scale for elicitation.
@@ -390,7 +389,7 @@ Alternatively, a noninformative uniform prior density on standard deviation para
 For small hierarchical variance a $\text{Gamma}(2, 0.1)$ may be preferred \cite{Chung2013}.
 
 % cut-point data
-As discussed, the early phase of a trial is not very informative of the cure fraction if no plateauing is yet to occur. In this situation, we can take advantage of the Bayesian hierarchical structure. In the absence of other evidence, it is reasonable to assume that the cure fractions for each end-point are from the same distribution which corresponds to a narrow prior on the between-group standard deviation at the global cure fraction level. 
+As discussed, the early phase of a trial is not very informative of the cure fraction if no plateauing is yet to occur. In this situation, we can take advantage of the Bayesian hierarchical structure. In the absence of other evidence, it is reasonable to assume that uncertainty about the cure fractions for each end-point can be modelled using a common distribution, which corresponds to a narrow prior on the between-group standard deviation at the global cure fraction level. 
 Firstly, adopting the same family of prior distributions as in the main analysis when using complete data, then suppose a two-tailed confidence interval of approximately 99\% of the density so significance level $\alpha = 0.01$.
 This gives $\sigma_k \sim \mbox{N}(0, 0.06^2)\mathbb{I}(0,)$ for $p(\pi_k > 0.55) = 0.005$, ie, 99\% interval [0.45, 0.55], and $\sigma_k \sim \mbox{N}(0, 0.03^2)\mathbb{I}(0,)$ for $p(\pi_k > 0.525) = 0.005$.
 Alternatively, we can use a {\it Penalised Complexity (PC)} prior which preferences a base model of greatest simplicity \cite{Simpson2017}.
@@ -407,10 +406,8 @@ We can see how this corresponds to the prior uncertainty on the cure fraction sc
 
 
 %
-\subsection{Choice of survival distributions}
-The hierarchical and separate models were fit for Exponential, Weibull, Gompertz, Log-Normal, Log-Logistic to the OS and PFS event times.
-% which distributions
-These are distributions from a suite of distributions given in NICE guidelines for Health Technology Assessments (HTA) \cite{Latimer2011}.
+\subsection{Parametric models for the sampling variability}
+To model the sampling variability in the observed OS and PFS event times we use the Exponential, Weibull, Gompertz, Log-Normal and Log-Logistic distributions. These are among a those recommended by NICE guidelines for Health Technology Assessments (HTA) \cite{Latimer2011}.
 In general, providing this list has been interpreted by many in the HTA literature as meaning all of these distributions should be modelled with a given data set.
 This prescriptive approach does not take into account what may be known {\it a priori} about the problem.
 In reality, a subset of these parametric models will be more plausible for the data and so these are the ones that should be investigated.
