@@ -1,4 +1,5 @@
 \documentclass[AMA,STIX1COL]{WileyNJD-v2}
+
 \usepackage{graphicx}
 \usepackage{wrapfig}
 % \usepackage{lscape}
@@ -8,11 +9,14 @@
 \usepackage{float}
 \usepackage{subfig}
 % \usepackage{endfloat}
-\usepackage{bm,amssymb,amsmath}
+\usepackage{amssymb,amsmath}
+\usepackage{bm}
 \usepackage{trackchanges}  %http://trackchanges.sourceforge.net/help_stylefile.html
 
 \usepackage{tikz}
 \usetikzlibrary{shapes, arrows, positioning}
+\usetikzlibrary{external}
+\tikzexternalize  % activate
 
 \usepackage{lineno}
 \linenumbers
@@ -29,6 +33,8 @@
 \raggedbottom
 
 \begin{document}
+
+% tikzset{external/force remake}
 
 \title{A Bayesian hierarchical mixture cure model demonstrated with data from the CheckMate 067 trial}
 % \protect\thanks{title footnote.}}
@@ -47,7 +53,7 @@
 
 \address[1]{\orgdiv{Department of Statistical Science}, \orgname{UCL}, \orgaddress{\state{London}, \country{UK}}}
 
-\address[2]{\orgdiv{Worldwide Health Economics & Outcomes Research}, \orgname{Bristol Myers Squibb}, \orgaddress{\state{NJ}, \country{USA}}}
+\address[2]{\orgdiv{Worldwide Health Economics and Outcomes Research}, \orgname{Bristol Myers Squibb}, \orgaddress{\state{NJ}, \country{USA}}}
 
 \address[3]{\orgname{The Royal Marsden Hospital}, \orgaddress{\state{London}, \country{UK}}} %james.larkin@rmh.nhs.uk
 
@@ -73,9 +79,8 @@ We show the benefits of using our approach with a motivating example, the CheckM
 \keywords{Bayesian, survival analysis, oncology}
 
 \jnlcitation{\cname{%
-\author{Green N.}, and
-\author{G. Baio}} (\cyear{2021}), 
-\ctitle{}, \cvol{2017;00:1--6}.}
+\author{Green N.} et al} (\cyear{2024}), 
+\ctitle{}, \cvol{1; 00:1--6}.}
 
 \maketitle
 
